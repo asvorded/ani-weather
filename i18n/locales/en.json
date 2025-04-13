@@ -1,0 +1,8 @@
+{
+  "townSelect": {
+    "textField": {
+      "placeholder": "Find cities..."
+    },
+    "popularCities": "Popular cities"
+  }
+}

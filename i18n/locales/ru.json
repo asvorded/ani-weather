@@ -1,0 +1,8 @@
+{
+  "townSelect": {
+    "textField": {
+      "placeholder": "Поиск городов..."
+    },
+    "popularCities": "Популярные города"
+  }
+}
