@@ -15,17 +15,17 @@ import { initReactI18next } from 'react-i18next';
 i18next
   .use(initReactI18next)
   .init({
-    lng: "ru",
-    fallbackLng: "en",
+    lng: 'ru',
+    fallbackLng: 'en',
     debug: true,
     resources: {
       ru: {
-        translation: ru
+        translation: ru,
       },
       en: {
-        translation: en
-      }
-    }
-  })
+        translation: en,
+      },
+    },
+  });
 
 AppRegistry.registerComponent(appName, () => App);
