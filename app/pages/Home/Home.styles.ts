@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     temperatureMain: {
-        fontFamily: 'BellotaText-Regular',
+        // fontFamily: 'BellotaText-Regular',
         fontSize: 70,
     },
     mask: {

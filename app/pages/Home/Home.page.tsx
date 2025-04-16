@@ -1,15 +1,21 @@
-import {ImageBackground, Text, View} from 'react-native';
+import {Button, ImageBackground, TouchableOpacity, View} from 'react-native';
 import React, {StrictMode} from 'react';
 import {useTranslation} from 'react-i18next';
-import { styles } from '../styles/HomePageStyle.ts';
+import { styles } from './Home.styles.ts';
 import LinearGradient from 'react-native-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
+import { CustomText } from '../../components/CustomText/CustomText.tsx';
+import { PagesNames } from '../../types/common/root-stack-params-list.ts';
+import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
+
 const HomePage = ()=> {
     let { t } = useTranslation();
+    const navigation = useCustomNavigation();
+
     return (
         <StrictMode>
             <ImageBackground
-                source={require('./../assets/images/sample_1920×1280.png')}
+                source={require('./../../../assets/images/sample_1920×1280.png')}
                 resizeMode="cover"
             >
         <View style={styles.container}>
@@ -26,7 +32,7 @@ const HomePage = ()=> {
                         />
                     }
                 >
-                    <Text style={styles.temperatureMain}>10°C</Text>
+                    <CustomText style={styles.temperatureMain}>10°C</CustomText>
                 </MaskedView>
             </View>
            <View style={styles.detailsGrid}>
@@ -60,6 +66,9 @@ const HomePage = ()=> {
                    </View>
                </View>
             </View>
+            <TouchableOpacity onPress={() => navigation.navigate(PagesNames.TownSelect)}>
+                <View style={{ backgroundColor: 'white' }}><CustomText>Go to TownSelect</CustomText></View>
+            </TouchableOpacity>
         </View>
             </ImageBackground>
         </StrictMode>
