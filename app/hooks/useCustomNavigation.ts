@@ -4,5 +4,5 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamsList } from '../types/common/root-stack-params-list';
 
 export function useCustomNavigation() {
-    return useNavigation<NativeStackNavigationProp<RootStackParamsList>>();
+  return useNavigation<NativeStackNavigationProp<RootStackParamsList>>();
 }

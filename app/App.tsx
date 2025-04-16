@@ -30,10 +30,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <SystemBars style="auto"/>
-
-      {/* <SafeAreaView> */}
-      <Navigation />
-      {/* </SafeAreaView> */}
+        <Navigation />
     </SafeAreaProvider>
   );
 };

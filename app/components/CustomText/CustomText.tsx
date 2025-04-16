@@ -5,12 +5,12 @@ import { CustomTextProps } from './CustomText.types';
 
 
 export const CustomText: React.FC<CustomTextProps> = ({ children, style, ...restProps }: CustomTextProps) => {
-    return (
-        <Text
-            style={[styles.text, style]}
-            {...restProps}
-        >
-            {children}
-        </Text>
-    );
+  return (
+    <Text
+      style={[styles.text, style]}
+      {...restProps}
+    >
+      {children}
+    </Text>
+  );
 };

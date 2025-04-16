@@ -1,4 +1,4 @@
-import { City } from '../../models/City';
+import { City } from '../types/api/City';
 
 export { getPopularCitiesAsync };
 
