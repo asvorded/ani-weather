@@ -24,19 +24,19 @@ const TownSelect = () => {
 
   return (
     <View style={[
-        {
-          marginTop: insets.top,
-          marginBottom: insets.bottom,
-        },
-        styles.screen,
-      ]}
+      {
+        marginTop: insets.top,
+        marginBottom: insets.bottom,
+      },
+      styles.screen,
+    ]}
     >
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder={t('townSelect.textField.placeholder')}
           numberOfLines={1}
-          />
+        />
         <Image
           style={styles.locationIcon}
           source={require('../../../assets/logos/location.png')}
