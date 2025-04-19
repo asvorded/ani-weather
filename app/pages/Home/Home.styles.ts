@@ -1,5 +1,9 @@
 import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    backgroundColor: '#FAE3D2',
+  },
   container: {
     paddingHorizontal: 20,
     paddingTop: 25,
@@ -21,6 +25,8 @@ export const styles = StyleSheet.create({
   },
   detailsGrid:{
     width: '100%',
+    display: 'flex',
+    gap: 20,
   },
   city: {
     fontFamily: 'BellotaText-Regular',
@@ -39,6 +45,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    gap: 20,
   },
   cell: {
     justifyContent: 'center',
@@ -47,22 +54,21 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
   },
   detailsPanel:{
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderRadius: 20,
-    width: 150,
+    width: '100%',
     height: 100,
-    margin: 20,
     backgroundColor: '#A9E788',
     borderWidth: 1,
     borderStyle: 'solid',
   },
   forecastPanel:{
+    width: '100%',
     borderRadius: 20,
-    width: 340,
     height: 100,
-    margin: 20,
     backgroundColor: '#A9E788',
     borderWidth: 1,
     borderStyle: 'solid',
   },
-
 });

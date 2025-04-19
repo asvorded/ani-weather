@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {useFonts} from 'expo-font';
@@ -28,10 +28,12 @@ const App = () => {
   });
 
   return (
-    <SafeAreaProvider>
-      <SystemBars style="auto"/>
-      <Navigation />
-    </SafeAreaProvider>
+    <StrictMode>
+      <SafeAreaProvider>
+        <SystemBars style="auto"/>
+        <Navigation />
+      </SafeAreaProvider>
+    </StrictMode>
   );
 };
 
