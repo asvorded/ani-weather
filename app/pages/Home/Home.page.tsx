@@ -5,6 +5,8 @@ import {useTranslation} from 'react-i18next';
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
 import { WeatherDetailedPanelProps } from './Home.types.ts';
+import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
+import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
 
 
 const WeatherDetailedPanel = ({
@@ -35,6 +37,7 @@ const WeatherPanel = () => {
         <CustomText style={styles.cityText}>Минск</CustomText>
       </View>
       <View style={styles.weatherMainContainer}>
+        <WeatherIcon type={WeatherIconType.PartlyCloudyDay} size={130} />
         <View />
         <CustomText style={styles.temperatureMain}>10°C</CustomText>
       </View>

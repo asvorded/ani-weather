@@ -45,6 +45,7 @@ export const styles = StyleSheet.create({
   },
   cityText: {
     fontSize: 24,
+    marginBottom: -10,
   },
   weatherDescriptionText: {
     fontSize: 16,
