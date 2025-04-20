@@ -92,4 +92,10 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
   },
+  moonPhaseComponent: {
+    height: 65,
+    width: 65,
+    borderRadius: '50%',
+    backgroundColor: '#F7F7F7',
+  },
 });

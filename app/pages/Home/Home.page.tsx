@@ -30,6 +30,12 @@ const WeatherDetailedPanel = ({
   );
 };
 
+const MoonPhaseComponent = () => {
+  return (
+    <View style={styles.moonPhaseComponent} />
+  );
+};
+
 const HomePage = ()=> {
   let { t } = useTranslation();
 
@@ -60,7 +66,7 @@ const HomePage = ()=> {
               color="#A9E78888"
               title="Фаза луны"
               text="Первая четверть"
-              contentElement={<CustomText>Test</CustomText>}
+              contentElement={<MoonPhaseComponent />}
             />
             <WeatherDetailedPanel
               color="#B3DBFF88"
