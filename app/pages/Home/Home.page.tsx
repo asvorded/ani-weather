@@ -76,36 +76,36 @@ const HomePage = ()=> {
             />
             <WeatherDetailedPanel
               color="#B3DBFF88"
-              title="Фаза луны"
-              text="Полнолуние"
+              title="Геомагнитная активность"
+              text="Слабая буря"
               contentElement={<></>}
             />
           </View>
           <View style={styles.row}>
             <WeatherDetailedPanel
               color="#FFE17988"
-              title="Фаза луны"
-              text="Полнолуние"
+              title="Влажность"
+              text="Высокая"
               contentElement={<></>}
             />
             <WeatherDetailedPanel
               color="#FBB9BA88"
-              title="Фаза луны"
-              text="Полнолуние"
+              title="Атмосферное давление"
+              text="Повышенное"
               contentElement={<></>}
             />
           </View>
           <View style={styles.row}>
             <WeatherDetailedPanel
               color="#FF9A7988"
-              title="Фаза луны"
-              text="Полнолуние"
+              title="Ветер"
+              text="14.8 км/ч (ЮЗ)"
               contentElement={<></>}
             />
             <WeatherDetailedPanel
               color="#B9F4FB88"
-              title="Фаза луны"
-              text="Полнолуние"
+              title="Качество воздуха"
+              text="Хорошее"
               contentElement={<></>}
             />
           </View>
