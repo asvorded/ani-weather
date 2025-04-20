@@ -1,8 +1,6 @@
 import {ScrollView, View} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import LinearGradient from 'react-native-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
@@ -30,6 +28,24 @@ const WeatherDetailedPanel = ({
   );
 };
 
+const WeatherPanel = () => {
+  return (
+    <View style={styles.topContainer}>
+      <View style={styles.cityWrapper}>
+        <CustomText style={styles.cityText}>Минск</CustomText>
+      </View>
+      <View style={styles.weatherMainContainer}>
+        <View />
+        <CustomText style={styles.temperatureMain}>10°C</CustomText>
+      </View>
+      <View style={styles.weatherDescriptionContainer}>
+        <CustomText style={styles.weatherDescriptionText}>Переменная облачность</CustomText>
+        <CustomText style={styles.temperatureAmplitudeText}>15°/7°</CustomText>
+      </View>
+    </View>
+  );
+};
+
 const MoonPhaseComponent = () => {
   return (
     <View style={styles.moonPhaseComponent} />
@@ -44,22 +60,9 @@ const HomePage = ()=> {
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        overScrollMode="never"
       >
-        <View style={styles.topContainer} >
-          <MaskedView
-            maskElement={
-              <LinearGradient
-                style={styles.mask}
-                colors={['rgba(0,0,0,1)', 'rgba(0,0,0,0.0)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                locations={[0, 1]}
-              />
-            }
-          >
-            <CustomText style={styles.temperatureMain}>10°C</CustomText>
-          </MaskedView>
-        </View>
+        <WeatherPanel />
         <View style={styles.detailsGrid}>
           <View style={styles.row}>
             <WeatherDetailedPanel

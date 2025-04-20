@@ -19,8 +19,8 @@ export const styles = StyleSheet.create({
     color: 'black',
   },
   topContainer: {
-    backgroundColor: 'transparent',
-    height: 200,
+    marginTop: 30,
+    marginBottom: 40,
     width: '100%',
   },
   detailsGrid:{
@@ -28,15 +28,32 @@ export const styles = StyleSheet.create({
     display: 'flex',
     gap: 20,
   },
-  city: {
-    fontFamily: 'BellotaText-Regular',
+  weatherMainContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  weatherDescriptionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cityWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  cityText: {
     fontSize: 24,
-    color: 'black',
-    backgroundColor: 'transparent',
+  },
+  weatherDescriptionText: {
+    fontSize: 16,
   },
   temperatureMain: {
-    // fontFamily: 'BellotaText-Regular',
     fontSize: 70,
+  },
+  temperatureAmplitudeText: {
+    fontSize: 20,
   },
   mask: {
     flex: 1,
