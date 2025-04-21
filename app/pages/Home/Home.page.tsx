@@ -7,7 +7,9 @@ import { CustomText } from '../../components/CustomText/CustomText.tsx';
 import { WeatherDetailedPanelProps } from './Home.types.ts';
 import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
 import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
-
+import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
+import WindCompassImg from '../../../assets/images/compass.svg';
+import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 
 const WeatherDetailedPanel = ({
   color,
@@ -55,6 +57,48 @@ const MoonPhaseComponent = () => {
   );
 };
 
+const MagneticActivityComponent = () => {
+  return (
+    <View style={styles.magneticActivityComponent}>
+      <MagneticActivityImg height={65} width={65} />
+      <CustomText style={styles.magneticActivityText}>5</CustomText>
+    </View>
+  );
+};
+
+const HumidityComponent = () => {
+  return (
+    <View style={styles.humidityComponent}>
+      <CustomText style={styles.humidityText}>90%</CustomText>
+    </View>
+  );
+};
+
+const PressureComponent = () => {
+  return (
+    <View style={styles.pressureComponent}>
+      <CustomText style={styles.pressureText}>1034</CustomText>
+      <CustomText style={styles.pressureTextSmall}>mbar</CustomText>
+    </View>
+  );
+};
+
+const WindComponent = () => {
+  return (
+    <View style={styles.windComponent}>
+      <WindCompassImg
+        height={52}
+        width={52}
+        style={styles.windCompassImg}
+      />
+      <WindCompassArrowImg
+        height={30}
+        style={[styles.windCompassArrowImg, { transform: [{ rotate: '30deg' }] }]}
+      />
+    </View>
+  );
+};
+
 const HomePage = ()=> {
   let { t } = useTranslation();
 
@@ -78,7 +122,7 @@ const HomePage = ()=> {
               color="#B3DBFF88"
               title="Геомагнитная активность"
               text="Слабая буря"
-              contentElement={<></>}
+              contentElement={<MagneticActivityComponent />}
             />
           </View>
           <View style={styles.row}>
@@ -86,13 +130,13 @@ const HomePage = ()=> {
               color="#FFE17988"
               title="Влажность"
               text="Высокая"
-              contentElement={<></>}
+              contentElement={<HumidityComponent />}
             />
             <WeatherDetailedPanel
               color="#FBB9BA88"
               title="Атмосферное давление"
               text="Повышенное"
-              contentElement={<></>}
+              contentElement={<PressureComponent />}
             />
           </View>
           <View style={styles.row}>
@@ -100,7 +144,7 @@ const HomePage = ()=> {
               color="#FF9A7988"
               title="Ветер"
               text="14.8 км/ч (ЮЗ)"
-              contentElement={<></>}
+              contentElement={<WindComponent />}
             />
             <WeatherDetailedPanel
               color="#B9F4FB88"
