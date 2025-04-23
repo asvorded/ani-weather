@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
 import { City } from '../../types/api/City';
-import { cityQueryPredicate, findCitiesAsync, getPopularCitiesAsync } from '../../services/CitiesProvider';
+import { filterCitiesByQuery, findCitiesAsync, getPopularCitiesAsync } from '../../services/CitiesProvider';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -45,11 +45,11 @@ const TownSelect = () => {
     if (locationError != null) {
       hideLocationError();
     }
-    setQuery(query);
 
-    setFoundCities(foundCities.filter((city) =>
-      cityQueryPredicate(city, query)
-    ));
+    setQuery(query);
+    query = query.trim();
+
+    setFoundCities(filterCitiesByQuery(foundCities, query));
 
     if (isQueryLongEnough(query)) {
       foundCities = await findCitiesAsync(query);
@@ -63,11 +63,11 @@ const TownSelect = () => {
     setLocationError(null);
 
     findLocationWithCallbacks((position) => {
+      setIsFindingLocation(false);
       // 
-      setIsFindingLocation(false);
     }, (error) => {
-      setLocationError(error.message);
       setIsFindingLocation(false);
+      setLocationError(error.message);
     });
   }
 
@@ -77,15 +77,13 @@ const TownSelect = () => {
   }
 
   return (
-    <View
-      style={[
-        {
-          marginTop: insets.top,
-          marginBottom: insets.bottom,
-        },
-        styles.screen,
-      ]}
-    >
+    <View style={[
+      {
+        marginTop: insets.top,
+        marginBottom: insets.bottom,
+      },
+      styles.screen,
+    ]}>
       <SystemBars style="dark"/>
 
       <View style={styles.inputContainer} key="input">

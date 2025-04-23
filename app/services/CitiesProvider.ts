@@ -1,11 +1,5 @@
 import { City } from '../types/api/City';
 
-export {
-  getPopularCitiesAsync,
-  findCitiesAsync,
-  cityQueryPredicate,
-};
-
 const cities: City[] = [
   {
     id: 0,
@@ -58,7 +52,7 @@ const cities: City[] = [
   },
 ];
 
-async function getPopularCitiesAsync(): Promise<City[]> {
+export async function getPopularCitiesAsync(): Promise<City[]> {
   // Wait 2 seconds
   await new Promise((resolve) => {
     setTimeout(resolve, 2000);
@@ -67,17 +61,19 @@ async function getPopularCitiesAsync(): Promise<City[]> {
   return cities;
 }
 
-async function findCitiesAsync(query: string) {
+export async function findCitiesAsync(query: string) {
   // wait 1 second
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
 
-  return cities.filter((city) =>
-    cityQueryPredicate(city, query)
-  );
+  return filterCitiesByQuery(cities, query);
 }
 
-function cityQueryPredicate(city: City, query: string) {
-  return city.name.toUpperCase().indexOf(query.toUpperCase()) >= 0;
+export function filterCitiesByQuery(cities: City[], query: string) {
+  query = query.trim().toLowerCase();
+
+  return cities.filter((city) =>
+    city.name.toLowerCase().indexOf(query) >= 0
+  );
 }
