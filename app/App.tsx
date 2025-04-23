@@ -1,5 +1,4 @@
 import React from 'react';
-import { SystemBars } from 'react-native-edge-to-edge';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {useFonts} from 'expo-font';
 import { createStaticNavigation } from '@react-navigation/native';
@@ -29,7 +28,6 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <SystemBars style="auto"/>
       <Navigation />
     </SafeAreaProvider>
   );

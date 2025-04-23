@@ -8,6 +8,7 @@ import { CustomText } from '../../components/CustomText/CustomText.tsx';
 import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 const HomePage = ()=> {
   let { t } = useTranslation();
@@ -16,6 +17,8 @@ const HomePage = ()=> {
 
   return (
     <StrictMode>
+      <SystemBars style="light"/>
+
       <ImageBackground
         source={require('./../../../assets/images/sample_1920×1280.png')}
         resizeMode="cover"

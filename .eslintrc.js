@@ -4,5 +4,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-unused-vars': 'warn',
     'indent': ['warn', 2],
+    '@typescript-eslint/no-shadow': 'off',
+    'react/no-unstable-nested-components': 'off', // ???
   },
 };

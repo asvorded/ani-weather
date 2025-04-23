@@ -3,6 +3,9 @@
     "textField": {
       "placeholder": "Find cities..."
     },
-    "popularCities": "Popular cities"
+    "popularCities": "Popular cities",
+    "location": {
+      "errorPrefix": "Error: "
+    }
   }
 }

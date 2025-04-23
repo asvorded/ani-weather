@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   screen: {
     paddingHorizontal: 15,
+    paddingTop: 15,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -25,14 +26,68 @@ export const styles = StyleSheet.create({
     width: 28,
     height: 28,
   },
-  text: {
-    marginVertical: 10,
-    marginHorizontal: 10,
+  locationImage: {
+    width: '100%',
+    height: '100%',
   },
-  suggestedCities: {
+  citiesContainer: {
+    marginVertical: 20,
+  },
+  popularCitiesText: {
+    marginHorizontal: 10,
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  popularCitiesContainer: {
     position: 'relative',
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  popularCity: {
+    marginRight: 10,
+    marginBottom: 10,
+
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 50,
+    backgroundColor: '#d9d9d9',
+  },
+  foundCity: {
+    display: 'flex',
+    justifyContent: 'center',
+    paddingVertical: 15,
+  },
+  foundCityText: {
+    fontSize: 16,
+  },
+  foundCitiesSeparator: {
+    width: '100%',
+    height: 1,
+    backgroundColor: 'lightgray',
+  },
+  locationErrorContainer: {
+    marginTop: 2,
+    marginHorizontal: 30,
+    backgroundColor: '#ff9393',
+    position: 'relative',
+    borderRadius: 10,
+  },
+  locationErrorText: {
+    textAlign: 'center',
+    color: 'white',
+    marginHorizontal: 40,
+    marginVertical: 12,
+  },
+  locationErrorClose: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 35,
+    height: 35,
+  },
+  locationErrorCloseIcon: {
+    width: '100%',
+    height: '100%',
   },
 });
