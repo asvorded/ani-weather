@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
 import { City } from '../../types/api/City';
-import { filterCitiesByQuery, findCitiesAsync, getPopularCitiesAsync } from '../../services/CitiesProvider';
+import { filterCitiesByQuery, findCitiesAsync, getPopularCitiesAsync, getReadableCountry } from '../../services/CitiesProvider';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -141,8 +141,8 @@ const TownSelect = () => {
             <Text style={styles.popularCitiesText}>{t('townSelect.popularCities')}</Text>
             <View>
               <View style={styles.popularCitiesContainer}>{
-                popularCities.map((city) => (
-                  <PopularCity key={city.id} name={city.name}/>
+                popularCities.map((city, index) => (
+                  <PopularCity key={index} name={city.name}/>
                 ))
               }</View>
             </View>
@@ -177,7 +177,7 @@ const FoundCities = (
     renderItem={({item}) => (
       <TouchableOpacity style={styles.foundCity}>
         <Text style={styles.foundCityText}>{item.name}</Text>
-        <Text style={styles.foundCityCountryText}>{item.country}</Text>
+        <Text style={styles.foundCityCountryText}>{getReadableCountry(item)}</Text>
       </TouchableOpacity>
     )}
     ItemSeparatorComponent={() => (

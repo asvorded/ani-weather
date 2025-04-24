@@ -1,73 +1,72 @@
+import axios from 'axios';
 import { City } from '../types/api/City';
+
+const searchUrl: string = 'https://nominatim.openstreetmap.org/search';
 
 const popularCities: City[] = [
   {
-    id: 0,
     name: 'Минск',
+    region: 'Минская область',
     country: 'Беларусь',
-    longitude: 0,
-    latitide: 0,
+    longitude: 27.5618225,
+    latitide: 53.9024716,
   },
   {
-    id: 1,
     name: 'Кировск',
+    region: 'Могилевская область',
     country: 'Беларусь',
-    longitude: 0,
-    latitide: 0,
+    longitude: 29.4716,
+    latitide: 53.27022,
   },
   {
-    id: 2,
     name: 'Могилев',
+    region: 'Могилевская область',
     country: 'Беларусь',
-    longitude: 0,
-    latitide: 0,
-  },
-  {
-    id: 3,
-    name: 'Новополоцк',
-    country: 'Беларусь',
-    longitude: 0,
-    latitide: 0,
-  },
-  {
-    id: 4,
-    name: 'Бобруйск',
-    country: 'Беларусь',
-    longitude: 0,
-    latitide: 0,
-  },
-  {
-    id: 5,
-    name: 'Витебск',
-    country: 'Беларусь',
-    longitude: 0,
-    latitide: 0,
-  },
-  {
-    id: 6,
-    name: 'Полоцк',
-    country: 'Беларусь',
-    longitude: 0,
-    latitide: 0,
+    longitude: 30.3429838,
+    latitide: 53.9090245,
   },
 ];
 
 export async function getPopularCitiesAsync(): Promise<City[]> {
-  // Wait 2 seconds
-  await new Promise((resolve) => {
-    setTimeout(resolve, 2000);
-  });
-
   return popularCities;
 }
 
 export async function findCitiesAsync(query: string) {
-  // wait 1 second
-  await new Promise((resolve) => {
-    setTimeout(resolve, 1000);
+  // Potential exception ignored beacuse there is no need to handle it
+  let response = await axios.get(searchUrl, {
+    params: {
+      city: query,
+      format: 'geojson',
+      featureType: 'city',
+      addressdetails: 1,
+    },
+    headers: {
+      'Accept-Language': 'ru', // TODO: Language according to location
+    },
   });
 
-  return filterCitiesByQuery(popularCities, query);
+  let foundCities: any[] = response.data.features;
+  return foundCities.map((cityJson): City => {
+    let address = cityJson.properties.address;
+
+    let name = cityJson.properties.name;
+    let country = address.country;
+    let lon = cityJson.geometry.coordinates[0];
+    let lat = cityJson.geometry.coordinates[1];
+
+    // Extract region
+    let region = Object.values(cityJson.properties.address)
+      .slice(1, Object.keys(cityJson.properties.address).indexOf('ISO3166-2-lvl4'))
+      .join(', ');
+
+    return {
+      name: name,
+      region: region,
+      country: country,
+      longitude: lon,
+      latitide: lat,
+    };
+  });
 }
 
 export function filterCitiesByQuery(cities: City[], query: string) {
@@ -76,4 +75,12 @@ export function filterCitiesByQuery(cities: City[], query: string) {
   return cities.filter((city) =>
     city.name.toLowerCase().indexOf(query) >= 0
   );
+}
+
+export function getReadableCountry(city: City): string {
+  if (city.region !== undefined) {
+    return `${city.region}, ${city.country}`;
+  } else {
+    return city.country;
+  }
 }
