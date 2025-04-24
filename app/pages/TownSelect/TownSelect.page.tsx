@@ -64,11 +64,11 @@ const TownSelect = () => {
 
     findLocationWithCallbacks((position) => {
       setIsFindingLocation(false);
-      // 
+      // TODO: Goto to main screen with found location
     }, (error) => {
       setIsFindingLocation(false);
       setLocationError(error.message);
-    });
+    }, 15_000);
   }
 
   // Hide location error
@@ -112,7 +112,7 @@ const TownSelect = () => {
             <ActivityIndicator
               style={styles.locationImage}
               size="small"
-              color="#4B77D1"
+              color={styles.locationImage.color}
             />
           )}
         </View>
@@ -177,6 +177,7 @@ const FoundCities = (
     renderItem={({item}) => (
       <TouchableOpacity style={styles.foundCity}>
         <Text style={styles.foundCityText}>{item.name}</Text>
+        <Text style={styles.foundCityCountryText}>{item.country}</Text>
       </TouchableOpacity>
     )}
     ItemSeparatorComponent={() => (

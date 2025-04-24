@@ -1,6 +1,6 @@
 import { City } from '../types/api/City';
 
-const cities: City[] = [
+const popularCities: City[] = [
   {
     id: 0,
     name: 'Минск',
@@ -58,7 +58,7 @@ export async function getPopularCitiesAsync(): Promise<City[]> {
     setTimeout(resolve, 2000);
   });
 
-  return cities;
+  return popularCities;
 }
 
 export async function findCitiesAsync(query: string) {
@@ -67,7 +67,7 @@ export async function findCitiesAsync(query: string) {
     setTimeout(resolve, 1000);
   });
 
-  return filterCitiesByQuery(cities, query);
+  return filterCitiesByQuery(popularCities, query);
 }
 
 export function filterCitiesByQuery(cities: City[], query: string) {

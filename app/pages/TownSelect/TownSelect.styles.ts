@@ -29,6 +29,7 @@ export const styles = StyleSheet.create({
   locationImage: {
     width: '100%',
     height: '100%',
+    color: '#4B77D1',
   },
   citiesContainer: {
     marginVertical: 20,
@@ -60,6 +61,9 @@ export const styles = StyleSheet.create({
   },
   foundCityText: {
     fontSize: 16,
+  },
+  foundCityCountryText: {
+    color: 'gray',
   },
   foundCitiesSeparator: {
     width: '100%',
