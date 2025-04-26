@@ -31,17 +31,33 @@ export async function getPopularCitiesAsync(): Promise<City[]> {
   return popularCities;
 }
 
-export async function findCitiesAsync(query: string) {
+let inputTimeout: NodeJS.Timeout | null = null;
+
+export function findCitiesWithTimeout(
+  query: string,
+  callback: (cities: City[]) => void
+) {
+  if (inputTimeout) {
+    clearTimeout(inputTimeout);
+  }
+
+  inputTimeout = setTimeout(() => {
+    findCitiesAsync(query).then(callback);
+  }, 500);
+}
+
+export async function findCitiesAsync(query: string): Promise<City[]> {
   // Potential exception ignored beacuse there is no need to handle it
   let response = await axios.get(searchUrl, {
     params: {
       city: query,
+      countrycodes: 'by',
       format: 'geojson',
-      featureType: 'city',
+      featureType: 'settlement',
       addressdetails: 1,
     },
     headers: {
-      'Accept-Language': 'ru', // TODO: Language according to location
+      'Accept-Language': 'ru', // TODO: Language according to locale
     },
   });
 
@@ -55,9 +71,13 @@ export async function findCitiesAsync(query: string) {
     let lat = cityJson.geometry.coordinates[1];
 
     // Extract region
-    let region = Object.values(cityJson.properties.address)
-      .slice(1, Object.keys(cityJson.properties.address).indexOf('ISO3166-2-lvl4'))
-      .join(', ');
+    let region = '';
+    let end = Object.keys(cityJson.properties.address).indexOf('ISO3166-2-lvl4');
+    if (end > 1) {
+      region = Object.values(cityJson.properties.address)
+        .slice(1, end)
+        .join(', ');
+    }
 
     return {
       name: name,
@@ -78,7 +98,7 @@ export function filterCitiesByQuery(cities: City[], query: string) {
 }
 
 export function getReadableCountry(city: City): string {
-  if (city.region !== undefined) {
+  if (city.region.length > 0) {
     return `${city.region}, ${city.country}`;
   } else {
     return city.country;

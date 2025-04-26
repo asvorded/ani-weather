@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
 import { City } from '../../types/api/City';
-import { filterCitiesByQuery, findCitiesAsync, getPopularCitiesAsync, getReadableCountry } from '../../services/CitiesProvider';
+import { filterCitiesByQuery, findCitiesWithTimeout, getPopularCitiesAsync, getReadableCountry } from '../../services/OSMCitiesService';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -41,7 +41,7 @@ const TownSelect = () => {
   }, []);
 
   // Filter and find cities
-  async function processQueryAsync(query: string) {
+  function processQueryAsync(query: string) {
     if (locationError != null) {
       hideLocationError();
     }
@@ -52,8 +52,9 @@ const TownSelect = () => {
     setFoundCities(filterCitiesByQuery(foundCities, query));
 
     if (isQueryLongEnough(query)) {
-      foundCities = await findCitiesAsync(query);
-      setFoundCities(foundCities);
+      findCitiesWithTimeout(query, (foundCities) => {
+        setFoundCities(foundCities);
+      });
     }
   }
 
@@ -67,6 +68,7 @@ const TownSelect = () => {
       // TODO: Goto to main screen with found location
     }, (error) => {
       setIsFindingLocation(false);
+      // TODO: Make error translations
       setLocationError(error.message);
     }, 15_000);
   }
@@ -92,8 +94,8 @@ const TownSelect = () => {
           placeholder={t('townSelect.textField.placeholder')}
           numberOfLines={1}
           value={query}
-          onChange={async ({nativeEvent}) => {
-            await processQueryAsync(nativeEvent.text);
+          onChange={({nativeEvent}) => {
+            processQueryAsync(nativeEvent.text);
           }}
           editable={!isFindingLocation}
         />
@@ -171,19 +173,27 @@ const FoundCities = (
   props: {
     cities: City[]
   }
-) => (
-  <FlatList
-    data={props.cities}
-    renderItem={({item}) => (
-      <TouchableOpacity style={styles.foundCity}>
-        <Text style={styles.foundCityText}>{item.name}</Text>
-        <Text style={styles.foundCityCountryText}>{getReadableCountry(item)}</Text>
-      </TouchableOpacity>
-    )}
-    ItemSeparatorComponent={() => (
-      <View style={styles.foundCitiesSeparator}/>
-    )}
-  />
-);
+) => {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <FlatList
+      data={props.cities}
+      showsVerticalScrollIndicator={false}
+      renderItem={({item}) => (
+        <TouchableOpacity style={styles.foundCity}>
+          <Text style={styles.foundCityText}>{item.name}</Text>
+          <Text style={styles.foundCityCountryText}>{getReadableCountry(item)}</Text>
+        </TouchableOpacity>
+      )}
+      ItemSeparatorComponent={() => (
+        <View style={styles.foundCitiesSeparator}/>
+      )}
+      ListFooterComponent={(
+        <View style={{height: insets.bottom}}/>
+      )}
+    />
+  );
+};
 
 export default TownSelect;
