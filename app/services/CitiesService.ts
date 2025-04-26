@@ -1,10 +1,10 @@
 import axios from 'axios';
+import Config from 'react-native-config';
+
 import { City } from '../types/api/City';
 
 const OSMSearchUrl: string = 'https://nominatim.openstreetmap.org/search';
 const OWMSearchUrl: string = 'http://api.openweathermap.org/geo/1.0/direct';
-
-const OWMKey: string = 'b9a4752bafcb18d05b46200a024d5c66';
 
 const popularCities: City[] = [
   {
@@ -96,7 +96,7 @@ export async function findCitiesOWMAsync(query: string): Promise<City[]> {
   // Potential exception ignored beacuse there is no need to handle it
   let response = await axios.get(OWMSearchUrl, {
     params: {
-      appid: OWMKey,
+      appid: Config.OWM_API_KEY,
       q: query,
       limit: 5,
     },
