@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
 import { City } from '../../types/api/City';
-import { filterCitiesByQuery, findCitiesWithTimeout, getPopularCitiesAsync, getReadableCountry } from '../../services/OSMCitiesService';
+import { filterCitiesByQuery, findCitiesWithTimeout,
+  getPopularCitiesAsync, getReadableCountry } from '../../services/CitiesService';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -83,6 +84,8 @@ const TownSelect = () => {
       {
         marginTop: insets.top,
         marginBottom: insets.bottom,
+        marginLeft: insets.left,
+        marginRight: insets.right,
       },
       styles.screen,
     ]}>

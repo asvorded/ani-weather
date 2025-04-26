@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { City } from '../types/api/City';
 
-const searchUrl: string = 'https://nominatim.openstreetmap.org/search';
+const OSMSearchUrl: string = 'https://nominatim.openstreetmap.org/search';
+const OWMSearchUrl: string = 'http://api.openweathermap.org/geo/1.0/direct';
+
+const OWMKey: string = 'b9a4752bafcb18d05b46200a024d5c66';
 
 const popularCities: City[] = [
   {
@@ -9,21 +12,21 @@ const popularCities: City[] = [
     region: 'Минская область',
     country: 'Беларусь',
     longitude: 27.5618225,
-    latitide: 53.9024716,
+    latitude: 53.9024716,
   },
   {
     name: 'Кировск',
     region: 'Могилевская область',
     country: 'Беларусь',
     longitude: 29.4716,
-    latitide: 53.27022,
+    latitude: 53.27022,
   },
   {
     name: 'Могилев',
     region: 'Могилевская область',
     country: 'Беларусь',
     longitude: 30.3429838,
-    latitide: 53.9090245,
+    latitude: 53.9090245,
   },
 ];
 
@@ -42,13 +45,13 @@ export function findCitiesWithTimeout(
   }
 
   inputTimeout = setTimeout(() => {
-    findCitiesAsync(query).then(callback);
+    findCitiesOSMAsync(query).then(callback);
   }, 500);
 }
 
-export async function findCitiesAsync(query: string): Promise<City[]> {
+export async function findCitiesOSMAsync(query: string): Promise<City[]> {
   // Potential exception ignored beacuse there is no need to handle it
-  let response = await axios.get(searchUrl, {
+  let response = await axios.get(OSMSearchUrl, {
     params: {
       city: query,
       countrycodes: 'by',
@@ -84,8 +87,32 @@ export async function findCitiesAsync(query: string): Promise<City[]> {
       region: region,
       country: country,
       longitude: lon,
-      latitide: lat,
+      latitude: lat,
     };
+  });
+}
+
+export async function findCitiesOWMAsync(query: string): Promise<City[]> {
+  // Potential exception ignored beacuse there is no need to handle it
+  let response = await axios.get(OWMSearchUrl, {
+    params: {
+      appid: OWMKey,
+      q: query,
+      limit: 5,
+    },
+  });
+
+  let foundCities: any[] = response.data;
+  return foundCities.map((cityJson) => {
+    let c: City = {
+      name: cityJson?.local_names?.ru ?? cityJson.name,
+      region: cityJson.state ?? '',
+      country: cityJson.country,
+      longitude: cityJson.lon,
+      latitude: cityJson.lat,
+    };
+
+    return c;
   });
 }
 

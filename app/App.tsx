@@ -30,7 +30,6 @@ const App = () => {
   return (
     <StrictMode>
       <SafeAreaProvider>
-        <SystemBars style="auto"/>
         <Navigation />
       </SafeAreaProvider>
     </StrictMode>

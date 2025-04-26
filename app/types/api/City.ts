@@ -3,5 +3,5 @@ export type City = {
   region: string,
   country: string,
   longitude: number,
-  latitide: number
+  latitude: number
 };

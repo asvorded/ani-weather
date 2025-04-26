@@ -1,6 +1,6 @@
-import {ScrollView, View} from 'react-native';
+import { Button, ImageBackground, ScrollView, View } from 'react-native';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
@@ -10,6 +10,10 @@ import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.
 import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
 import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
+import { PagesNames } from '../../types/common/root-stack-params-list.ts';
+import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 const WeatherDetailedPanel = ({
   color,
@@ -99,67 +103,96 @@ const WindComponent = () => {
   );
 };
 
-const HomePage = ()=> {
+const HomePage = () => {
   let { t } = useTranslation();
+  const navigation = useCustomNavigation();
+
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.outerContainer}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-        overScrollMode="never"
+    <View style={styles.outerContainer} key="home page">
+      <SystemBars style="light"/>
+
+      <ImageBackground
+        style={styles.imageContainer}
+        source={require('../../../assets/images/sample.png')}
       >
-        <WeatherPanel />
-        <View style={styles.detailsGrid}>
-          <View style={styles.row}>
-            <WeatherDetailedPanel
-              color="#A9E78888"
-              title="Фаза луны"
-              text="Первая четверть"
-              contentElement={<MoonPhaseComponent />}
-            />
-            <WeatherDetailedPanel
-              color="#B3DBFF88"
-              title="Геомагнитная активность"
-              text="Слабая буря"
-              contentElement={<MagneticActivityComponent />}
-            />
-          </View>
-          <View style={styles.row}>
-            <WeatherDetailedPanel
-              color="#FFE17988"
-              title="Влажность"
-              text="Высокая"
-              contentElement={<HumidityComponent />}
-            />
-            <WeatherDetailedPanel
-              color="#FBB9BA88"
-              title="Атмосферное давление"
-              text="Повышенное"
-              contentElement={<PressureComponent />}
-            />
-          </View>
-          <View style={styles.row}>
-            <WeatherDetailedPanel
-              color="#FF9A7988"
-              title="Ветер"
-              text="14.8 км/ч (ЮЗ)"
-              contentElement={<WindComponent />}
-            />
-            <WeatherDetailedPanel
-              color="#B9F4FB88"
-              title="Качество воздуха"
-              text="Хорошее"
-              contentElement={<></>}
-            />
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <View style={styles.forecastPanel} />
+        <ScrollView
+          style={{
+            marginLeft: insets.left,
+            marginRight: insets.right,
+          }}
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+          overScrollMode="never"
+        >
+          <WeatherPanel />
+          <View style={styles.detailsGrid}>
+            <View style={styles.row}>
+              <WeatherDetailedPanel
+                key="moon phase"
+                color="#A9E78888"
+                title="Фаза луны"
+                text="Первая четверть"
+                contentElement={<MoonPhaseComponent />}
+              />
+              <WeatherDetailedPanel
+                color="#B3DBFF88"
+                title="Геомагнитная активность"
+                text="Слабая буря"
+                contentElement={<MagneticActivityComponent />}
+              />
             </View>
+            <View style={styles.row}>
+              <WeatherDetailedPanel
+                color="#FFE17988"
+                title="Влажность"
+                text="Высокая"
+                contentElement={<HumidityComponent />}
+              />
+              <WeatherDetailedPanel
+                color="#FBB9BA88"
+                title="Атмосферное давление"
+                text="Повышенное"
+                contentElement={<PressureComponent />}
+              />
+            </View>
+            <View style={styles.row}>
+              <WeatherDetailedPanel
+                color="#FF9A7988"
+                title="Ветер"
+                text="14.8 км/ч (ЮЗ)"
+                contentElement={<WindComponent />}
+              />
+              <WeatherDetailedPanel
+                color="#B9F4FB88"
+                title="Качество воздуха"
+                text="Хорошее"
+                contentElement={<></>}
+              />
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <View style={styles.forecastPanel} />
+              </View>
+            </View>
+            <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+
+        <View key="system navigation buttons"
+          style={[
+            styles.systemNavButtons,
+            { height: insets.bottom },
+          ]}
+        />
+      </ImageBackground>
+      <View key="system status bar"
+        style={[
+          styles.systemStatusBar,
+          { height: insets.top },
+        ]}
+      />
     </View>
   );
 };

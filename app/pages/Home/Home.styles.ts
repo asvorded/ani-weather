@@ -1,8 +1,24 @@
 import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   outerContainer: {
-    flex: 1,
-    backgroundColor: '#FAE3D2',
+    position: 'relative',
+    //flex: 1,
+    backgroundColor: '#fae3d2',
+  },
+  systemStatusBar: {
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+    backgroundColor: '#1b1b1b',
+    opacity: 0.2,
+  },
+  systemNavButtons: {
+    width: '100%',
+    backgroundColor: '#1b1b1b',
+    opacity: 0.2,
+  },
+  imageContainer: {
+    height: '100%',
   },
   container: {
     paddingHorizontal: 20,
