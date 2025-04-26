@@ -1,8 +1,12 @@
 import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    backgroundColor: '#FAE3D2',
+  },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 25,
+    paddingVertical: 25,
     width: '100%',
     //height: '100%',
     // backgroundColor: '#FAE3D2',
@@ -15,22 +19,42 @@ export const styles = StyleSheet.create({
     color: 'black',
   },
   topContainer: {
-    backgroundColor: 'transparent',
-    height: 200,
+    marginTop: 30,
+    marginBottom: 40,
     width: '100%',
   },
   detailsGrid:{
     width: '100%',
+    display: 'flex',
+    gap: 20,
   },
-  city: {
-    fontFamily: 'BellotaText-Regular',
+  weatherMainContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  weatherDescriptionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cityWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  cityText: {
     fontSize: 24,
-    color: 'black',
-    backgroundColor: 'transparent',
+    marginBottom: -10,
+  },
+  weatherDescriptionText: {
+    fontSize: 16,
   },
   temperatureMain: {
-    // fontFamily: 'BellotaText-Regular',
     fontSize: 70,
+  },
+  temperatureAmplitudeText: {
+    fontSize: 20,
   },
   mask: {
     flex: 1,
@@ -39,30 +63,119 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    gap: 20,
   },
   cell: {
     justifyContent: 'center',
     alignItems: 'center',
-    flexBasis: 'auto',
+    flexBasis: 1,
     flexGrow: 1,
   },
   detailsPanel:{
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 20,
-    width: 150,
-    height: 100,
-    margin: 20,
+    width: '100%',
+    height: 140,
     backgroundColor: '#A9E788',
     borderWidth: 1,
     borderStyle: 'solid',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  detailsPanelContentWrapper: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  detailsTextPanel: {
+    width: '100%',
+    flexDirection: 'column',
+  },
+  detailsPanelTitle: {
+    width: '100%',
+    fontSize: 12,
+    marginBottom: -4,
+  },
+  detailsPanelText: {
+    width: '100%',
+    fontSize: 18,
   },
   forecastPanel:{
+    width: '100%',
     borderRadius: 20,
-    width: 340,
-    height: 100,
-    margin: 20,
-    backgroundColor: '#A9E788',
+    height: 150,
+    backgroundColor: '#CEBBFF88',
     borderWidth: 1,
     borderStyle: 'solid',
   },
-
+  moonPhaseComponent: {
+    height: 65,
+    width: 65,
+    borderRadius: '50%',
+    backgroundColor: '#F7F7F7',
+  },
+  magneticActivityComponent: {
+    height: 65,
+    width: 65,
+    position: 'relative',
+  },
+  magneticActivityText: {
+    fontSize: 30,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    lineHeight: 40,
+  },
+  humidityComponent: {
+    height: 65,
+    width: 65,
+    backgroundColor: '#D9D9D9',
+    borderRadius: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  humidityText: {
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  pressureComponent: {
+    height: 65,
+    width: 65,
+    backgroundColor: '#FFE6CD',
+    borderRadius: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pressureText: {
+    marginBottom: -5,
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  pressureTextSmall: {
+    fontSize: 10,
+    lineHeight: 15,
+  },
+  windComponent: {
+    height: 65,
+    width: 65,
+    borderRadius: '50%',
+    backgroundColor: '#FFF7E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  windCompassImg: {
+    height: 52,
+    width: 52,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+  },
+  windCompassArrowImg: {
+    height: 30,
+  },
 });
