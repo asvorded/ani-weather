@@ -248,7 +248,7 @@ const HomePage = () => {
               <WeatherDetailedPanel
                 key="air quality"
                 color="#B9F4FB"
-                title="Качество воздуха"
+                title={t('forecast.airQuality.main')}
                 text="#######"
                 contentElement={<></>}
               />
