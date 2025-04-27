@@ -94,8 +94,8 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: 140,
     backgroundColor: '#A9E788',
-    borderWidth: 1,
-    borderStyle: 'solid',
+    borderWidth: 0.75,
+    borderColor: '#656565',
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
@@ -118,7 +118,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     fontSize: 18,
   },
-  forecastPanel:{
+  forecastPanel: {
     width: '100%',
     borderRadius: 20,
     height: 150,
@@ -170,7 +170,7 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
   },
-  pressureTextSmall: {
+  pressureUnits: {
     fontSize: 10,
     lineHeight: 15,
   },

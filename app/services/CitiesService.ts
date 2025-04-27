@@ -6,7 +6,8 @@ import { City } from '../types/api/City';
 const OSMSearchUrl: string = 'https://nominatim.openstreetmap.org/search';
 const OWMSearchUrl: string = 'http://api.openweathermap.org/geo/1.0/direct';
 
-const popularCities: City[] = [
+// TODO: remove export
+export const popularCities: City[] = [
   {
     name: 'Минск',
     region: 'Минская область',

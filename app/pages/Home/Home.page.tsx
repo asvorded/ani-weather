@@ -1,10 +1,12 @@
 import { Button, ImageBackground, ScrollView, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
-import { WeatherDetailedPanelProps } from './Home.types.ts';
+import { HumidityProps, MagneticActivityProps, PressureProps,
+  WeatherDetailedPanelProps, WindProps,
+} from './Home.types.ts';
 import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
 import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
 import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
@@ -14,6 +16,12 @@ import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
+import { SavedCity } from '../../types/api/SavedCity.ts';
+import { MoonPhases, PressureUnits, TempUnits, WindSpeedUnits } from '../../types/api/Forecast.ts';
+import { getReadableGeomagneticDegreeId, getReadableHumidityId,
+  getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
+  getReadableWindDirectionId, getReadableWindUnitsId,
+} from './Home.utils.ts';
 
 const WeatherDetailedPanel = ({
   color,
@@ -23,7 +31,7 @@ const WeatherDetailedPanel = ({
 }: WeatherDetailedPanelProps) => {
   return (
     <View style={styles.cell}>
-      <View style={[styles.detailsPanel, { backgroundColor: color }]}>
+      <View style={[styles.detailsPanel, { backgroundColor: color + 'C0' }]}>
         <View style={styles.detailsPanelContentWrapper}>
           {contentElement}
         </View>
@@ -40,16 +48,16 @@ const WeatherPanel = () => {
   return (
     <View style={styles.topContainer}>
       <View style={styles.cityWrapper}>
-        <CustomText style={styles.cityText}>Минск</CustomText>
+        <CustomText style={styles.cityText}>#######</CustomText>
       </View>
       <View style={styles.weatherMainContainer}>
         <WeatherIcon type={WeatherIconType.PartlyCloudyDay} size={130} />
         <View />
-        <CustomText style={styles.temperatureMain}>10°C</CustomText>
+        <CustomText style={styles.temperatureMain}>###</CustomText>
       </View>
       <View style={styles.weatherDescriptionContainer}>
-        <CustomText style={styles.weatherDescriptionText}>Переменная облачность</CustomText>
-        <CustomText style={styles.temperatureAmplitudeText}>15°/7°</CustomText>
+        <CustomText style={styles.weatherDescriptionText}>#########</CustomText>
+        <CustomText style={styles.temperatureAmplitudeText}>#########</CustomText>
       </View>
     </View>
   );
@@ -61,33 +69,46 @@ const MoonPhaseComponent = () => {
   );
 };
 
-const MagneticActivityComponent = () => {
+const MagneticActivityComponent = ({
+  degree,
+}: MagneticActivityProps) => {
   return (
     <View style={styles.magneticActivityComponent}>
       <MagneticActivityImg height={65} width={65} />
-      <CustomText style={styles.magneticActivityText}>5</CustomText>
+      <CustomText style={styles.magneticActivityText}>{degree}</CustomText>
     </View>
   );
 };
 
-const HumidityComponent = () => {
+const HumidityComponent = ({
+  humidity,
+}: HumidityProps) => {
   return (
     <View style={styles.humidityComponent}>
-      <CustomText style={styles.humidityText}>90%</CustomText>
+      <CustomText style={styles.humidityText}>{`${humidity}%`}</CustomText>
     </View>
   );
 };
 
-const PressureComponent = () => {
+const PressureComponent = ({
+  pressure,
+  units,
+}: PressureProps) => {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.pressureComponent}>
-      <CustomText style={styles.pressureText}>1034</CustomText>
-      <CustomText style={styles.pressureTextSmall}>mbar</CustomText>
+      <CustomText style={styles.pressureText}>{pressure}</CustomText>
+      <CustomText style={styles.pressureUnits}>
+        {t(getReadablePressureUnitsId(units))}
+      </CustomText>
     </View>
   );
 };
 
-const WindComponent = () => {
+const WindComponent = ({
+  speed, units, directionAngle,
+}: WindProps) => {
   return (
     <View style={styles.windComponent}>
       <WindCompassImg
@@ -97,7 +118,7 @@ const WindComponent = () => {
       />
       <WindCompassArrowImg
         height={30}
-        style={[styles.windCompassArrowImg, { transform: [{ rotate: '30deg' }] }]}
+        style={[styles.windCompassArrowImg, { transform: [{ rotate: `${directionAngle}deg` }] }]}
       />
     </View>
   );
@@ -108,6 +129,38 @@ const HomePage = () => {
   const navigation = useCustomNavigation();
 
   const insets = useSafeAreaInsets();
+
+  const [ testSavedCity, setSavedCities ] = useState({
+    city: {
+      name: 'тест',
+      region: 'pdsfuhsdpfiu',
+      country: 'Беларусь',
+      longitude: 53,
+      latitude: 27,
+    },
+    forecast: {
+      currentTemp: 10,
+      tempUnits: TempUnits.Celsius,
+      state: -1,
+      shortDescription: 'Солнышко',
+      maxTemp: 12.5,
+      minTemp: 8.3,
+      moonPhase: MoonPhases.NewMoon,
+      geomagneticActivity: 4,
+      humidity: 78,
+      pressure: 1014,
+      pressureUnits: PressureUnits.Pascal,
+      windSpeed: 8.5,
+      windSpeedUnits: WindSpeedUnits.Ms,
+      windDirectionAngle: 0,
+      airQuality: 78,
+      hourlyforecast: [
+        { time: '12:00', state: -1, temp: 10.1 },
+        { time: '12:00', state: -1,  temp: 10.1 },
+        { time: '12:00', state: -1, temp: 10.1 },
+      ],
+    },
+  });
 
   return (
     <View style={styles.outerContainer} key="home page">
@@ -124,50 +177,79 @@ const HomePage = () => {
           }}
           contentContainerStyle={styles.container}
           showsVerticalScrollIndicator={false}
-          overScrollMode="never"
+          //overScrollMode="never"
         >
           <WeatherPanel />
           <View style={styles.detailsGrid}>
             <View style={styles.row}>
               <WeatherDetailedPanel
                 key="moon phase"
-                color="#A9E78888"
-                title="Фаза луны"
-                text="Первая четверть"
+                color="#A9E788"
+                title={t('forecast.moonPhase.main')}
+                text={t(getReadableMoonPhaseId(testSavedCity.forecast.moonPhase))}
                 contentElement={<MoonPhaseComponent />}
               />
               <WeatherDetailedPanel
-                color="#B3DBFF88"
-                title="Геомагнитная активность"
-                text="Слабая буря"
-                contentElement={<MagneticActivityComponent />}
+                key="geomag"
+                color="#B3DBFF"
+                title={t('forecast.geomagnetic.main')}
+                text={t(getReadableGeomagneticDegreeId(testSavedCity.forecast.geomagneticActivity))}
+                contentElement={
+                  <MagneticActivityComponent
+                    degree={testSavedCity.forecast.geomagneticActivity}
+                  />
+                }
               />
             </View>
             <View style={styles.row}>
               <WeatherDetailedPanel
-                color="#FFE17988"
-                title="Влажность"
-                text="Высокая"
-                contentElement={<HumidityComponent />}
+                key="humidity"
+                color="#FFE179"
+                title={t('forecast.humidity.main')}
+                text={t(getReadableHumidityId(testSavedCity.forecast.humidity))}
+                contentElement={
+                  <HumidityComponent humidity={testSavedCity.forecast.humidity} />
+                }
               />
               <WeatherDetailedPanel
-                color="#FBB9BA88"
-                title="Атмосферное давление"
-                text="Повышенное"
-                contentElement={<PressureComponent />}
+                key="pressure"
+                color="#FBB9BA"
+                title={t('forecast.pressure.main')}
+                text={t(getReadablePressureId(
+                  testSavedCity.forecast.pressure,
+                  testSavedCity.forecast.pressureUnits
+                ))}
+                contentElement={
+                  <PressureComponent
+                    pressure={testSavedCity.forecast.pressure}
+                    units={testSavedCity.forecast.pressureUnits}
+                  />
+                }
               />
             </View>
             <View style={styles.row}>
               <WeatherDetailedPanel
-                color="#FF9A7988"
-                title="Ветер"
-                text="14.8 км/ч (ЮЗ)"
-                contentElement={<WindComponent />}
+                key="wind"
+                color="#FF9A79"
+                title={t('forecast.wind.main')}
+                text={`${testSavedCity.forecast.windSpeed} ${
+                  t(getReadableWindUnitsId(testSavedCity.forecast.windSpeedUnits))
+                } (${t(getReadableWindDirectionId(
+                  testSavedCity.forecast.windDirectionAngle
+                ))})`}
+                contentElement={
+                  <WindComponent
+                    speed={testSavedCity.forecast.windSpeed}
+                    units={testSavedCity.forecast.windSpeedUnits}
+                    directionAngle={testSavedCity.forecast.windDirectionAngle}
+                  />
+                }
               />
               <WeatherDetailedPanel
-                color="#B9F4FB88"
+                key="air quality"
+                color="#B9F4FB"
                 title="Качество воздуха"
-                text="Хорошее"
+                text="#######"
                 contentElement={<></>}
               />
             </View>
