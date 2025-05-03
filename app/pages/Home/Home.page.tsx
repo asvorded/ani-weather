@@ -258,8 +258,10 @@ const HomePage = () => {
                 <View style={styles.forecastPanel} />
               </View>
             </View>
-            <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
           </View>
+
+          <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
+          <Button title="рябов ответит (за всё)" onPress={() => navigation.navigate(PagesNames.MeteoChannel)}/>
         </ScrollView>
 
         <View key="system navigation buttons"
