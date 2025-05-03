@@ -132,3 +132,19 @@ export function getReadableCountry(city: City): string {
     return city.country;
   }
 }
+
+export async function getCityNameByCoordinates(longitude: number, latitude: number): Promise<string> {
+  const response = await axios.get(OWMSearchUrl, {
+    params: {
+      appid: Config.OWM_API_KEY,
+      limit: 1,
+      lon: longitude,
+      lat: latitude,
+    },
+  });
+
+  const cityObj = response.data[0];
+  const cityName = cityObj.local_names.ru as string;
+
+  return cityName;
+}
