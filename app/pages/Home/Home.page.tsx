@@ -22,6 +22,8 @@ import { getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
+import {fetchWeatherByCoords} from '../../services/WeatherService.ts';
+import {test} from '../../services/notifications/notifications.ts';
 
 const WeatherDetailedPanel = ({
   color,
@@ -258,7 +260,11 @@ const HomePage = () => {
                 <View style={styles.forecastPanel} />
               </View>
             </View>
-            <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
+            <Button
+              title="town select"
+              onPress={() => navigation.navigate(PagesNames.TownSelect)}
+            />
+            <Button title="Make notification" onPress={() => test()} />
           </View>
         </ScrollView>
 

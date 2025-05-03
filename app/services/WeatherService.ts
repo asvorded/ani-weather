@@ -16,21 +16,29 @@ export async function fetchWeatherByCity(city: string): Promise<Forecast> {
   }
 
   const data = await response.json();
-  console.log(data);
   const forecastUrl = `${FORECAST_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=ru`;
   const forecastResponse = await fetch(forecastUrl);
   if (!forecastResponse.ok) {
     throw new Error(`Ошибка : ${forecastResponse.statusText}`);
   }
   const forecastData = await forecastResponse.json();
-  console.log(forecastData);
   return mapDataToForecast(data, forecastData);
+}
+export async function fetchCurrentWeatherByCity(city: string) {
+  const url = `${CURRENT_WEATHER_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=ru`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Ошибка : ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return mapDataToForecast(data, null);
 }
 function mapDataToForecast(data: any, forecastData: any): Forecast {
   return {
     airQuality: 0,
     geomagneticActivity: 0,
-    hourlyforecast: forecastData.list.map((item: any) => ({
+    hourlyforecast: forecastData?.list.map((item: any) => ({
       time: new Date(item.dt * 1000), // [x]: string or time?
       temp: item.main.temp,
       state: 0,
@@ -56,21 +64,17 @@ export async function fetchWeatherByCoords(
   longitude: number,
 ): Promise<Forecast> {
   const url = `${CURRENT_WEATHER_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=ru`;
-  console.log('awaiting fetch' + url);
   const response = await fetch(url);
-  console.log('response' + response);
   if (!response.ok) {
     throw new Error(`Ошибка : ${response.statusText}`);
   }
 
   const data = await response.json();
-  console.log(data);
   const forecastUrl = `${FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=ru`;
   const forecastResponse = await fetch(forecastUrl);
   if (!forecastResponse.ok) {
     throw new Error(`Ошибка : ${forecastResponse.statusText}`);
   }
   const forecastData = await forecastResponse.json();
-  console.log(forecastData);
   return mapDataToForecast(data, forecastData);
 }
