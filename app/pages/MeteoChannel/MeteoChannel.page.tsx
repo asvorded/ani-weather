@@ -3,11 +3,12 @@ import { FlatList, Text, View } from 'react-native';
 import { styles } from './MeteoChannel.styles';
 import { getLastMessagesAsync } from '../../services/MeteoChannelService';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 const MeteoChannel = () => {
   const insets = useSafeAreaInsets();
 
-  const [messages, setMessages] = useState(['haha', 'hehe']);
+  const [messages, setMessages] = useState<string[]>([]);
 
   useEffect(() => {
     getLastMessagesAsync(5)
@@ -27,6 +28,8 @@ const MeteoChannel = () => {
         marginRight: insets.right,
       },
     ]}>
+      <SystemBars style="dark"/>
+
       <FlatList
         key="messages list"
         contentContainerStyle={styles.messagesList}
@@ -34,7 +37,7 @@ const MeteoChannel = () => {
         inverted
         renderItem={({item}) => (
           <View style={styles.messageContainer}>
-            <Text>{item}</Text>
+            <Text style={styles.defaultFont}>{item}</Text>
           </View>
         )}
         ItemSeparatorComponent={() => (

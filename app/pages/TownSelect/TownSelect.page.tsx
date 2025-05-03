@@ -93,7 +93,7 @@ const TownSelect = () => {
 
       <View style={styles.inputContainer} key="input">
         <TextInput
-          style={styles.input}
+          style={[styles.input, styles.defaultFont]}
           placeholder={t('townSelect.textField.placeholder')}
           numberOfLines={1}
           value={query}
@@ -125,7 +125,7 @@ const TownSelect = () => {
 
       {locationError ? (
         <View style={styles.locationErrorContainer} key="location_error">
-          <Text style={styles.locationErrorText}>{t('townSelect.location.errorPrefix') + locationError}</Text>
+          <Text style={[styles.locationErrorText, styles.defaultFont]}>{t('townSelect.location.errorPrefix') + locationError}</Text>
           <TouchableOpacity
             style={styles.locationErrorClose}
             onPress={hideLocationError}
@@ -143,7 +143,7 @@ const TownSelect = () => {
           <FoundCities cities={showingFoundCities} />
         ) : (
           <View>
-            <Text style={styles.popularCitiesText}>{t('townSelect.popularCities')}</Text>
+            <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
             <View>
               <View style={styles.popularCitiesContainer}>{
                 popularCities.map((city, index) => (
@@ -168,7 +168,7 @@ const PopularCity = (
     style={styles.popularCity}
     onPress={props.onPress}
   >
-    <Text>{props.name}</Text>
+    <Text style={styles.defaultFont}>{props.name}</Text>
   </TouchableOpacity>
 );
 
@@ -185,8 +185,14 @@ const FoundCities = (
       showsVerticalScrollIndicator={false}
       renderItem={({item}) => (
         <TouchableOpacity style={styles.foundCity}>
-          <Text style={styles.foundCityText}>{item.name}</Text>
-          <Text style={styles.foundCityCountryText}>{getReadableCountry(item)}</Text>
+          <Text style={[
+            styles.foundCityText,
+            styles.defaultFont,
+          ]}>{item.name}</Text>
+          <Text style={[
+            styles.foundCityCountryText,
+            styles.defaultFont,
+          ]}>{getReadableCountry(item)}</Text>
         </TouchableOpacity>
       )}
       ItemSeparatorComponent={() => (

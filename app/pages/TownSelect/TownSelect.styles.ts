@@ -5,6 +5,9 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingTop: 15,
   },
+  defaultFont: {
+    fontFamily: 'BellotaText-Regular',
+  },
   inputContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

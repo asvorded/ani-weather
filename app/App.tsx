@@ -29,11 +29,12 @@ const App = () => {
   });
 
   return (
-    <StrictMode>
+    // FIXME: Strict mode breaks fetch functions' logic
+    <>
       <SafeAreaProvider>
         <Navigation />
       </SafeAreaProvider>
-    </StrictMode>
+    </>
   );
 };
 

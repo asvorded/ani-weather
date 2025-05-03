@@ -4,6 +4,9 @@ export const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
+  defaultFont: {
+    fontFamily: 'BellotaText-Regular',
+  },
   messagesList: {
     paddingHorizontal: 15,
   },
