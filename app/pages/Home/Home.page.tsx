@@ -1,6 +1,8 @@
 import { Button, ImageBackground, ScrollView, View } from 'react-native';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
@@ -14,14 +16,14 @@ import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SystemBars } from 'react-native-edge-to-edge';
 import { SavedCity } from '../../types/api/SavedCity.ts';
 import { MoonPhases, PressureUnits, TempUnits, WindSpeedUnits } from '../../types/api/Forecast.ts';
 import { getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
+
+import { WeatherModule } from '../../../specs/NativeModules.ts';
 
 const WeatherDetailedPanel = ({
   color,
@@ -262,6 +264,7 @@ const HomePage = () => {
 
           <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
           <Button title="рябов ответит (за всё)" onPress={() => navigation.navigate(PagesNames.MeteoChannel)}/>
+          <Button title="Toast test" onPress={() => WeatherModule.showTestToast()}/>
         </ScrollView>
 
         <View key="system navigation buttons"
