@@ -85,6 +85,37 @@ export function getReadableWindDirectionId(angle: number): string {
   const direction = directions.find(
     ([min, max]) => angle >= min && angle <= max,
   );
-
   return direction ? direction[2] : 'forecast.wind.direction.default';
+}
+
+
+export function convertWindSpeed(value: number, originalUnits: WindSpeedUnits, targetUnits: WindSpeedUnits){
+  const conversionFactors: Record<WindSpeedUnits, Record<WindSpeedUnits, number>> = {
+    [WindSpeedUnits.Kmh]: {
+      [WindSpeedUnits.Ms]: 0.277778,
+    } as Record<WindSpeedUnits, number>,
+    [WindSpeedUnits.Ms]: {
+      [WindSpeedUnits.Kmh]: 3.6,
+    } as Record<WindSpeedUnits, number>,
+  };
+  if (originalUnits === targetUnits) {
+    return value;
+  }
+  return value * conversionFactors[originalUnits][targetUnits];
+}
+
+export function convertPressure(value: number, originalUnits: PressureUnits, targetUnits: PressureUnits){
+  const conversionFactors: Record<PressureUnits, Record<PressureUnits, number>> = {
+    [PressureUnits.Pascal]: {
+      [PressureUnits.MmHg]: 0.00750062 * 100,
+    } as Record<PressureUnits, number>,
+    [PressureUnits.MmHg]: {
+      [PressureUnits.Pascal]: 133.322 * 0.01,
+    } as Record<PressureUnits, number>,
+  };
+
+  if (originalUnits === targetUnits) {
+    return value;
+  }
+  return value * conversionFactors[originalUnits][targetUnits];
 }

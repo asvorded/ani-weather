@@ -83,14 +83,15 @@
       "title": "ИКВ"
     }
   },
-  "Settings": {
-    "Title": "Настройки",
-    "Language": "Язык",
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык",
     "units": {
       "title" : "Единицы измерения",
       "temperature": "Температура",
       "pressure" : "Давление",
       "wind": "Ветер"
-    }
+    },
+    "notifications": "Уведомления"
   }
 }

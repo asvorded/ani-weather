@@ -6,14 +6,18 @@ import {useCustomNavigation} from '../../hooks/useCustomNavigation.ts';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {SystemBars} from 'react-native-edge-to-edge';
 import {Picker} from '@react-native-picker/picker';
-import {PressureUnits, TempUnits} from '../../types/api/Forecast.ts';
+import {
+  PressureUnits,
+  TempUnits,
+  WindSpeedUnits,
+} from '../../types/api/Forecast.ts';
 import {Languages} from '../../types/storage/Languages.ts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {UserSettings} from '../../types/storage/UserSettings.ts';
-import {useUserSettingsContext} from '../../services/UserSettingsProvider.tsx';
+import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 
 const SettingsPage = () => {
-  const { userSettings, setUserSettings } = useUserSettingsContext();
+  const {userSettings, setUserSettings} = useUserSettings();
   const {t, i18n} = useTranslation();
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
@@ -33,6 +37,11 @@ const SettingsPage = () => {
     setUserSettings(updatedSettings);
   }
 
+  function setWindSpeedUnits(value: WindSpeedUnits) {
+    const updatedSettings = {...userSettings, windSpeed: value};
+    setUserSettings(updatedSettings);
+  }
+
   function setNotifications(value: boolean) {
     const updatedSettings = {...userSettings, notifications: value};
     setUserSettings(updatedSettings);
@@ -48,10 +57,10 @@ const SettingsPage = () => {
           marginRight: insets.right,
         }}>
         <SystemBars style="light" />
-        <Text style={styles.header}>Settings</Text>
+        <Text style={styles.header}>{t('settings.title')}</Text>
 
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Language</Text>
+          <Text style={styles.settingLabel}>{t('settings.language')}</Text>
           <Picker
             selectedValue={userSettings.language}
             mode="dropdown"
@@ -64,10 +73,12 @@ const SettingsPage = () => {
 
         {/* Measurement Units */}
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Units of Measurement</Text>
+          <Text style={styles.settingLabel}>{t('settings.units.title')}</Text>
         </View>
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Temperature</Text>
+          <Text style={styles.settingLabel}>
+            {t('settings.units.temperature')}
+          </Text>
           <Picker
             selectedValue={userSettings.temperature}
             style={styles.picker}
@@ -80,7 +91,9 @@ const SettingsPage = () => {
           </Picker>
         </View>
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Pressure</Text>
+          <Text style={styles.settingLabel}>
+            {t('settings.units.pressure')}
+          </Text>
           <Picker
             selectedValue={userSettings.pressure}
             style={styles.picker}
@@ -94,10 +107,27 @@ const SettingsPage = () => {
             />
           </Picker>
         </View>
+        <View style={styles.settingItem}>
+          <Text style={styles.settingLabel}>
+            {t('settings.units.wind')}
+          </Text>
+          <Picker
+            selectedValue={userSettings.windSpeed}
+            style={styles.picker}
+            mode="dropdown"
+            itemStyle={{color: 'white'}}
+            onValueChange={value => setWindSpeedUnits(value)}>
+            <Picker.Item label="M/s" value={WindSpeedUnits.Ms} />
+            <Picker.Item
+              label="Km/s"
+              value={WindSpeedUnits.Kmh}
+            />
+          </Picker>
+        </View>
 
         {/* Notifications */}
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Notifications</Text>
+          <Text style={styles.settingLabel}>{t('settings.notifications')}</Text>
           <Switch
             value={userSettings.notifications}
             onValueChange={value => setNotifications(value)}

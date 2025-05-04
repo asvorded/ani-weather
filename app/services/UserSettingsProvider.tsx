@@ -2,7 +2,7 @@ import React, {createContext, useState, useEffect, useContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {UserSettings} from '../types/storage/UserSettings.ts';
 import {Languages} from '../types/storage/Languages.ts';
-import {PressureUnits, TempUnits} from '../types/api/Forecast.ts';
+import {PressureUnits, TempUnits, WindSpeedUnits} from '../types/api/Forecast.ts';
 import {useTranslation} from 'react-i18next';
 
 
@@ -16,7 +16,7 @@ interface UserSettingsContextInterface {
 
 export const UserSettingsContext = createContext<UserSettingsContextInterface | undefined>(undefined);
 
-export const useUserSettingsContext = () => {
+export const useUserSettings = () => {
   const context = useContext(UserSettingsContext);
   if (context === undefined) {
     throw new Error('UserSettingsContext must be used within a CookieProvider');
@@ -29,6 +29,7 @@ export const UserSettingsProvider = ({ children }: { children: React.ReactNode }
     language: Languages.Russian,
     temperature: TempUnits.Celsius,
     pressure: PressureUnits.Pascal,
+    windSpeed: WindSpeedUnits.Ms,
     notifications: false,
   });
   useEffect(() => {

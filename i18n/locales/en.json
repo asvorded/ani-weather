@@ -10,10 +10,58 @@
   },
   "forecast": {
     "moonPhase": {
-      "main": "Moon phase"
+      "main": "Moon phase",
+      "default": "<No data>",
+      "newMoon": "New moon",
+      "firstHalf": "First half",
+      "fullMoon": "Full moon",
+      "lastHalf": "Last half"
+    },
+    "geomagnetic": {
+      "main": "geomagnetic activity",
+      "default": "<No data>",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "humidity": {
+      "main": "Humidity",
+      "default": "<No data>",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "pressure": {
+      "main": "Pressure",
+      "default": "<No data>",
+      "low": "Low",
+      "medium": "Normal",
+      "high": "High",
+      "units": {
+        "pascal": "hPa",
+        "mmHg": "mmHg"
+      }
+    },
+    "wind": {
+      "main": "Wind",
+      "direction": {
+        "default": "<No data>",
+        "N": "N",
+        "S": "S",
+        "W": "W",
+        "E": "E",
+        "NW": "NW",
+        "NE": "NE",
+        "SW": "SW",
+        "SE": "SE"
+      },
+      "units": {
+        "kmh": "km/h",
+        "ms": "m/s"
+      }
     },
     "weatherStates": {
-      "none": "No data",
+      "none": "<No data>",
       "thunderstorm": "Thunderstorm",
       "drizzle": "Drizzle",
       "rain": "Rain",
@@ -29,15 +77,21 @@
       "tornado": "Tornado",
       "clear": "Clear",
       "clouds": "Cloudy"
+    },
+    "airQuality": {
+      "main": "Air Quality",
+      "title": "AQI"
     }
   },
-  "Settings": {
-    "Title": "Settings",
-    "Language": "Language",
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
     "units": {
       "title" : "Units of measurement",
+      "temperature": "Temperature",
       "pressure" : "Pressure",
       "wind": "Wind"
-    }
+    },
+    "notifications": "Notifications"
   }
 }

@@ -18,7 +18,8 @@ import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
 import { SavedCity } from '../../types/api/SavedCity.ts';
 import { MoonPhases, PressureUnits, TempUnits, WindSpeedUnits } from '../../types/api/Forecast.ts';
-import { getReadableGeomagneticDegreeId, getReadableHumidityId,
+import {
+  convertPressure, convertWindSpeed, getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
@@ -26,6 +27,7 @@ import WeatherService from '../../services/WeatherService.ts';
 
 import { WeatherModule } from '../../../specs/NativeModules.ts';
 import {test} from '../../services/notifications/notifications.ts';
+import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 
 const WeatherDetailedPanel = ({
   color,
@@ -102,7 +104,7 @@ const PressureComponent = ({
 
   return (
     <View style={styles.pressureComponent}>
-      <CustomText style={styles.pressureText}>{pressure}</CustomText>
+      <CustomText style={styles.pressureText}>{pressure.toPrecision(4)}</CustomText>
       <CustomText style={styles.pressureUnits}>
         {t(getReadablePressureUnitsId(units))}
       </CustomText>
@@ -129,6 +131,7 @@ const WindComponent = ({
 };
 
 const HomePage = () => {
+  const {userSettings} = useUserSettings();
   let { t } = useTranslation();
   const navigation = useCustomNavigation();
 
@@ -177,12 +180,11 @@ const HomePage = () => {
 
   return (
     <View style={styles.outerContainer} key="home page">
-      <SystemBars style="light"/>
+      <SystemBars style="light" />
 
       <ImageBackground
         style={styles.imageContainer}
-        source={require('../../../assets/images/sample.png')}
-      >
+        source={require('../../../assets/images/sample.png')}>
         <ScrollView
           style={{
             marginLeft: insets.left,
@@ -199,14 +201,20 @@ const HomePage = () => {
                 key="moon phase"
                 color="#A9E788"
                 title={t('forecast.moonPhase.main')}
-                text={t(getReadableMoonPhaseId(testSavedCity.forecast.moonPhase))}
+                text={t(
+                  getReadableMoonPhaseId(testSavedCity.forecast.moonPhase),
+                )}
                 contentElement={<MoonPhaseComponent />}
               />
               <WeatherDetailedPanel
                 key="geomag"
                 color="#B3DBFF"
                 title={t('forecast.geomagnetic.main')}
-                text={t(getReadableGeomagneticDegreeId(testSavedCity.forecast.geomagneticActivity))}
+                text={t(
+                  getReadableGeomagneticDegreeId(
+                    testSavedCity.forecast.geomagneticActivity,
+                  ),
+                )}
                 contentElement={
                   <MagneticActivityComponent
                     degree={testSavedCity.forecast.geomagneticActivity}
@@ -221,21 +229,29 @@ const HomePage = () => {
                 title={t('forecast.humidity.main')}
                 text={t(getReadableHumidityId(testSavedCity.forecast.humidity))}
                 contentElement={
-                  <HumidityComponent humidity={testSavedCity.forecast.humidity} />
+                  <HumidityComponent
+                    humidity={testSavedCity.forecast.humidity}
+                  />
                 }
               />
               <WeatherDetailedPanel
                 key="pressure"
                 color="#FBB9BA"
                 title={t('forecast.pressure.main')}
-                text={t(getReadablePressureId(
-                  testSavedCity.forecast.pressure,
-                  testSavedCity.forecast.pressureUnits
-                ))}
+                text={t(
+                  getReadablePressureId(
+                    testSavedCity.forecast.pressure,
+                    testSavedCity.forecast.pressureUnits,
+                  ),
+                )}
                 contentElement={
                   <PressureComponent
-                    pressure={testSavedCity.forecast.pressure}
-                    units={testSavedCity.forecast.pressureUnits}
+                    pressure={convertPressure(
+                      testSavedCity.forecast.pressure,
+                      testSavedCity.forecast.pressureUnits,
+                      userSettings.pressure,
+                    )}
+                    units={userSettings.pressure}
                   />
                 }
               />
@@ -245,11 +261,13 @@ const HomePage = () => {
                 key="wind"
                 color="#FF9A79"
                 title={t('forecast.wind.main')}
-                text={`${testSavedCity.forecast.windSpeed} ${
-                  t(getReadableWindUnitsId(testSavedCity.forecast.windSpeedUnits))
-                } (${t(getReadableWindDirectionId(
-                  testSavedCity.forecast.windDirectionAngle
-                ))})`}
+                text={`${convertWindSpeed(testSavedCity.forecast.windSpeed, testSavedCity.forecast.windSpeedUnits,userSettings.windSpeed)} ${t(
+                  getReadableWindUnitsId(userSettings.windSpeed),
+                )} (${t(
+                  getReadableWindDirectionId(
+                    testSavedCity.forecast.windDirectionAngle,
+                  ),
+                )})`}
                 contentElement={
                   <WindComponent
                     speed={testSavedCity.forecast.windSpeed}
@@ -274,25 +292,33 @@ const HomePage = () => {
           </View>
 
           {/* TODO: remove in production code */}
-          <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
-          <Button title="рябов ответит (за всё)" onPress={() => navigation.navigate(PagesNames.MeteoChannel)}/>
-          <Button title="Настройки" onPress={() => navigation.navigate(PagesNames.Settings)}/>
-          <Button title="Toast test" onPress={() => WeatherModule.showTestToast()}/>
+          <Button
+            title="town select"
+            onPress={() => navigation.navigate(PagesNames.TownSelect)}
+          />
+          <Button
+            title="рябов ответит (за всё)"
+            onPress={() => navigation.navigate(PagesNames.MeteoChannel)}
+          />
+          <Button
+            title="Настройки"
+            onPress={() => navigation.navigate(PagesNames.Settings)}
+          />
+          <Button
+            title="Toast test"
+            onPress={() => WeatherModule.showTestToast()}
+          />
           <Button title="Make notification" onPress={() => test()} />
         </ScrollView>
 
-        <View key="system navigation buttons"
-          style={[
-            styles.systemNavButtons,
-            { height: insets.bottom },
-          ]}
+        <View
+          key="system navigation buttons"
+          style={[styles.systemNavButtons, {height: insets.bottom}]}
         />
       </ImageBackground>
-      <View key="system status bar"
-        style={[
-          styles.systemStatusBar,
-          { height: insets.top },
-        ]}
+      <View
+        key="system status bar"
+        style={[styles.systemStatusBar, {height: insets.top}]}
       />
     </View>
   );

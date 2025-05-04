@@ -17,8 +17,8 @@ class WeatherService {
 
   public static async fetchWeatherByCity(city: string): Promise<Forecast> {
     try {
-      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?q=${city}&appid=${this.API_KEY}&units=metric&lang=ru`;
-      const forecastUrl = `${this.FORECAST_URL}?q=${city}&appid=${this.API_KEY}&units=metric&lang=ru`;
+      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?q=${city}&appid=${this.API_KEY}&units=metric`;
+      const forecastUrl = `${this.FORECAST_URL}?q=${city}&appid=${this.API_KEY}&units=metric`;
 
       const [currentWeatherResponse, forecastResponse] = await Promise.all([
         axios.get(currentWeatherUrl),
@@ -39,8 +39,8 @@ class WeatherService {
     longitude: number,
   ): Promise<Forecast> {
     try {
-      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric&lang=ru`;
-      const forecastUrl = `${this.FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric&lang=ru`;
+      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric`;
+      const forecastUrl = `${this.FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric`;
 
       const [currentWeatherResponse, forecastResponse] = await Promise.all([
         axios.get(currentWeatherUrl),
@@ -71,8 +71,8 @@ class WeatherService {
       state: this.mapWeatherIdToStateId(data.weather[0].id),
       tempUnits: TempUnits.Celsius,
       windDirectionAngle: data.wind.deg,
-      windSpeed: data.wind.speed * 3.6,
-      windSpeedUnits: WindSpeedUnits.Kmh,
+      windSpeed: data.wind.speed,
+      windSpeedUnits: WindSpeedUnits.Ms,
       currentTemp: data.main.temp,
       humidity: data.main.humidity,
       maxTemp: data.main.temp_max,
