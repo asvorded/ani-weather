@@ -37,6 +37,30 @@ class SavedForecastsService {
     return jsons.map(e => JSON.parse(e)) as SavedForecastWithCityCoords[];
   }
 
+  private static async getForecastsStorageIds(): Promise<string[]> {
+    const forecastsIdsStr = await AsyncStorage.getItem(this.forecastsStorageIdsKey);
+
+    const forecastsIds = forecastsIdsStr ? this.parseSavedForecastsIdsJSON(forecastsIdsStr) : [] as string[];
+
+    return forecastsIds;
+  }
+
+  private static async addForecastStorageId(coords: Coords) {
+    const forecastsIds = await this.getForecastsStorageIds();
+
+    const newForecastsIds = [...forecastsIds, this.getSavedForecastStorageId(coords)];
+
+    await AsyncStorage.setItem(this.forecastsStorageIdsKey, JSON.stringify(newForecastsIds));
+  }
+
+  private static async removeForecastStorageId(coords: Coords) {
+    const forecastsIds = await this.getForecastsStorageIds();
+
+    const newCitiesIds = forecastsIds.filter(e => e !== this.getSavedForecastStorageId(coords));
+
+    await AsyncStorage.setItem(this.forecastsStorageIdsKey, JSON.stringify(newCitiesIds));
+  }
+
   static async getSavedForecastByCoords(coords: Coords): Promise<SavedForecastWithCityCoords | null> {
     const savedForecastJSON = await AsyncStorage.getItem(this.getSavedForecastStorageId(coords));
 
@@ -48,9 +72,7 @@ class SavedForecastsService {
   }
 
   static async getAllSavedForecasts(): Promise<SavedForecastWithCityCoords[]> {
-    const forecastsIdsStr = await AsyncStorage.getItem(this.forecastsStorageIdsKey);
-
-    const forecastsIds = forecastsIdsStr ? this.parseSavedForecastsIdsJSON(forecastsIdsStr) : [] as string[];
+    const forecastsIds = await this.getForecastsStorageIds();
 
     const savedForecastsJSONs = this.getValuesFromPairs(await AsyncStorage.multiGet(forecastsIds));
 
@@ -64,6 +86,7 @@ class SavedForecastsService {
   }
 
   static async removeForecastByCoords(coords: Coords): Promise<void> {
+    await this.removeForecastStorageId(coords);
     await AsyncStorage.removeItem(this.getSavedForecastStorageId(coords));
   }
 }
@@ -122,10 +145,32 @@ export class SavedCitiesService {
     });
   }
 
-  static async getAllSavedCities(): Promise<SavedCityWithForecast[]> {
+  private static async getCitiesStorageIds(): Promise<string[]> {
     const citiesIdsStr = await AsyncStorage.getItem(this.citiesStorageIdsKey);
 
     const citiesIds = citiesIdsStr ? this.parseCitiesIdsJSON(citiesIdsStr) : [] as string[];
+
+    return citiesIds;
+  }
+
+  private static async addCityStorageId(coords: Coords): Promise<void> {
+    const citiesIds = await this.getCitiesStorageIds();
+
+    const newCitiesIds = [...citiesIds, this.getSavedCityStorageId(coords)];
+
+    await AsyncStorage.setItem(this.citiesStorageIdsKey, JSON.stringify(newCitiesIds));
+  }
+
+  private static async removeCityStorageId(coords: Coords): Promise<void> {
+    const citiesIds = await this.getCitiesStorageIds();
+
+    const newCitiesIds = citiesIds.filter(e => e !== this.getSavedCityStorageId(coords));
+
+    await AsyncStorage.setItem(this.citiesStorageIdsKey, JSON.stringify(newCitiesIds));
+  }
+
+  static async getAllSavedCities(): Promise<SavedCityWithForecast[]> {
+    const citiesIds = await this.getCitiesStorageIds();
 
     const savedCitiesJSONs = this.getValuesFromPairs(await AsyncStorage.multiGet(citiesIds));
 
@@ -145,14 +190,20 @@ export class SavedCitiesService {
   static async addCity(city: City): Promise<SavedCity> {
     const cityForSave = this.toSavedCity(city);
 
+    await this.addCityStorageId(cityForSave.coords);
     await AsyncStorage.setItem(this.getSavedCityStorageId(cityForSave.coords), JSON.stringify(cityForSave));
 
     return cityForSave;
   }
 
   static async removeCityByCoords(coords: Coords): Promise<void> {
+    await this.removeCityStorageId(coords);
     await AsyncStorage.removeItem(this.getSavedCityStorageId(coords));
 
     await SavedForecastsService.removeForecastByCoords(coords);
   }
+
+  // static async updateForecastByCoords(coords: Coords) {
+
+  // }
 }
