@@ -4,8 +4,10 @@ import { KeyValuePair } from '@react-native-async-storage/async-storage/lib/type
 import { Coords } from '../types/common/Coords';
 import { SavedCity } from '../types/storage/SavedCity';
 import { SavedCityWithForecast } from '../types/storage/SavedCityWithForecast';
-import { SavedForecastWithCityCoords } from '../types/storage/SavedForecast';
+import { SavedForecast, SavedForecastWithCityCoords } from '../types/storage/SavedForecast';
 import { City } from '../types/api/City';
+import WeatherService from './WeatherService';
+import { Forecast } from '../types/api/Forecast';
 
 class SavedForecastsService {
   private static forecastsStorageIdPrefix = 'forecasts-';
@@ -37,7 +39,7 @@ class SavedForecastsService {
     return jsons.map(e => JSON.parse(e)) as SavedForecastWithCityCoords[];
   }
 
-  private static async getForecastsStorageIds(): Promise<string[]> {
+  static async getForecastsStorageIds(): Promise<string[]> {
     const forecastsIdsStr = await AsyncStorage.getItem(this.forecastsStorageIdsKey);
 
     const forecastsIds = forecastsIdsStr ? this.parseSavedForecastsIdsJSON(forecastsIdsStr) : [] as string[];
@@ -59,6 +61,10 @@ class SavedForecastsService {
     const newCitiesIds = forecastsIds.filter(e => e !== this.getSavedForecastStorageId(coords));
 
     await AsyncStorage.setItem(this.forecastsStorageIdsKey, JSON.stringify(newCitiesIds));
+  }
+
+  static mapForecastToSavedForecast(forecast: Forecast): SavedForecast {
+    return forecast as SavedForecast;
   }
 
   static async getSavedForecastByCoords(coords: Coords): Promise<SavedForecastWithCityCoords | null> {
@@ -88,6 +94,18 @@ class SavedForecastsService {
   static async removeForecastByCoords(coords: Coords): Promise<void> {
     await this.removeForecastStorageId(coords);
     await AsyncStorage.removeItem(this.getSavedForecastStorageId(coords));
+  }
+
+  static async addOrUpdateForecastByCoords(coords: Coords, forecastToSave: SavedForecast) {
+    const forecastsIds = await this.getForecastsStorageIds();
+
+    const newForecastId = this.getSavedForecastStorageId(coords);
+
+    if (!forecastsIds.includes(newForecastId)) {
+      this.addForecastStorageId(coords);
+    }
+
+    await AsyncStorage.setItem(newForecastId, JSON.stringify(forecastToSave));
   }
 }
 
@@ -145,7 +163,7 @@ export class SavedCitiesService {
     });
   }
 
-  private static async getCitiesStorageIds(): Promise<string[]> {
+  static async getCitiesStorageIds(): Promise<string[]> {
     const citiesIdsStr = await AsyncStorage.getItem(this.citiesStorageIdsKey);
 
     const citiesIds = citiesIdsStr ? this.parseCitiesIdsJSON(citiesIdsStr) : [] as string[];
@@ -203,7 +221,12 @@ export class SavedCitiesService {
     await SavedForecastsService.removeForecastByCoords(coords);
   }
 
-  // static async updateForecastByCoords(coords: Coords) {
+  static async updateForecastByCoords(coords: Coords): Promise<void> {
+    const forecast = await WeatherService.fetchWeatherWithForecastByCoords(coords.lat, coords.long);
 
-  // }
+    await SavedForecastsService.addOrUpdateForecastByCoords(
+      coords,
+      SavedForecastsService.mapForecastToSavedForecast(forecast)
+    );
+  }
 }
