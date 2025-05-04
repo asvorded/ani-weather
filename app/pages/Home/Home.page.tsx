@@ -22,6 +22,7 @@ import { getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
+import * as citiesService from '../../services/CitiesService.ts';
 
 import { WeatherModule } from '../../../specs/NativeModules.ts';
 
