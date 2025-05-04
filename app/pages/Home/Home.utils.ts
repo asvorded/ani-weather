@@ -16,30 +16,38 @@ export function getReadableMoonPhaseId(phase: MoonPhases): string {
 }
 
 export function getReadableGeomagneticDegreeId(degree: number): string {
-  if (degree >= 0 && degree <= 4) {
-    return 'forecast.geomagnetic.weak';
-  } else if (degree >= 5 && degree <= 6) {
-    return 'forecast.geomagnetic.medium';
-  } else if (degree >= 7 && degree <= 9) {
-    return 'forecast.geomagnetic.strong';
-  }
+  const geomagneticLevels = [
+    {min: 0, max: 4, id: 'forecast.geomagnetic.weak'},
+    {min: 5, max: 6, id: 'forecast.geomagnetic.medium'},
+    {min: 7, max: 9, id: 'forecast.geomagnetic.strong'},
+  ];
 
-  return 'forecast.geomagnetic.default';
+  const level = geomagneticLevels.find(
+    ({min, max}) => degree >= min && degree <= max,
+  );
+  return level ? level.id : 'forecast.geomagnetic.default';
 }
 
 export function getReadableHumidityId(value: number): string {
-  if (value >= 0 && value < 40) {
-    return 'forecast.humidity.low';
-  } else if (value >= 40 && value <= 60) {
-    return 'forecast.humidity.medium';
-  } else if (value > 60 && value <= 100) {
-    return 'forecast.humidity.high';
+  if (value < 0 || value > 100) {
+    return 'forecast.humidity.default';
   }
 
-  return 'forecast.humidity.default';
+  if (value < 40) {
+    return 'forecast.humidity.low';
+  }
+
+  if (value <= 60) {
+    return 'forecast.humidity.medium';
+  }
+
+  return 'forecast.humidity.high';
 }
 
-export function getReadablePressureId(value: number, units: PressureUnits): string {
+export function getReadablePressureId(
+  value: number,
+  units: PressureUnits,
+): string {
   return 'forecast.pressure.default';
 }
 
@@ -62,23 +70,21 @@ export function getReadableWindUnitsId(units: WindSpeedUnits): string {
 }
 
 export function getReadableWindDirectionId(angle: number): string {
-  if ((angle > 337.5 && angle <= 360) || (angle >= 0 && angle < 22.5)) {
-    return 'forecast.wind.direction.N';
-  } else if (angle >= 22.5 && angle <= 67.5) {
-    return 'forecast.wind.direction.NE';
-  } else if (angle > 67.5 && angle < 112.5) {
-    return 'forecast.wind.direction.E';
-  } else if (angle >= 112.5 && angle <= 157.5) {
-    return 'forecast.wind.direction.SE';
-  } else if (angle > 157.5 && angle < 202.5) {
-    return 'forecast.wind.direction.S';
-  } else if (angle >= 202.5 && angle <= 247.5) {
-    return 'forecast.wind.direction.SW';
-  } else if (angle > 247.5 && angle < 292.5) {
-    return 'forecast.wind.direction.W';
-  } else if (angle >= 292.5 && angle <= 337.5) {
-    return 'forecast.wind.direction.NW';
-  }
+  const directions: [number, number, string][] = [
+    [337.5, 360, 'forecast.wind.direction.N'],
+    [0, 22.5, 'forecast.wind.direction.N'],
+    [22.5, 67.5, 'forecast.wind.direction.NE'],
+    [67.5, 112.5, 'forecast.wind.direction.E'],
+    [112.5, 157.5, 'forecast.wind.direction.SE'],
+    [157.5, 202.5, 'forecast.wind.direction.S'],
+    [202.5, 247.5, 'forecast.wind.direction.SW'],
+    [247.5, 292.5, 'forecast.wind.direction.W'],
+    [292.5, 337.5, 'forecast.wind.direction.NW'],
+  ];
 
-  return 'forecast.wind.direction.default';
+  const direction = directions.find(
+    ([min, max]) => angle >= min && angle <= max,
+  );
+
+  return direction ? direction[2] : 'forecast.wind.direction.default';
 }

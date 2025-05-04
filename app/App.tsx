@@ -7,6 +7,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TownSelect from './pages/TownSelect/TownSelect.page';
 import HomePage from './pages/Home/Home.page';
 import MeteoChannel from './pages/MeteoChannel/MeteoChannel.page';
+import SettingsPage from './pages/Settings/Settings.page.tsx';
 
 import {
   PagesNames,
@@ -22,6 +23,7 @@ const RootStack = createNativeStackNavigator<RootStackParamsList>({
     [PagesNames.Home]: HomePage,
     [PagesNames.TownSelect]: TownSelect,
     [PagesNames.MeteoChannel]: MeteoChannel,
+    [PagesNames.Settings]: SettingsPage,
   },
 });
 

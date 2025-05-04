@@ -1,5 +1,5 @@
 import { Button, ImageBackground, ScrollView, View } from 'react-native';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -22,7 +22,7 @@ import { getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
-import * as citiesService from '../../services/CitiesService.ts';
+import WeatherService from '../../services/WeatherService.ts';
 
 import { WeatherModule } from '../../../specs/NativeModules.ts';
 import {fetchWeatherByCoords} from '../../services/WeatherService.ts';
@@ -166,6 +166,15 @@ const HomePage = () => {
       ],
     },
   });
+  useEffect(() => {
+    console.log('calling fetchWeatherByCoords');
+    WeatherService.fetchWeatherWithForecastByCoords(
+      testSavedCity.city.latitude,
+      testSavedCity.city.longitude,
+    ).then(forecast => {
+      setSavedCities(prevState => ({...prevState, forecast}));
+    });
+  }, [testSavedCity.city.latitude, testSavedCity.city.longitude]);
 
   return (
     <View style={styles.outerContainer} key="home page">

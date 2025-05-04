@@ -11,6 +11,33 @@
   "forecast": {
     "moonPhase": {
       "main": "Moon phase"
+    },
+    "weatherStates": {
+      "none": "No data",
+      "thunderstorm": "Thunderstorm",
+      "drizzle": "Drizzle",
+      "rain": "Rain",
+      "snow": "Snow",
+      "mist": "Mist",
+      "smoke": "Smoke",
+      "haze": "Haze",
+      "dust": "Dust",
+      "fog": "Fog",
+      "sand": "Sand",
+      "ash": "Ash",
+      "squall": "Squall",
+      "tornado": "Tornado",
+      "clear": "Clear",
+      "clouds": "Cloudy"
+    }
+  },
+  "Settings": {
+    "Title": "Settings",
+    "Language": "Language",
+    "units": {
+      "title" : "Units of measurement",
+      "pressure" : "Pressure",
+      "wind": "Wind"
     }
   }
 }
