@@ -150,11 +150,9 @@ export class SavedCitiesService {
     return cityForSave;
   }
 
-  static async removeCity(city: City): Promise<void> {
-    const cityForRemove = this.toSavedCity(city);
+  static async removeCityByCoords(coords: Coords): Promise<void> {
+    await AsyncStorage.removeItem(this.getSavedCityStorageId(coords));
 
-    await AsyncStorage.removeItem(this.getSavedCityStorageId(cityForRemove.coords));
-
-    await SavedForecastsService.removeForecastByCoords(cityForRemove.coords);
+    await SavedForecastsService.removeForecastByCoords(coords);
   }
 }
