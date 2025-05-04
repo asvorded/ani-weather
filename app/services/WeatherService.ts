@@ -1,76 +1,109 @@
+import axios from 'axios';
 import {
   Forecast,
   MoonPhases,
   PressureUnits,
   TempUnits,
+  WeatherId,
   WindSpeedUnits,
 } from '../types/api/Forecast.ts';
-const API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY; //not safe!!!
-const CURRENT_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
-const FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
-export async function fetchWeatherByCity(city: string): Promise<Forecast> {
-  const url = `${CURRENT_WEATHER_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=ru`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Ошибка : ${response.statusText}`);
+
+class WeatherService {
+  private static API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
+  private static CURRENT_WEATHER_URL =
+    'https://api.openweathermap.org/data/2.5/weather';
+  private static FORECAST_URL =
+    'https://api.openweathermap.org/data/2.5/forecast';
+
+  public static async fetchWeatherByCity(city: string): Promise<Forecast> {
+    try {
+      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?q=${city}&appid=${this.API_KEY}&units=metric`;
+      const forecastUrl = `${this.FORECAST_URL}?q=${city}&appid=${this.API_KEY}&units=metric`;
+
+      const [currentWeatherResponse, forecastResponse] = await Promise.all([
+        axios.get(currentWeatherUrl),
+        axios.get(forecastUrl),
+      ]);
+
+      return this.mapDataToForecast(
+        currentWeatherResponse.data,
+        forecastResponse.data,
+      );
+    } catch (error: any) {
+      throw new Error(`Ошибка: ${error.response?.statusText || error.message}`);
+    }
   }
 
-  const data = await response.json();
-  console.log(data);
-  const forecastUrl = `${FORECAST_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=ru`;
-  const forecastResponse = await fetch(forecastUrl);
-  if (!forecastResponse.ok) {
-    throw new Error(`Ошибка : ${forecastResponse.statusText}`);
-  }
-  const forecastData = await forecastResponse.json();
-  console.log(forecastData);
-  return mapDataToForecast(data, forecastData);
-}
-function mapDataToForecast(data: any, forecastData: any): Forecast {
-  return {
-    airQuality: 0,
-    geomagneticActivity: 0,
-    hourlyforecast: forecastData.list.map((item: any) => ({
-      time: new Date(item.dt * 1000), // [x]: string or time?
-      temp: item.main.temp,
-      state: 0,
-    })),
-    moonPhase: MoonPhases.FullMoon, //TODO: change to calculate it based on date
-    pressure: data.main.pressure,
-    pressureUnits: PressureUnits.Pascal, //open weather supports only hPa https://openweathermap.org/weather-data
-    state: 0,
-    tempUnits: TempUnits.Celsius, //standard = Kelvin, metric = Celsius, imperial = Fahrenheit
-    windDirectionAngle: data.wind.deg,
-    windSpeed: data.wind.speed * 3.6,
-    windSpeedUnits: WindSpeedUnits.Kmh, //standard, metric = m/s, imperial ml/h
-    currentTemp: data.main.temp,
-    humidity: data.main.humidity, // %
-    maxTemp: data.main.temp_max,
-    minTemp: data.main.temp_min,
-    shortDescription: data.weather[0].description,
-  };
-}
+  public static async fetchWeatherWithForecastByCoords(
+    latitude: number,
+    longitude: number,
+  ): Promise<Forecast> {
+    try {
+      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric`;
+      const forecastUrl = `${this.FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric`;
 
-export async function fetchWeatherByCoords(
-  latitude: number,
-  longitude: number,
-): Promise<Forecast> {
-  const url = `${CURRENT_WEATHER_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=ru`;
-  console.log('awaiting fetch' + url);
-  const response = await fetch(url);
-  console.log('response' + response);
-  if (!response.ok) {
-    throw new Error(`Ошибка : ${response.statusText}`);
+      const [currentWeatherResponse, forecastResponse] = await Promise.all([
+        axios.get(currentWeatherUrl),
+        axios.get(forecastUrl),
+      ]);
+
+      return this.mapDataToForecast(
+        currentWeatherResponse.data,
+        forecastResponse.data,
+      );
+    } catch (error: any) {
+      throw new Error(`Ошибка: ${error.response?.statusText || error.message}`);
+    }
   }
 
-  const data = await response.json();
-  console.log(data);
-  const forecastUrl = `${FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=ru`;
-  const forecastResponse = await fetch(forecastUrl);
-  if (!forecastResponse.ok) {
-    throw new Error(`Ошибка : ${forecastResponse.statusText}`);
+  private static mapDataToForecast(data: any, forecastData: any): Forecast {
+    return {
+      airQuality: 0,
+      geomagneticActivity: 0,
+      hourlyforecast: forecastData.list.map((item: any) => ({
+        time: new Date(item.dt * 1000),
+        temp: item.main.temp,
+        state: this.mapWeatherIdToStateId(item.main.weather[0].id),
+      })),
+      moonPhase: MoonPhases.FullMoon,
+      pressure: data.main.pressure,
+      pressureUnits: PressureUnits.Pascal,
+      state: this.mapWeatherIdToStateId(data.weather[0].id),
+      tempUnits: TempUnits.Celsius,
+      windDirectionAngle: data.wind.deg,
+      windSpeed: data.wind.speed,
+      windSpeedUnits: WindSpeedUnits.Ms,
+      currentTemp: data.main.temp,
+      humidity: data.main.humidity,
+      maxTemp: data.main.temp_max,
+      minTemp: data.main.temp_min,
+      shortDescription: data.weather[0].description,
+    };
   }
-  const forecastData = await forecastResponse.json();
-  console.log(forecastData);
-  return mapDataToForecast(data, forecastData);
+  private static mapWeatherIdToStateId(weatherId: number): WeatherId {
+    const states: [number, number, WeatherId][] = [
+      [200, 232, WeatherId.thunderstorm],
+      [300, 321, WeatherId.drizzle],
+      [500, 531, WeatherId.rain],
+      [600, 622, WeatherId.snow],
+      [700, 700, WeatherId.mist],
+      [711, 711, WeatherId.smoke],
+      [721, 721, WeatherId.haze],
+      [731, 731, WeatherId.dust],
+      [741, 741, WeatherId.fog],
+      [751, 751, WeatherId.sand],
+      [761, 761, WeatherId.dust],
+      [762, 762, WeatherId.ash],
+      [771, 771, WeatherId.squall],
+      [781, 781, WeatherId.tornado],
+      [800, 800, WeatherId.clear],
+      [801, 804, WeatherId.clouds],
+    ];
+    const [min, max, state] = states.find(
+      ([min, max]) => weatherId >= min && weatherId <= max,
+    ) || [0, 0, WeatherId.clear];
+    return state;
+  }
 }
+
+export default WeatherService;

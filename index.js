@@ -10,22 +10,21 @@ import i18next from 'i18next';
 
 import ru from './i18n/locales/ru.json';
 import en from './i18n/locales/en.json';
-import { initReactI18next } from 'react-i18next';
+import {initReactI18next} from 'react-i18next';
+import {registerNotificationBackgroundHandler} from './app/services/notifications/notifications';
 
-i18next
-  .use(initReactI18next)
-  .init({
-    lng: 'ru',
-    fallbackLng: 'en',
-    debug: true,
-    resources: {
-      ru: {
-        translation: ru,
-      },
-      en: {
-        translation: en,
-      },
+i18next.use(initReactI18next).init({
+  lng: 'ru',
+  fallbackLng: 'en',
+  debug: true,
+  resources: {
+    ru: {
+      translation: ru,
     },
-  });
-
+    en: {
+      translation: en,
+    },
+  },
+});
+registerNotificationBackgroundHandler();
 AppRegistry.registerComponent(appName, () => App);

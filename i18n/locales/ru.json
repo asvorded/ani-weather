@@ -58,11 +58,40 @@
       "units": {
         "kmh": "км/ч",
         "ms": "м/с"
+      },
+      "weatherStates": {
+        "none": "Нет данных",
+        "thunderstorm": "Гроза",
+        "drizzle": "Морось",
+        "rain": "Дождь",
+        "snow": "Снег",
+        "mist": "Мгла",
+        "smoke": "Дым",
+        "haze": "Дымка",
+        "dust": "Пыль",
+        "fog": "Туман",
+        "sand": "Песок",
+        "ash": "Зола",
+        "squall": "Шквал",
+        "tornado": "Торнадо",
+        "clear": "Ясно",
+        "clouds": "Облачно"
       }
     },
     "airQuality": {
       "main": "Качество воздуха",
       "title": "ИКВ"
     }
+  },
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык",
+    "units": {
+      "title" : "Единицы измерения",
+      "temperature": "Температура",
+      "pressure" : "Давление",
+      "wind": "Ветер"
+    },
+    "notifications": "Уведомления"
   }
 }
