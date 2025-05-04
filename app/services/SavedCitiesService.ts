@@ -5,6 +5,7 @@ import { Coords } from '../types/common/Coords';
 import { SavedCity } from '../types/storage/SavedCity';
 import { SavedCityWithForecast } from '../types/storage/SavedCityWithForecast';
 import { SavedForecastWithCityCoords } from '../types/storage/SavedForecast';
+import { City } from '../types/api/City';
 
 class SavedForecastsService {
   private static forecastsStorageIdPrefix = 'forecasts-';
@@ -61,6 +62,10 @@ class SavedForecastsService {
 
     return savedForecasts;
   }
+
+  static async removeForecastByCoords(coords: Coords): Promise<void> {
+    await AsyncStorage.removeItem(this.getSavedForecastStorageId(coords));
+  }
 }
 
 export class SavedCitiesService {
@@ -94,6 +99,18 @@ export class SavedCitiesService {
     return JSON.parse(json) as string[];
   }
 
+  private static toSavedCity(city: City): SavedCity {
+    return {
+      name: city.name,
+      country: city.country,
+      region: city.region,
+      coords: {
+        lat: city.latitude,
+        long: city.longitude,
+      },
+    };
+  }
+
   private static mergeCitiesAndForecasts(cities: SavedCity[], forecasts: SavedForecastWithCityCoords[]): SavedCityWithForecast[] {
     return cities.map(city => {
       const foundForecast = forecasts.find(forecast => this.areCoordsEqual(forecast.cityCoords, city.coords));
@@ -123,5 +140,21 @@ export class SavedCitiesService {
     const savedCitiesWithForecasts = this.mergeCitiesAndForecasts(savedCities, savedForecasts);
 
     return savedCitiesWithForecasts;
+  }
+
+  static async addCity(city: City): Promise<SavedCity> {
+    const cityForSave = this.toSavedCity(city);
+
+    await AsyncStorage.setItem(this.getSavedCityStorageId(cityForSave.coords), JSON.stringify(cityForSave));
+
+    return cityForSave;
+  }
+
+  static async removeCity(city: City): Promise<void> {
+    const cityForRemove = this.toSavedCity(city);
+
+    await AsyncStorage.removeItem(this.getSavedCityStorageId(cityForRemove.coords));
+
+    await SavedForecastsService.removeForecastByCoords(cityForRemove.coords);
   }
 }
