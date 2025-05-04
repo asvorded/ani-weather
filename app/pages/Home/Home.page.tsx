@@ -25,6 +25,8 @@ import { getReadableGeomagneticDegreeId, getReadableHumidityId,
 import * as citiesService from '../../services/CitiesService.ts';
 
 import { WeatherModule } from '../../../specs/NativeModules.ts';
+import {fetchWeatherByCoords} from '../../services/WeatherService.ts';
+import {test} from '../../services/notifications/notifications.ts';
 
 const WeatherDetailedPanel = ({
   color,
@@ -263,9 +265,11 @@ const HomePage = () => {
             </View>
           </View>
 
+          {/* TODO: remove in production code */}
           <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
           <Button title="рябов ответит (за всё)" onPress={() => navigation.navigate(PagesNames.MeteoChannel)}/>
           <Button title="Toast test" onPress={() => WeatherModule.showTestToast()}/>
+          <Button title="Make notification" onPress={() => test()} />
         </ScrollView>
 
         <View key="system navigation buttons"
