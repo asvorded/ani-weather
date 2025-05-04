@@ -13,6 +13,7 @@ import {
   PagesNames,
   RootStackParamsList,
 } from './types/common/root-stack-params-list';
+import {UserSettingsProvider} from './services/UserSettingsProvider.tsx';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>({
   initialRouteName: PagesNames.Home,
@@ -36,9 +37,11 @@ const App = () => {
   return (
     // FIXME: Strict mode breaks fetch functions' logic
     <>
-      <SafeAreaProvider>
-        <Navigation />
-      </SafeAreaProvider>
+      <UserSettingsProvider>
+        <SafeAreaProvider>
+          <Navigation />
+        </SafeAreaProvider>
+      </UserSettingsProvider>
     </>
   );
 };
