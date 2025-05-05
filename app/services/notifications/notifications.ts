@@ -1,10 +1,7 @@
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as Notifications from 'expo-notifications';
-import {
-  fetchCurrentWeatherByCity,
-  fetchWeatherByCity,
-} from '../WeatherService.ts';
+import WeatherService from '../WeatherService.ts';
 import {Platform} from 'react-native';
 
 const WEATHER_TASK = 'WEATHER_UPDATE_TASK';
@@ -31,7 +28,7 @@ export async function registerNotificationBackgroundHandler() {
     console.log('Background task started');
     try {
       // Замените URL и параметры на данные вашего погодного API
-      const weather = await fetchCurrentWeatherByCity('Minsk');
+      const weather = await WeatherService.fetchWeatherByCity('Minsk');
 
       // Составляем сообщение на основе полученной информации
       const weatherText = `Сегодня ${weather.shortDescription} при температуре ${weather.currentTemp}°C`;
