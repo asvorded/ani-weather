@@ -28,6 +28,7 @@ import WeatherService from '../../services/WeatherService.ts';
 import { WeatherModule } from '../../../specs/NativeModules.ts';
 import {test} from '../../services/notifications/notifications.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
+import CityCarousel from './components/CityCarousel.tsx';
 
 const WeatherDetailedPanel = ({
   color,
@@ -51,10 +52,19 @@ const WeatherDetailedPanel = ({
 };
 
 const WeatherPanel = () => {
+  const [cityWrapperWidth, setCityWrapperWidth] = useState(0);
+
   return (
     <View style={styles.topContainer}>
-      <View style={styles.cityWrapper}>
-        <CustomText style={styles.cityText}>#######</CustomText>
+      <View
+        style={styles.cityWrapper}
+        onLayout={event => setCityWrapperWidth(event.nativeEvent.layout.width)}
+      >
+        <CityCarousel
+          cities={[]}
+          onChange={city => console.log(city)}
+          style={{ width: cityWrapperWidth }}
+        />
       </View>
       <View style={styles.weatherMainContainer}>
         <WeatherIcon type={WeatherIconType.PartlyCloudyDay} size={130} />

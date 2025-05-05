@@ -57,11 +57,6 @@ export const styles = StyleSheet.create({
   },
   cityWrapper: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  cityText: {
-    fontSize: 24,
-    marginBottom: -10,
   },
   weatherDescriptionText: {
     fontSize: 16,

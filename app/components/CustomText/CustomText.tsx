@@ -14,3 +14,7 @@ export const CustomText: React.FC<CustomTextProps> = ({ children, style, ...rest
     </Text>
   );
 };
+
+const customTextStyles = styles.text;
+
+export { customTextStyles };
