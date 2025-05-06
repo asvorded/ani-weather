@@ -195,6 +195,12 @@ const HomePage = () => {
   const routes = [
     { key: 'first', title: 'First' },
     { key: 'second', title: 'Second' },
+    { key: 'second1', title: 'Second' },
+    { key: 'second2', title: 'Second' },
+    { key: 'second3', title: 'Second' },
+    { key: 'second4', title: 'Second' },
+    { key: 'second5', title: 'Second' },
+    { key: 'second6', title: 'Second' },
   ];
 
   return (
@@ -211,6 +217,7 @@ const HomePage = () => {
           renderTabBar={props =>
             <TabBar
               style={{ backgroundColor: '#00000000' }}
+              scrollEnabled
               renderIndicator={() => null}
               {...props}
             />
