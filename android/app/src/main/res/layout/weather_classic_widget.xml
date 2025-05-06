@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    android:padding="10dp"
+    android:paddingHorizontal="10dp"
     android:gravity="center">
 
     <LinearLayout
