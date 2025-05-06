@@ -1,5 +1,5 @@
 import { Button, ImageBackground, ScrollView, useWindowDimensions, View } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -29,7 +29,6 @@ import WeatherService from '../../services/WeatherService.ts';
 import { WeatherModule } from '../../../specs/NativeModules.ts';
 import {test} from '../../services/notifications/notifications.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
-import CityCarousel from './components/CityCarousel.tsx';
 
 const WeatherDetailedPanel = ({
   color,
@@ -141,10 +140,206 @@ const WindComponent = ({
   );
 };
 
-const HomePage = () => {
+const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
   const {userSettings} = useUserSettings();
   let { t } = useTranslation();
   const navigation = useCustomNavigation();
+
+  const insets = useSafeAreaInsets();
+
+  const scrollRef = useRef<ScrollView>(null);
+
+  const testSavedCity = {
+    city: {
+      name: 'тест',
+      region: 'pdsfuhsdpfiu',
+      country: 'Беларусь',
+      longitude: 53,
+      latitude: 27,
+    },
+    forecast: {
+      currentTemp: 10,
+      tempUnits: TempUnits.Celsius,
+      state: -1,
+      shortDescription: 'Солнышко',
+      maxTemp: 12.5,
+      minTemp: 8.3,
+      moonPhase: MoonPhases.NewMoon,
+      geomagneticActivity: 4,
+      humidity: 78,
+      pressure: 1014,
+      pressureUnits: PressureUnits.Pascal,
+      windSpeed: 8.5,
+      windSpeedUnits: WindSpeedUnits.Ms,
+      windDirectionAngle: 0,
+      airQuality: 78,
+      hourlyforecast: [
+        { time: '12:00', state: -1, temp: 10.1 },
+        { time: '12:00', state: -1,  temp: 10.1 },
+        { time: '12:00', state: -1, temp: 10.1 },
+      ],
+    },
+  };
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  }, [pageIndex]);
+
+  return (
+    <ScrollView
+      ref={scrollRef}
+      style={{
+        marginLeft: insets.left,
+        marginRight: insets.right,
+      }}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
+      <WeatherPanel />
+      <View style={styles.detailsGrid}>
+        <View style={styles.row}>
+          <WeatherDetailedPanel
+            key="moon phase"
+            color="#A9E788"
+            title={t('forecast.moonPhase.main')}
+            text={t(
+              getReadableMoonPhaseId(testSavedCity.forecast.moonPhase),
+            )}
+            contentElement={<MoonPhaseComponent />}
+          />
+          <WeatherDetailedPanel
+            key="geomag"
+            color="#B3DBFF"
+            title={t('forecast.geomagnetic.main')}
+            text={t(
+              getReadableGeomagneticDegreeId(
+                testSavedCity.forecast.geomagneticActivity,
+              ),
+            )}
+            contentElement={
+              <MagneticActivityComponent
+                degree={testSavedCity.forecast.geomagneticActivity}
+              />
+            }
+          />
+        </View>
+        <View style={styles.row}>
+          <WeatherDetailedPanel
+            key="humidity"
+            color="#FFE179"
+            title={t('forecast.humidity.main')}
+            text={t(getReadableHumidityId(testSavedCity.forecast.humidity))}
+            contentElement={
+              <HumidityComponent
+                humidity={testSavedCity.forecast.humidity}
+              />
+            }
+          />
+          <WeatherDetailedPanel
+            key="pressure"
+            color="#FBB9BA"
+            title={t('forecast.pressure.main')}
+            text={t(
+              getReadablePressureId(
+                testSavedCity.forecast.pressure,
+                testSavedCity.forecast.pressureUnits,
+              ),
+            )}
+            contentElement={
+              <PressureComponent
+                pressure={convertPressure(
+                  testSavedCity.forecast.pressure,
+                  testSavedCity.forecast.pressureUnits,
+                  userSettings.pressure,
+                )}
+                units={userSettings.pressure}
+              />
+            }
+          />
+        </View>
+        <View style={styles.row}>
+          <WeatherDetailedPanel
+            key="wind"
+            color="#FF9A79"
+            title={t('forecast.wind.main')}
+            text={`${convertWindSpeed(testSavedCity.forecast.windSpeed, testSavedCity.forecast.windSpeedUnits,userSettings.windSpeed)} ${t(
+              getReadableWindUnitsId(userSettings.windSpeed),
+            )} (${t(
+              getReadableWindDirectionId(
+                testSavedCity.forecast.windDirectionAngle,
+              ),
+            )})`}
+            contentElement={
+              <WindComponent
+                speed={testSavedCity.forecast.windSpeed}
+                units={testSavedCity.forecast.windSpeedUnits}
+                directionAngle={testSavedCity.forecast.windDirectionAngle}
+              />
+            }
+          />
+          <WeatherDetailedPanel
+            key="air quality"
+            color="#B9F4FB"
+            title={t('forecast.airQuality.main')}
+            text="#######"
+            contentElement={<></>}
+          />
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <View style={styles.forecastPanel} />
+          </View>
+        </View>
+      </View>
+
+      {/* TODO: remove in production code */}
+      <Button
+        title="town select"
+        onPress={() => navigation.navigate(PagesNames.TownSelect)}
+      />
+      <Button
+        title="рябов ответит (за всё)"
+        onPress={() => navigation.navigate(PagesNames.MeteoChannel)}
+      />
+      <Button
+        title="Настройки"
+        onPress={() => navigation.navigate(PagesNames.Settings)}
+      />
+      <Button
+        title="Toast test"
+        onPress={() => WeatherModule.showTestToast()}
+      />
+      <Button title="Make notification" onPress={() => test()} />
+    </ScrollView>
+
+  );
+};
+
+const WeatherTabBar: React.FC<any> = (props) => {
+  return (
+    <TabBar
+      style={styles.tabBar}
+      renderTabBarItem={({key: _, ...props}) =>
+        <TabBarItem
+          label={props =>
+            <CustomText
+              numberOfLines={1}
+              style={[styles.tabBarText, { color: props.color }]}
+            >
+              {props.labelText ?? ''}
+            </CustomText>
+          }
+          {...props}
+        />
+      }
+      scrollEnabled
+      renderIndicator={() => null}
+      {...props}
+    />
+  );
+};
+
+const HomePage = () => {
 
   const insets = useSafeAreaInsets();
 
@@ -192,15 +387,15 @@ const HomePage = () => {
   const [index, setIndex] = React.useState(0);
   const layout = useWindowDimensions();
 
-  const routes = [
-    { key: 'first', title: 'First' },
-    { key: 'second', title: 'Second' },
-    { key: 'second1', title: 'Second' },
-    { key: 'second2', title: 'Second' },
-    { key: 'second3', title: 'Second' },
-    { key: 'second4', title: 'Second' },
-    { key: 'second5', title: 'Second' },
-    { key: 'second6', title: 'Second' },
+  const mockedRoutes = [
+    { key: 'first', title: 'Минск' },
+    { key: 'second', title: 'Москва' },
+    { key: 'second1', title: 'Новосибирск' },
+    { key: 'second2', title: 'Кировск' },
+    { key: 'second3', title: 'Новополоцк' },
+    { key: 'second4', title: 'Могилев' },
+    { key: 'second5', title: 'Гомель' },
+    { key: 'second6', title: 'Лондон' },
   ];
 
   return (
@@ -210,145 +405,13 @@ const HomePage = () => {
         style={styles.imageContainer}
         source={require('../../../assets/images/sample.png')}>
         <TabView
-          navigationState={{ index, routes }}
+          lazy
+          navigationState={{ index, routes: mockedRoutes }}
           style={{
             marginTop: insets.top,
           }}
-          renderTabBar={props =>
-            <TabBar
-              style={{ backgroundColor: '#00000000' }}
-              scrollEnabled
-              renderIndicator={() => null}
-              {...props}
-            />
-          }
-          renderScene={() => (
-            <ScrollView
-              style={{
-                marginLeft: insets.left,
-                marginRight: insets.right,
-              }}
-              contentContainerStyle={styles.container}
-              showsVerticalScrollIndicator={false}
-              //overScrollMode="never"
-            >
-              <WeatherPanel />
-              <View style={styles.detailsGrid}>
-                <View style={styles.row}>
-                  <WeatherDetailedPanel
-                    key="moon phase"
-                    color="#A9E788"
-                    title={t('forecast.moonPhase.main')}
-                    text={t(
-                      getReadableMoonPhaseId(testSavedCity.forecast.moonPhase),
-                    )}
-                    contentElement={<MoonPhaseComponent />}
-                  />
-                  <WeatherDetailedPanel
-                    key="geomag"
-                    color="#B3DBFF"
-                    title={t('forecast.geomagnetic.main')}
-                    text={t(
-                      getReadableGeomagneticDegreeId(
-                        testSavedCity.forecast.geomagneticActivity,
-                      ),
-                    )}
-                    contentElement={
-                      <MagneticActivityComponent
-                        degree={testSavedCity.forecast.geomagneticActivity}
-                      />
-                    }
-                  />
-                </View>
-                <View style={styles.row}>
-                  <WeatherDetailedPanel
-                    key="humidity"
-                    color="#FFE179"
-                    title={t('forecast.humidity.main')}
-                    text={t(getReadableHumidityId(testSavedCity.forecast.humidity))}
-                    contentElement={
-                      <HumidityComponent
-                        humidity={testSavedCity.forecast.humidity}
-                      />
-                    }
-                  />
-                  <WeatherDetailedPanel
-                    key="pressure"
-                    color="#FBB9BA"
-                    title={t('forecast.pressure.main')}
-                    text={t(
-                      getReadablePressureId(
-                        testSavedCity.forecast.pressure,
-                        testSavedCity.forecast.pressureUnits,
-                      ),
-                    )}
-                    contentElement={
-                      <PressureComponent
-                        pressure={convertPressure(
-                          testSavedCity.forecast.pressure,
-                          testSavedCity.forecast.pressureUnits,
-                          userSettings.pressure,
-                        )}
-                        units={userSettings.pressure}
-                      />
-                    }
-                  />
-                </View>
-                <View style={styles.row}>
-                  <WeatherDetailedPanel
-                    key="wind"
-                    color="#FF9A79"
-                    title={t('forecast.wind.main')}
-                    text={`${convertWindSpeed(testSavedCity.forecast.windSpeed, testSavedCity.forecast.windSpeedUnits,userSettings.windSpeed)} ${t(
-                      getReadableWindUnitsId(userSettings.windSpeed),
-                    )} (${t(
-                      getReadableWindDirectionId(
-                        testSavedCity.forecast.windDirectionAngle,
-                      ),
-                    )})`}
-                    contentElement={
-                      <WindComponent
-                        speed={testSavedCity.forecast.windSpeed}
-                        units={testSavedCity.forecast.windSpeedUnits}
-                        directionAngle={testSavedCity.forecast.windDirectionAngle}
-                      />
-                    }
-                  />
-                  <WeatherDetailedPanel
-                    key="air quality"
-                    color="#B9F4FB"
-                    title={t('forecast.airQuality.main')}
-                    text="#######"
-                    contentElement={<></>}
-                  />
-                </View>
-                <View style={styles.row}>
-                  <View style={styles.cell}>
-                    <View style={styles.forecastPanel} />
-                  </View>
-                </View>
-              </View>
-
-              {/* TODO: remove in production code */}
-              <Button
-                title="town select"
-                onPress={() => navigation.navigate(PagesNames.TownSelect)}
-              />
-              <Button
-                title="рябов ответит (за всё)"
-                onPress={() => navigation.navigate(PagesNames.MeteoChannel)}
-              />
-              <Button
-                title="Настройки"
-                onPress={() => navigation.navigate(PagesNames.Settings)}
-              />
-              <Button
-                title="Toast test"
-                onPress={() => WeatherModule.showTestToast()}
-              />
-              <Button title="Make notification" onPress={() => test()} />
-            </ScrollView>
-          )}
+          renderTabBar={WeatherTabBar}
+          renderScene={() => <WeatherPage pageIndex={index} />}
           onIndexChange={setIndex}
           initialLayout={{ width: layout.width }}
         />

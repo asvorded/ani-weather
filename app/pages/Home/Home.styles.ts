@@ -189,4 +189,10 @@ export const styles = StyleSheet.create({
   windCompassArrowImg: {
     height: 30,
   },
+  tabBar: {
+    backgroundColor: 'transparent',
+  },
+  tabBarText: {
+    fontSize: 18,
+  },
 });
