@@ -8,13 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.AlarmClock
 import android.widget.RemoteViews
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
-/**
- * Implementation of App Widget functionality.
- */
 class WeatherClassicWidget : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
@@ -45,20 +39,9 @@ class WeatherClassicWidget : AppWidgetProvider() {
                     setOnClickPendingIntent(R.id.weather_view, weatherPendingIntent)
                     setOnClickPendingIntent(R.id.time_text, timePendingIntent)
                     setOnClickPendingIntent(R.id.date_text, calendarPendingIntent)
-
-                    setWidgetDateAndTime()
                 }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
-}
-
-internal fun RemoteViews.setWidgetDateAndTime() {
-    val currentDate = Date()
-    val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(currentDate)
-    val date = SimpleDateFormat("EE, d MMMM", Locale.getDefault()).format(currentDate)
-
-    this.setTextViewText(R.id.time_text, time)
-    this.setTextViewText(R.id.date_text, date)
 }

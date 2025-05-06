@@ -13,8 +13,8 @@
         android:gravity="center_vertical"
         android:orientation="vertical">
 
-        <!-- Date -->
-        <TextView
+        <!-- Time -->
+        <TextClock
             android:id="@+id/time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,21 +26,22 @@
             android:shadowDy="@dimen/widget_shadow_dy"
             android:shadowColor="#B0000000"
             android:shadowRadius="@dimen/widget_shadow_radius"
-            android:text="@string/widget_default_time" />
+            />
 
-        <!-- Time -->
-        <TextView
+        <!-- Date -->
+        <TextClock
             android:id="@+id/date_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/bellota_text_regular"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
+            android:format12Hour="EE, d MMMM"
+            android:format24Hour="EE, d MMMM"
             android:shadowDx="@dimen/widget_shadow_dx"
             android:shadowDy="@dimen/widget_shadow_dy"
             android:shadowColor="#B0000000"
-            android:shadowRadius="@dimen/widget_shadow_radius"
-            android:text="@string/widget_default_date"/>
+            android:shadowRadius="@dimen/widget_shadow_radius" />
     </LinearLayout>
 
     <LinearLayout
