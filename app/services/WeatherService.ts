@@ -10,19 +10,29 @@ import {
 
 class WeatherService {
   private static API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
-  private static CURRENT_WEATHER_URL =
+  private static currentWeatherOWUrl =
     'https://api.openweathermap.org/data/2.5/weather';
-  private static FORECAST_URL =
+  private static forecastWeatherOWUrl =
     'https://api.openweathermap.org/data/2.5/forecast';
 
   public static async fetchWeatherByCity(city: string): Promise<Forecast> {
+    console.log(this.API_KEY, this.currentWeatherOWUrl, this.forecastWeatherOWUrl);
     try {
-      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?q=${city}&appid=${this.API_KEY}&units=metric`;
-      const forecastUrl = `${this.FORECAST_URL}?q=${city}&appid=${this.API_KEY}&units=metric`;
-
       const [currentWeatherResponse, forecastResponse] = await Promise.all([
-        axios.get(currentWeatherUrl),
-        axios.get(forecastUrl),
+        axios.get(this.currentWeatherOWUrl, {
+          params: {
+            q: city,
+            appid: this.API_KEY,
+            units: 'metric',
+          },
+        }),
+        axios.get(this.forecastWeatherOWUrl, {
+          params: {
+            q: city,
+            appid: this.API_KEY,
+            units: 'metric',
+          },
+        }),
       ]);
 
       return this.mapDataToForecast(
@@ -39,12 +49,23 @@ class WeatherService {
     longitude: number,
   ): Promise<Forecast> {
     try {
-      const currentWeatherUrl = `${this.CURRENT_WEATHER_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric`;
-      const forecastUrl = `${this.FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${this.API_KEY}&units=metric`;
-
       const [currentWeatherResponse, forecastResponse] = await Promise.all([
-        axios.get(currentWeatherUrl),
-        axios.get(forecastUrl),
+        axios.get(this.currentWeatherOWUrl, {
+          params: {
+            lat: latitude,
+            lon: longitude,
+            appid: this.API_KEY,
+            units: 'metric',
+          },
+        }),
+        axios.get(this.currentWeatherOWUrl, {
+          params: {
+            lat: latitude,
+            lon: longitude,
+            appid: this.API_KEY,
+            units: 'metric',
+          },
+        }),
       ]);
 
       return this.mapDataToForecast(
@@ -80,6 +101,7 @@ class WeatherService {
       shortDescription: data.weather[0].description,
     };
   }
+
   private static mapWeatherIdToStateId(weatherId: number): WeatherId {
     const states: [number, number, WeatherId][] = [
       [200, 232, WeatherId.thunderstorm],
