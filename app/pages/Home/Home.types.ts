@@ -25,3 +25,14 @@ export type WindProps = {
   units: WindSpeedUnits;
   directionAngle: number;
 }
+
+
+export type WeatherPanelProps = {
+  temp: number;
+  icon: string;
+  description: string;
+  minTemp: number;
+  maxTemp: number;
+  tempUnits: string;
+  stateId: number;
+}

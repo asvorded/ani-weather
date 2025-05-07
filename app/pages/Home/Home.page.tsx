@@ -7,8 +7,9 @@ import { TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
-import { HumidityProps, MagneticActivityProps, PressureProps,
-  WeatherDetailedPanelProps, WindProps,
+import {
+  HumidityProps, MagneticActivityProps, PressureProps,
+  WeatherDetailedPanelProps, WeatherPanelProps, WindProps,
 } from './Home.types.ts';
 import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
 import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
@@ -18,7 +19,7 @@ import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
 import { SavedCity } from '../../types/api/SavedCity.ts';
-import { MoonPhases, PressureUnits, TempUnits, WindSpeedUnits } from '../../types/api/Forecast.ts';
+import {createWeatherState, MoonPhases, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast.ts';
 import {
   convertPressure, convertWindSpeed, getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
@@ -51,9 +52,8 @@ const WeatherDetailedPanel = ({
   );
 };
 
-const WeatherPanel = () => {
+const WeatherPanel = ({temp, tempUnits,maxTemp, minTemp, icon, description, stateId }:WeatherPanelProps) => {
   const [cityWrapperWidth, setCityWrapperWidth] = useState(0);
-
   return (
     <View style={styles.topContainer}>
       <View
@@ -69,11 +69,11 @@ const WeatherPanel = () => {
       <View style={styles.weatherMainContainer}>
         <WeatherIcon type={WeatherIconType.PartlyCloudyDay} size={130} />
         <View />
-        <CustomText style={styles.temperatureMain}>###</CustomText>
+        <CustomText style={styles.temperatureMain}>{temp}{tempUnits}</CustomText>
       </View>
       <View style={styles.weatherDescriptionContainer}>
-        <CustomText style={styles.weatherDescriptionText}>#########</CustomText>
-        <CustomText style={styles.temperatureAmplitudeText}>#########</CustomText>
+        <CustomText style={styles.weatherDescriptionText}>{description}</CustomText>
+        <CustomText style={styles.temperatureAmplitudeText}>{maxTemp}{tempUnits}/{minTemp}{tempUnits}</CustomText>
       </View>
     </View>
   );
@@ -193,18 +193,23 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
         marginRight: insets.right,
       }}
       contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
-      <WeatherPanel />
+      showsVerticalScrollIndicator={false}>
+      <WeatherPanel
+        temp={testSavedCity.forecast.currentTemp}
+        icon={''}
+        description={t(createWeatherState(testSavedCity.forecast.state).translationId)}
+        minTemp={testSavedCity.forecast.minTemp}
+        maxTemp={testSavedCity.forecast.maxTemp}
+        tempUnits={'°C'}
+        stateId={testSavedCity.forecast.state}
+      />
       <View style={styles.detailsGrid}>
         <View style={styles.row}>
           <WeatherDetailedPanel
             key="moon phase"
             color="#A9E788"
             title={t('forecast.moonPhase.main')}
-            text={t(
-              getReadableMoonPhaseId(testSavedCity.forecast.moonPhase),
-            )}
+            text={t(getReadableMoonPhaseId(testSavedCity.forecast.moonPhase))}
             contentElement={<MoonPhaseComponent />}
           />
           <WeatherDetailedPanel
@@ -230,9 +235,7 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
             title={t('forecast.humidity.main')}
             text={t(getReadableHumidityId(testSavedCity.forecast.humidity))}
             contentElement={
-              <HumidityComponent
-                humidity={testSavedCity.forecast.humidity}
-              />
+              <HumidityComponent humidity={testSavedCity.forecast.humidity} />
             }
           />
           <WeatherDetailedPanel
@@ -262,9 +265,11 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
             key="wind"
             color="#FF9A79"
             title={t('forecast.wind.main')}
-            text={`${convertWindSpeed(testSavedCity.forecast.windSpeed, testSavedCity.forecast.windSpeedUnits,userSettings.windSpeed)} ${t(
-              getReadableWindUnitsId(userSettings.windSpeed),
-            )} (${t(
+            text={`${convertWindSpeed(
+              testSavedCity.forecast.windSpeed,
+              testSavedCity.forecast.windSpeedUnits,
+              userSettings.windSpeed,
+            )} ${t(getReadableWindUnitsId(userSettings.windSpeed))} (${t(
               getReadableWindDirectionId(
                 testSavedCity.forecast.windDirectionAngle,
               ),
@@ -311,7 +316,6 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
       />
       <Button title="Make notification" onPress={() => test()} />
     </ScrollView>
-
   );
 };
 

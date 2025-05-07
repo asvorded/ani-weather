@@ -7,7 +7,6 @@ import {
   WeatherId,
   WindSpeedUnits,
 } from '../types/api/Forecast.ts';
-
 class WeatherService {
   private static API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY || '';
   private static currentWeatherOWUrl =
@@ -99,7 +98,7 @@ class WeatherService {
       maxTemp: data.main.temp_max,
       minTemp: data.main.temp_min,
       shortDescription: data.weather[0].description,
-      lastUpdated: data.dt + data.timezone,
+      lastUpdated: data.dt,
     };
   }
 
@@ -122,7 +121,7 @@ class WeatherService {
       [800, 800, WeatherId.clear],
       [801, 804, WeatherId.clouds],
     ];
-    const [min, max, state] = states.find(
+    const [state] = states.find(
       ([min, max]) => weatherId >= min && weatherId <= max,
     ) || [0, 0, WeatherId.clear];
     return state;
