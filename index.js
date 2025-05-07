@@ -12,6 +12,7 @@ import ru from './i18n/locales/ru.json';
 import en from './i18n/locales/en.json';
 import {initReactI18next} from 'react-i18next';
 import {registerNotificationBackgroundHandler} from './app/services/notifications/notifications';
+import * as BackgroundForecastFetcherService from './app/services/background/BackgroundForecastFetcherService';
 
 i18next.use(initReactI18next).init({
   lng: 'ru',
@@ -27,4 +28,8 @@ i18next.use(initReactI18next).init({
   },
 });
 registerNotificationBackgroundHandler();
+
+BackgroundForecastFetcherService.defineWeatherFetchTask();
+BackgroundForecastFetcherService.registerWeatherFetchTask();
+
 AppRegistry.registerComponent(appName, () => App);

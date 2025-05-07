@@ -2,6 +2,7 @@
   "name": "BelWeather",
   "displayName": "BelWeather",
   "plugins": [
-    "expo-localization"
+    "expo-localization",
+    "expo-background-task"
   ]
 }

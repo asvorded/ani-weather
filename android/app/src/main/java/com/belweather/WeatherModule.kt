@@ -1,9 +1,14 @@
 package com.belweather
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.widget.RemoteViews
 import android.widget.Toast
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
+import java.util.Locale
 
 class WeatherModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
     private val NAME = "WeatherModule";
@@ -11,11 +16,32 @@ class WeatherModule(context: ReactApplicationContext) : ReactContextBaseJavaModu
     override fun getName() = NAME
 
     @ReactMethod
-    fun showTestToast() {
-        val text = "Hello toast!"
-        val duration = Toast.LENGTH_SHORT
+    fun setForecastOnWidget(forecast: ReadableMap) {
+        val name = forecast.getString("name")
+        val state = forecast.getDouble("state").toInt()
+        val currentTemp = forecast.getDouble("currentTemp")
+        val minTemp = forecast.getDouble("minTemp")
+        val maxTemp = forecast.getDouble("maxTemp")
 
-        val toast = Toast.makeText(reactApplicationContext, text, duration)
-        toast.show()
+        val context = reactApplicationContext.applicationContext
+
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val ids = appWidgetManager.getAppWidgetIds(
+            ComponentName(context, WeatherClassicWidget::class.java)
+        )
+
+        ids.forEach { id ->
+            val views = RemoteViews(context.packageName, R.layout.weather_classic_widget).apply {
+                setTextViewText(
+                    R.id.current_temp_text,
+                    String.format(Locale.getDefault(), "%.1f°", currentTemp)
+                )
+                setTextViewText(
+                    R.id.max_min_temp_text,
+                    String.format(Locale.getDefault(), "%.1f°/%.1f°", maxTemp, minTemp)
+                )
+            }
+            appWidgetManager.partiallyUpdateAppWidget(id, views)
+        }
     }
 }

@@ -23,8 +23,8 @@ import { getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
 import * as citiesService from '../../services/CitiesService.ts';
+import * as BacgroundService from '../../services/background/BackgroundForecastFetcherService.ts';
 
-import { WeatherModule } from '../../../specs/NativeModules.ts';
 import {fetchWeatherByCoords} from '../../services/WeatherService.ts';
 import {test} from '../../services/notifications/notifications.ts';
 
@@ -268,8 +268,8 @@ const HomePage = () => {
           {/* TODO: remove in production code */}
           <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
           <Button title="рябов ответит (за всё)" onPress={() => navigation.navigate(PagesNames.MeteoChannel)}/>
-          <Button title="Toast test" onPress={() => WeatherModule.showTestToast()}/>
           <Button title="Make notification" onPress={() => test()} />
+          <Button title="Disable background upadates" onPress={() => BacgroundService.unregisterWeatherFetchTask()} />
         </ScrollView>
 
         <View key="system navigation buttons"
