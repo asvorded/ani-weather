@@ -53,82 +53,82 @@ export const createWeatherState = (id: WeatherId): WeatherState => {
   const resourceMap = {
     [WeatherId.none]: {
       id: WeatherId.none,
-      translationId: 'forecast.weatherState.none',
+      translationId: 'forecast.weatherStates.none',
       imageId: 'icons/none.png',
     },
     [WeatherId.thunderstorm]: {
       id: WeatherId.thunderstorm,
-      translationId: 'forecast.weatherState.thunderstorm',
+      translationId: 'forecast.weatherStates.thunderstorm',
       imageId: 'icons/thunderstorm.png',
     },
     [WeatherId.drizzle]: {
       id: WeatherId.drizzle,
-      translationId: 'forecast.weatherState.drizzle',
+      translationId: 'forecast.weatherStates.drizzle',
       imageId: 'icons/drizzle.png',
     },
     [WeatherId.rain]: {
       id: WeatherId.rain,
-      translationId: 'forecast.weatherState.rain',
+      translationId: 'forecast.weatherStates.rain',
       imageId: 'icons/rain.png',
     },
     [WeatherId.snow]: {
       id: WeatherId.snow,
-      translationId: 'forecast.weatherState.snow',
+      translationId: 'forecast.weatherStates.snow',
       imageId: 'icons/snow.png',
     },
     [WeatherId.mist]: {
       id: WeatherId.mist,
-      translationId: 'forecast.weatherState.mist',
+      translationId: 'forecast.weatherStates.mist',
       imageId: 'icons/mist.png',
     },
     [WeatherId.smoke]: {
       id: WeatherId.smoke,
-      translationId: 'forecast.weatherState.smoke',
+      translationId: 'forecast.weatherStates.smoke',
       imageId: 'icons/smoke.png',
     },
     [WeatherId.haze]: {
       id: WeatherId.haze,
-      translationId: 'forecast.weatherState.haze',
+      translationId: 'forecast.weatherStates.haze',
       imageId: 'icons/haze.png',
     },
     [WeatherId.dust]: {
       id: WeatherId.dust,
-      translationId: 'forecast.weatherState.dust',
+      translationId: 'forecast.weatherStates.dust',
       imageId: 'icons/dust.png',
     },
     [WeatherId.fog]: {
       id: WeatherId.fog,
-      translationId: 'forecast.weatherState.fog',
+      translationId: 'forecast.weatherStates.fog',
       imageId: 'icons/fog.png',
     },
     [WeatherId.sand]: {
       id: WeatherId.sand,
-      translationId: 'forecast.weatherState.sand',
+      translationId: 'forecast.weatherStates.sand',
       imageId: 'icons/sand.png',
     },
     [WeatherId.ash]: {
       id: WeatherId.ash,
-      translationId: 'forecast.weatherState.ash',
+      translationId: 'forecast.weatherStates.ash',
       imageId: 'icons/ash.png',
     },
     [WeatherId.squall]: {
       id: WeatherId.squall,
-      translationId: 'forecast.weatherState.squall',
+      translationId: 'forecast.weatherStates.squall',
       imageId: 'icons/squall.png',
     },
     [WeatherId.tornado]: {
       id: WeatherId.tornado,
-      translationId: 'forecast.weatherState.tornado',
+      translationId: 'forecast.weatherStates.tornado',
       imageId: 'icons/tornado.png',
     },
     [WeatherId.clear]: {
       id: WeatherId.clear,
-      translationId: 'forecast.weatherState.clear',
+      translationId: 'forecast.weatherStates.clear',
       imageId: 'icons/clear.png',
     },
     [WeatherId.clouds]: {
       id: WeatherId.clouds,
-      translationId: 'forecast.weatherState.clouds',
+      translationId: 'forecast.weatherStates.clouds',
       imageId: 'icons/clouds.png',
     },
   };
@@ -158,4 +158,5 @@ export type Forecast = {
   windDirectionAngle: number;
   airQuality: number;
   hourlyforecast: HourForecast[];
+  lastUpdated: number;
 };

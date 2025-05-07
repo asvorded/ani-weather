@@ -99,6 +99,7 @@ class WeatherService {
       maxTemp: data.main.temp_max,
       minTemp: data.main.temp_min,
       shortDescription: data.weather[0].description,
+      lastUpdated: data.dt + data.timezone,
     };
   }
 
