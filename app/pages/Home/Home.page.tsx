@@ -21,8 +21,8 @@ import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
 import { SavedCity } from '../../types/api/SavedCity.ts';
 import {createWeatherState, MoonPhases, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast.ts';
 import {
-  convertPressure, convertWindSpeed, getReadableGeomagneticDegreeId, getReadableHumidityId,
-  getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId,
+  convertPressure, convertTemperature, convertWindSpeed, getReadableGeomagneticDegreeId, getReadableHumidityId,
+  getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId, getReadableTemperatureUnitsId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
 import WeatherService from '../../services/WeatherService.ts';
@@ -69,11 +69,11 @@ const WeatherPanel = ({temp, tempUnits,maxTemp, minTemp, icon, description, stat
       <View style={styles.weatherMainContainer}>
         <WeatherIcon type={WeatherIconType.PartlyCloudyDay} size={130} />
         <View />
-        <CustomText style={styles.temperatureMain}>{temp}{tempUnits}</CustomText>
+        <CustomText style={styles.temperatureMain}>{temp.toPrecision(3)}{tempUnits}</CustomText>
       </View>
       <View style={styles.weatherDescriptionContainer}>
         <CustomText style={styles.weatherDescriptionText}>{description}</CustomText>
-        <CustomText style={styles.temperatureAmplitudeText}>{maxTemp}{tempUnits}/{minTemp}{tempUnits}</CustomText>
+        <CustomText style={styles.temperatureAmplitudeText}>{maxTemp.toPrecision(3)}{tempUnits}/{minTemp.toPrecision(3)}{tempUnits}</CustomText>
       </View>
     </View>
   );
@@ -171,7 +171,7 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
       pressureUnits: PressureUnits.Pascal,
       windSpeed: 8.5,
       windSpeedUnits: WindSpeedUnits.Ms,
-      windDirectionAngle: 0,
+      windDirectionAngle: 45,
       airQuality: 78,
       hourlyforecast: [
         { time: '12:00', state: -1, temp: 10.1 },
@@ -195,12 +195,12 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}>
       <WeatherPanel
-        temp={testSavedCity.forecast.currentTemp}
+        temp={convertTemperature(testSavedCity.forecast.currentTemp, testSavedCity.forecast.tempUnits, userSettings.temperature)}
         icon={''}
         description={t(createWeatherState(testSavedCity.forecast.state).translationId)}
-        minTemp={testSavedCity.forecast.minTemp}
-        maxTemp={testSavedCity.forecast.maxTemp}
-        tempUnits={'°C'}
+        minTemp={convertTemperature(testSavedCity.forecast.minTemp, testSavedCity.forecast.tempUnits, userSettings.temperature)}
+        maxTemp={convertTemperature(testSavedCity.forecast.maxTemp, testSavedCity.forecast.tempUnits, userSettings.temperature)}
+        tempUnits={t(getReadableTemperatureUnitsId(userSettings.temperature))}
         stateId={testSavedCity.forecast.state}
       />
       <View style={styles.detailsGrid}>

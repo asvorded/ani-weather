@@ -1,6 +1,4 @@
-import { t } from 'i18next';
-import { MoonPhases, PressureUnits, WindSpeedUnits } from '../../types/api/Forecast';
-import { Animated } from 'react-native';
+import {MoonPhases, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast';
 
 export function getReadableMoonPhaseId(phase: MoonPhases): string {
   switch (phase) {
@@ -69,6 +67,15 @@ export function getReadableWindUnitsId(units: WindSpeedUnits): string {
   }
 }
 
+export function getReadableTemperatureUnitsId(units: TempUnits): string {
+  const tempUnits = {
+    [TempUnits.Celsius]: 'forecast.temperature.units.celsius',
+    [TempUnits.Kelvin]: 'forecast.temperature.units.kelvin',
+    [TempUnits.Fahrenheit]: 'forecast.temperature.units.fahrenheit',
+  };
+  return tempUnits[units];
+}
+
 export function getReadableWindDirectionId(angle: number): string {
   const directions: [number, number, string][] = [
     [337.5, 360, 'forecast.wind.direction.N'],
@@ -104,6 +111,26 @@ export function convertWindSpeed(value: number, originalUnits: WindSpeedUnits, t
   return value * conversionFactors[originalUnits][targetUnits];
 }
 
+export function convertTemperature(value: number, originalUnits: TempUnits, targetUnits: TempUnits){
+  const conversionFactors: Record<TempUnits, Record<TempUnits, (value: number) => number>> = {
+    [TempUnits.Celsius]: {
+      [TempUnits.Fahrenheit]: (value) => value * 1.8 + 32,
+      [TempUnits.Kelvin]: (value) => value + 273.15,
+    } as Record<TempUnits, (value: number) => number>,
+    [TempUnits.Fahrenheit]: {
+      [TempUnits.Celsius]: (value) => (value - 32) / 1.8,
+      [TempUnits.Kelvin]: (value) => (value + 459.67) * 5 / 9,
+    } as Record<TempUnits, (value: number) => number>,
+    [TempUnits.Kelvin]: {
+      [TempUnits.Celsius]: (value) => value - 273.15,
+      [TempUnits.Fahrenheit]: (value) => value * 9 / 5 - 459.67,
+    } as Record<TempUnits, (value: number) => number>,
+  };
+  if (originalUnits === targetUnits) {
+    return value;
+  }
+  return conversionFactors[originalUnits][targetUnits](value);
+}
 export function convertPressure(value: number, originalUnits: PressureUnits, targetUnits: PressureUnits){
   const conversionFactors: Record<PressureUnits, Record<PressureUnits, number>> = {
     [PressureUnits.Pascal]: {

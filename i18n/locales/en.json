@@ -9,6 +9,13 @@
     }
   },
   "forecast": {
+    "temperature": {
+      "units": {
+        "celsius": "°C",
+        "kelvin": "°K",
+        "fahrenheit": "°F"
+      }
+    },
     "moonPhase": {
       "main": "Moon phase",
       "default": "<No data>",
