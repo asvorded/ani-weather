@@ -27,6 +27,7 @@ i18next.use(initReactI18next).init({
     },
   },
 });
+// TODO: Move these to saved cities service
 registerNotificationBackgroundHandler();
 
 BackgroundForecastFetcherService.defineWeatherFetchTask();
