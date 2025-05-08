@@ -1,4 +1,4 @@
-import { Button, ImageBackground, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Button, ImageBackground, ScrollView, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,17 +8,14 @@ import { TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
 import {
+  ActionsPanelProps,
   HumidityProps, MagneticActivityProps, PressureProps,
   WeatherDetailedPanelProps, WeatherPanelProps, WindProps,
 } from './Home.types.ts';
 import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
 import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
-import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
-import WindCompassImg from '../../../assets/images/compass.svg';
-import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
-import { SavedCity } from '../../types/api/SavedCity.ts';
 import {createWeatherState, MoonPhases, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast.ts';
 import {
   convertPressure, convertTemperature, convertWindSpeed, getReadableGeomagneticDegreeId, getReadableHumidityId,
@@ -30,6 +27,50 @@ import WeatherService from '../../services/WeatherService.ts';
 import { WeatherModule } from '../../../specs/NativeModules.ts';
 import {test} from '../../services/notifications/notifications.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
+
+import AddDarkImg from '../../../assets/icons/add-dark.svg';
+import AddLightImg from '../../../assets/icons/add-light.svg';
+import SettingsLightImg from '../../../assets/icons/settings-light.svg';
+import SettingsDarkImg from '../../../assets/icons/settings-dark.svg';
+
+import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
+import WindCompassImg from '../../../assets/images/compass.svg';
+import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
+
+const ActionsPanel = ({
+  navOnCitySelectClick,
+  navOnSettingsClick,
+  isDarkMode,
+  topWindowInset,
+}: ActionsPanelProps) => {
+  const buttonWidth = styles.actionButtonIcon.width;
+  const buttonHeight = styles.actionButtonIcon.height;
+
+  return (
+    <View style={[styles.actionsPanel, {paddingTop: topWindowInset + 7}]}>
+      <TouchableOpacity key="city select"
+        style={styles.actionButton}
+        onPress={() => navOnCitySelectClick()}
+      >
+        {isDarkMode ? (
+          <AddLightImg width={buttonWidth} height={buttonHeight} />
+        ) : (
+          <AddDarkImg width={buttonWidth} height={buttonHeight} />
+        )}
+      </TouchableOpacity>
+      <TouchableOpacity key="settings"
+        style={styles.actionButton}
+        onPress={() => navOnSettingsClick()}
+      >
+        {isDarkMode ? (
+          <SettingsLightImg width={buttonWidth} height={buttonHeight} />
+        ) : (
+          <SettingsDarkImg width={buttonWidth} height={buttonHeight} />
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const WeatherDetailedPanel = ({
   color,
@@ -52,20 +93,13 @@ const WeatherDetailedPanel = ({
   );
 };
 
-const WeatherPanel = ({temp, tempUnits,maxTemp, minTemp, icon, description, stateId }:WeatherPanelProps) => {
+const WeatherPanel = ({
+  temp, tempUnits, maxTemp, minTemp,
+  icon, description, stateId
+}: WeatherPanelProps) => {
   const [cityWrapperWidth, setCityWrapperWidth] = useState(0);
   return (
     <View style={styles.topContainer}>
-      <View
-        style={styles.cityWrapper}
-        onLayout={event => setCityWrapperWidth(event.nativeEvent.layout.width)}
-      >
-        {/* <CityCarousel
-          cities={[]}
-          onChange={city => console.log(city)}
-          style={{ width: cityWrapperWidth }}
-        /> */}
-      </View>
       <View style={styles.weatherMainContainer}>
         <WeatherIcon type={WeatherIconType.PartlyCloudyDay} size={130} />
         <View />
@@ -182,7 +216,7 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
   };
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ y: 0, animated: true });
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [pageIndex]);
 
   return (
@@ -194,7 +228,7 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
       }}
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}>
-      <WeatherPanel
+      <WeatherPanel key="weather panel"
         temp={convertTemperature(testSavedCity.forecast.currentTemp, testSavedCity.forecast.tempUnits, userSettings.temperature)}
         icon={''}
         description={t(createWeatherState(testSavedCity.forecast.state).translationId)}
@@ -299,29 +333,16 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
 
       {/* TODO: remove in production code */}
       <Button
-        title="town select"
-        onPress={() => navigation.navigate(PagesNames.TownSelect)}
-      />
-      <Button
         title="рябов ответит (за всё)"
         onPress={() => navigation.navigate(PagesNames.MeteoChannel)}
       />
-      <Button
-        title="Настройки"
-        onPress={() => navigation.navigate(PagesNames.Settings)}
-      />
-      <Button
-        title="Toast test"
-        onPress={() => WeatherModule.showTestToast()}
-      />
-      <Button title="Make notification" onPress={() => test()} />
     </ScrollView>
   );
 };
 
 const WeatherTabBar: React.FC<any> = (props) => {
   return (
-    <TabBar
+    <TabBar key="cities tab bar"
       style={styles.tabBar}
       renderTabBarItem={({key: _, ...props}) =>
         <TabBarItem
@@ -344,8 +365,9 @@ const WeatherTabBar: React.FC<any> = (props) => {
 };
 
 const HomePage = () => {
-
   const insets = useSafeAreaInsets();
+
+  const navigation = useCustomNavigation();
 
   const [ testSavedCity, setSavedCities ] = useState({
     city: {
@@ -378,6 +400,7 @@ const HomePage = () => {
       ],
     },
   });
+
   useEffect(() => {
     console.log('calling fetchWeatherByCoords');
     WeatherService.fetchWeatherWithForecastByCoords(
@@ -407,19 +430,26 @@ const HomePage = () => {
       <SystemBars style="light" />
       <ImageBackground
         style={styles.imageContainer}
-        source={require('../../../assets/images/sample.png')}>
-        <TabView
-          lazy
-          navigationState={{ index, routes: mockedRoutes }}
-          style={{
-            marginTop: insets.top,
+        source={require('../../../assets/images/sample.png')}
+      >
+        <ActionsPanel
+          navOnCitySelectClick={() => {
+            navigation.navigate(PagesNames.TownSelect);
           }}
+          navOnSettingsClick={() => {
+            navigation.navigate(PagesNames.Settings);
+          }}
+          isDarkMode={true}
+          topWindowInset={insets.top}
+        />
+
+        <TabView key="tab view for cities"
+          navigationState={{ index, routes: mockedRoutes }}
           renderTabBar={WeatherTabBar}
           renderScene={() => <WeatherPage pageIndex={index} />}
           onIndexChange={setIndex}
           initialLayout={{ width: layout.width }}
         />
-
 
         <View
           key="system navigation buttons"

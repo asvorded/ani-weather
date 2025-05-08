@@ -31,7 +31,7 @@ export const popularCities: City[] = [
   },
 ];
 
-export async function getPopularCitiesAsync(): Promise<City[]> {
+export function getPopularCities(): City[] {
   return popularCities;
 }
 

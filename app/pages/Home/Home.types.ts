@@ -1,5 +1,12 @@
 import { PressureUnits, WindSpeedUnits } from '../../types/api/Forecast';
 
+export type ActionsPanelProps = {
+  navOnCitySelectClick: () => void;
+  navOnSettingsClick: () => void;
+  isDarkMode: boolean;
+  topWindowInset: number;
+}
+
 export type WeatherDetailedPanelProps = {
   color: string;
   title: string;

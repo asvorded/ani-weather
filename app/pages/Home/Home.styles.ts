@@ -5,6 +5,8 @@ export const styles = StyleSheet.create({
     //flex: 1,
     backgroundColor: '#fae3d2',
   },
+
+  // System views
   systemStatusBar: {
     position: 'absolute',
     top: 0,
@@ -17,6 +19,8 @@ export const styles = StyleSheet.create({
     backgroundColor: '#1b1b1b',
     opacity: 0.2,
   },
+
+  // Screen container
   imageContainer: {
     height: '100%',
   },
@@ -29,14 +33,24 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
   },
-  menuButton:{
-    position: 'absolute',
-    backgroundColor: 'transparent',
-    color: 'black',
+
+  // Actions panel
+  actionsPanel: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 7,
   },
+  actionButtonIcon: {
+    width: 44,
+    height: 44,
+  },
+  actionButton: {
+    padding: 3,
+  },
+
   topContainer: {
-    marginTop: 30,
-    marginBottom: 40,
+    marginTop: 0,
+    marginBottom: 20,
     width: '100%',
   },
   detailsGrid:{

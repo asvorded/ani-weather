@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 
 import { City } from '../../types/api/City';
 import { filterCitiesByQuery, findCitiesWithTimeout,
-  getPopularCitiesAsync, getReadableCountry } from '../../services/CitiesService';
+  getPopularCities, getReadableCountry } from '../../services/CitiesService';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -19,7 +19,60 @@ function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
 }
 
-let foundCities: City[] = [];
+const SavedCitiesList = (
+
+) => {
+
+}
+
+const PopularCity = (
+  props: {
+    name: string,
+    onPress?: ((event: GestureResponderEvent) => void)
+  }
+) => {
+  return (
+    <TouchableOpacity
+      style={styles.popularCity}
+      onPress={props.onPress}
+    >
+      <Text style={styles.defaultFont}>{props.name}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const FoundCities = (
+  props: {
+    cities: City[]
+  }
+) => {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <FlatList
+      data={props.cities}
+      showsVerticalScrollIndicator={false}
+      renderItem={({item}) => (
+        <TouchableOpacity style={styles.foundCity}>
+          <Text style={[
+            styles.foundCityText,
+            styles.defaultFont,
+          ]}>{item.name}</Text>
+          <Text style={[
+            styles.foundCityCountryText,
+            styles.defaultFont,
+          ]}>{getReadableCountry(item)}</Text>
+        </TouchableOpacity>
+      )}
+      ItemSeparatorComponent={() => (
+        <View style={styles.foundCitiesSeparator}/>
+      )}
+      ListFooterComponent={(
+        <View style={{height: insets.bottom}}/>
+      )}
+    />
+  );
+};
 
 const TownSelect = () => {
   let { t } = useTranslation();
@@ -27,7 +80,7 @@ const TownSelect = () => {
   const insets = useSafeAreaInsets();
 
   const [ popularCities, setPopularCities ] = useState<City[]>([]);
-  const [ showingFoundCities, setFoundCities ] = useState<City[]>([]);
+  const [ foundCities, setFoundCities ] = useState<City[]>([]);
   const [ query, setQuery ] = useState('');
 
   const [ isFindingLocation, setIsFindingLocation ] = useState(false);
@@ -35,10 +88,7 @@ const TownSelect = () => {
 
   // Get popular cities only once
   useEffect(() => {
-    getPopularCitiesAsync()
-      .then((fetchedCities) => {
-        setPopularCities(fetchedCities);
-      });
+    setPopularCities(getPopularCities());
   }, []);
 
   // Filter and find cities
@@ -140,7 +190,7 @@ const TownSelect = () => {
 
       <View style={styles.citiesContainer} key="cities_list">
         {query.length > 0 ? (
-          <FoundCities cities={showingFoundCities} />
+          <FoundCities cities={foundCities} />
         ) : (
           <View>
             <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
@@ -155,53 +205,6 @@ const TownSelect = () => {
         )}
       </View>
     </View>
-  );
-};
-
-const PopularCity = (
-  props: {
-    name: string,
-    onPress?: ((event: GestureResponderEvent) => void)
-  }
-) => (
-  <TouchableOpacity
-    style={styles.popularCity}
-    onPress={props.onPress}
-  >
-    <Text style={styles.defaultFont}>{props.name}</Text>
-  </TouchableOpacity>
-);
-
-const FoundCities = (
-  props: {
-    cities: City[]
-  }
-) => {
-  const insets = useSafeAreaInsets();
-
-  return (
-    <FlatList
-      data={props.cities}
-      showsVerticalScrollIndicator={false}
-      renderItem={({item}) => (
-        <TouchableOpacity style={styles.foundCity}>
-          <Text style={[
-            styles.foundCityText,
-            styles.defaultFont,
-          ]}>{item.name}</Text>
-          <Text style={[
-            styles.foundCityCountryText,
-            styles.defaultFont,
-          ]}>{getReadableCountry(item)}</Text>
-        </TouchableOpacity>
-      )}
-      ItemSeparatorComponent={() => (
-        <View style={styles.foundCitiesSeparator}/>
-      )}
-      ListFooterComponent={(
-        <View style={{height: insets.bottom}}/>
-      )}
-    />
   );
 };
 
