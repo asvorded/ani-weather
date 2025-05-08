@@ -14,16 +14,33 @@ import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { findLocationWithCallbacks } from '../../services/LocationService';
+import { SavedCitiesProps, SavedCityProps } from './TownSelect.types';
+import { SavedCity } from '../../types/storage/SavedCity';
 
 function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
 }
 
-const SavedCitiesList = (
+const SavedCityBlock = ({city}: SavedCityProps) => {
+  return (
+    <View>
+      <Text>{city.name}</Text>
+    </View>
+  );
+};
 
-) => {
+const SavedCitiesList = ({savedCities: cities}: SavedCitiesProps) => {
+  const { t } = useTranslation();
 
-}
+  return (
+    <View>
+      <Text>{t('townSelect.savedCities')}</Text>
+      {cities.map((city, index) => (
+        <SavedCityBlock key={`saved city ${index}`} city={city} />
+      ))}
+    </View>
+  );
+};
 
 const PopularCity = (
   props: {
@@ -76,8 +93,16 @@ const FoundCities = (
 
 const TownSelect = () => {
   let { t } = useTranslation();
-
   const insets = useSafeAreaInsets();
+
+  const [savedCities, setSavedCities] = useState<SavedCity[]>([
+    {
+      coords: {lat: 0, long: 0},
+      country: 'hhhh',
+      name: 'ouyfvi',
+      region: 'sfbbf',
+    },
+  ]);
 
   const [ popularCities, setPopularCities ] = useState<City[]>([]);
   const [ foundCities, setFoundCities ] = useState<City[]>([]);
@@ -153,6 +178,7 @@ const TownSelect = () => {
           editable={!isFindingLocation}
         />
 
+        {/* Find button */}
         <View style={styles.locationIcon}>
           {!isFindingLocation ? (
             <TouchableOpacity
@@ -173,9 +199,12 @@ const TownSelect = () => {
         </View>
       </View>
 
+      {/* Location error */}
       {locationError ? (
         <View style={styles.locationErrorContainer} key="location_error">
-          <Text style={[styles.locationErrorText, styles.defaultFont]}>{t('townSelect.location.errorPrefix') + locationError}</Text>
+          <Text
+            style={[styles.locationErrorText, styles.defaultFont]}
+          >{t('townSelect.location.errorPrefix') + locationError}</Text>
           <TouchableOpacity
             style={styles.locationErrorClose}
             onPress={hideLocationError}
@@ -188,18 +217,27 @@ const TownSelect = () => {
         </View>
       ) : null}
 
+      {/* Main content */}
       <View style={styles.citiesContainer} key="cities_list">
         {query.length > 0 ? (
           <FoundCities cities={foundCities} />
         ) : (
           <View>
-            <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
-            <View>
-              <View style={styles.popularCitiesContainer}>{
-                popularCities.map((city, index) => (
-                  <PopularCity key={index} name={city.name}/>
-                ))
-              }</View>
+            {/* Saved cities */}
+            {savedCities.length > 0 ? (
+              <SavedCitiesList savedCities={savedCities} />
+            ) : null}
+
+            {/* Popular cities */}
+            <View key="popular cities">
+              <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
+              <View>
+                <View style={styles.popularCitiesContainer}>{
+                  popularCities.map((city, index) => (
+                    <PopularCity key={index} name={city.name}/>
+                  ))
+                }</View>
+              </View>
             </View>
           </View>
         )}

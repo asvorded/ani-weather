@@ -6,7 +6,8 @@
     "popularCities": "Популярные города",
     "location": {
       "errorPrefix": "Ошибка: "
-    }
+    },
+    "savedCities": "Сохраненные города"
   },
   "forecast": {
     "temperature": {

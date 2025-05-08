@@ -6,7 +6,8 @@
     "popularCities": "Popular cities",
     "location": {
       "errorPrefix": "Error: "
-    }
+    },
+    "savedCities": "Saved cities"
   },
   "forecast": {
     "temperature": {
@@ -94,9 +95,9 @@
     "title": "Settings",
     "language": "Language",
     "units": {
-      "title" : "Units of measurement",
+      "title": "Units of measurement",
       "temperature": "Temperature",
-      "pressure" : "Pressure",
+      "pressure": "Pressure",
       "wind": "Wind"
     },
     "notifications": "Notifications"
