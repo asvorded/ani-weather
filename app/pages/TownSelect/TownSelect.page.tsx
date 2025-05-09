@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useCustomNavigation } from '../../hooks/useCustomNavigation';
 
@@ -25,12 +25,17 @@ import BackImg from '../../../assets/icons/back-custom.svg';
 import FindLocationImg from '../../../assets/icons/location.svg';
 import LocationDarkImg from '../../../assets/icons/location-filled-dark.svg';
 import DeleteDarkImg from '../../../assets/icons/delete-dark.svg';
+import { SavedCitiesService } from '../../services/SavedCitiesService';
+import PagerView from 'react-native-pager-view';
+import { PagesNames } from '../../types/common/root-stack-params-list';
 
 function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
 }
 
-const SavedCityBlock = ({city, isLocation}: SavedCityProps) => {
+const SavedCityBlock = ({
+  city, isLocation, onDeleteSavedCityClick,
+}: SavedCityProps) => {
   const locationWidth = styles.savedCityLocationIcon.width;
   const locationHeight = styles.savedCityLocationIcon.height;
   const deleteWidth = styles.savedCityDeleteIcon.width;
@@ -48,7 +53,7 @@ const SavedCityBlock = ({city, isLocation}: SavedCityProps) => {
           style={styles.savedCityLocationIcon}
         />
       ) : (
-        <TouchableOpacity onPress={() => {/* TODO */}}>
+        <TouchableOpacity onPress={() => onDeleteSavedCityClick(city)}>
           <DeleteDarkImg
             width={deleteWidth} height={deleteHeight}
             style={styles.savedCityDeleteIcon}
@@ -59,7 +64,9 @@ const SavedCityBlock = ({city, isLocation}: SavedCityProps) => {
   );
 };
 
-const SavedCitiesList = ({savedCities}: SavedCitiesProps) => {
+const SavedCitiesList = ({
+  savedCities, onDeleteSavedCityClick,
+}: SavedCitiesProps) => {
   const { t } = useTranslation();
 
   return (
@@ -74,6 +81,7 @@ const SavedCitiesList = ({savedCities}: SavedCitiesProps) => {
               key={`saved city ${index}`}
               city={city}
               isLocation={false}
+              onDeleteSavedCityClick={onDeleteSavedCityClick}
             />
           ))}
         </View>
@@ -105,6 +113,7 @@ const PopularCity = (
 
 const FoundCities = ({
   foundCities,
+  onFoundCityClick,
 }: FoundCityProps) => {
   const insets = useSafeAreaInsets();
 
@@ -113,7 +122,7 @@ const FoundCities = ({
       data={foundCities}
       showsVerticalScrollIndicator={false}
       renderItem={({item}) => (
-        <TouchableOpacity style={styles.foundCity}>
+        <TouchableOpacity style={styles.foundCity} onPress={() => onFoundCityClick(item)}>
           <Text style={[
             styles.foundCityText,
             styles.defaultFont,
@@ -148,9 +157,15 @@ const TownSelect = () => {
   const [ isFindingLocation, setIsFindingLocation ] = useState(false);
   const [ locationError, setLocationError ] = useState<string | null>(null);
 
-  // Get popular cities only once
+  // Get popular and saved cities on start
   useEffect(() => {
     setPopularCities(getPopularCities());
+
+    SavedCitiesService.getAllSavedCities()
+      .then((savedCities) => {
+        const savedCitiesToShow = savedCities.map((sc) => sc.savedCity);
+        setSavedCities(savedCitiesToShow);
+      });
   }, []);
 
   // Filter and find cities
@@ -189,6 +204,34 @@ const TownSelect = () => {
   // Hide location error
   function hideLocationError() {
     setLocationError(null);
+  }
+
+  // Get forecast, save city and go to Home page
+  function onFoundCityClick(foundCity: FoundCity) {
+    SavedCitiesService.addCity(foundCity)
+      .then(() => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.replace(PagesNames.Home);
+        }
+      })
+      .catch((err) => {
+        console.error(`Unable to add city: ${JSON.stringify(err, null, 2)}`);
+      });
+  }
+
+  // Delete saved city
+  function onDeleteCity(city: SavedCity) {
+    SavedCitiesService.removeCityByCoords(city.coords)
+      .then(() => {
+        SavedCitiesService.getAllSavedCities()
+          .then((savedCities) => {
+            const savedCitiesToShow = savedCities.map((sc) => sc.savedCity);
+            setSavedCities(savedCitiesToShow);
+          });
+      })
+      .catch();
   }
 
   return (
@@ -257,9 +300,13 @@ const TownSelect = () => {
       ) : null}
 
       {/* Main content */}
-      <View style={styles.citiesContainer} key="cities_list">
+      <View style={styles.citiesContainer} key="main content">
         {query.length > 0 ? (
-          <FoundCities foundCities={foundCities} />
+          // Found cities
+          <FoundCities
+            foundCities={foundCities}
+            onFoundCityClick={onFoundCityClick}
+          />
         ) : (
           <View>
             {/* Popular cities */}
@@ -273,7 +320,10 @@ const TownSelect = () => {
             </View>
 
             {/* Saved cities */}
-            <SavedCitiesList savedCities={savedCities} />
+            <SavedCitiesList
+              savedCities={savedCities}
+              onDeleteSavedCityClick={onDeleteCity}
+            />
           </View>
         )}
       </View>

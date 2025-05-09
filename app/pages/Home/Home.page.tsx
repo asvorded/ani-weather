@@ -1,4 +1,4 @@
-import { Button, ImageBackground, ScrollView, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { AppRegistry, Button, ImageBackground, ScrollView, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -374,7 +374,7 @@ const HomePage = () => {
 
   const [savedCities, setSavedCities] = useState<SavedCityWithForecast[]>([]);
 
-  // Get saved cities on start and go to TownSelect if no city saved
+  // Get saved cities or go to TownSelect if no city saved
   useEffect(() => {
     SavedCitiesService.getAllSavedCities()
       .then((savedCities) => {
