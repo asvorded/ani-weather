@@ -117,6 +117,7 @@ export class SavedCitiesService {
   private static citiesStorageIdsKey = 'cities-ids';
 
   private static cityNotFoundBySavedKeyErrMsg = 'Invalid async-storage key-value structure: saved city with saved id not found.';
+  private static forecastNotFoundByCityErrMsg = 'Invalid async-storage key-value structure: saved forecast for existing city not found.';
 
   private static getCoordsString(coords: Coords): string {
     return `${coords.lat}-${coords.long}`;
@@ -158,9 +159,13 @@ export class SavedCitiesService {
     return cities.map(city => {
       const foundForecast = forecasts.find(forecast => this.areCoordsEqual(forecast.cityCoords, city.coords));
 
+      if (!foundForecast) {
+        throw new Error(this.forecastNotFoundByCityErrMsg);
+      }
+
       return {
         savedCity: city,
-        forecast: foundForecast?.forecast,
+        forecast: foundForecast.forecast,
       };
     });
   }
