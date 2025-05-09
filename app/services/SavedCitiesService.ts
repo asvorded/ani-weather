@@ -96,7 +96,7 @@ class SavedForecastsService {
     await AsyncStorage.removeItem(this.getSavedForecastStorageId(coords));
   }
 
-  static async addOrUpdateForecastByCoords(coords: Coords, forecastToSave: SavedForecast) {
+  static async addOrUpdateForecastByCoords(coords: Coords, forecastToSave: SavedForecast): Promise<SavedForecast> {
     const forecastsIds = await this.getForecastsStorageIds();
 
     const newForecastId = this.getSavedForecastStorageId(coords);
@@ -106,6 +106,8 @@ class SavedForecastsService {
     }
 
     await AsyncStorage.setItem(newForecastId, JSON.stringify(forecastToSave));
+
+    return forecastToSave;
   }
 }
 
@@ -205,13 +207,22 @@ export class SavedCitiesService {
     return savedCitiesWithForecasts;
   }
 
-  static async addCity(city: FoundCity): Promise<SavedCity> {
+  static async addCity(city: FoundCity): Promise<SavedCityWithForecast> {
     const cityForSave = this.toSavedCity(city);
+
+    // Forecast should be updated first for data consistency purposes, as forecast update can throw network or other exceptions.
+    const forecastObj = await this.updateForecastByCoords(cityForSave.coords);
 
     await this.addCityStorageId(cityForSave.coords);
     await AsyncStorage.setItem(this.getSavedCityStorageId(cityForSave.coords), JSON.stringify(cityForSave));
 
-    return cityForSave;
+
+    const cityWithForecast: SavedCityWithForecast = {
+      forecast: forecastObj.forecast,
+      savedCity: cityForSave,
+    };
+
+    return cityWithForecast;
   }
 
   static async removeCityByCoords(coords: Coords): Promise<void> {
@@ -221,12 +232,19 @@ export class SavedCitiesService {
     await SavedForecastsService.removeForecastByCoords(coords);
   }
 
-  static async updateForecastByCoords(coords: Coords): Promise<void> {
+  static async updateForecastByCoords(coords: Coords): Promise<SavedForecastWithCityCoords> {
     const forecast = await WeatherService.fetchWeatherWithForecastByCoords(coords.lat, coords.long);
 
-    await SavedForecastsService.addOrUpdateForecastByCoords(
+    const savedForecast = await SavedForecastsService.addOrUpdateForecastByCoords(
       coords,
       SavedForecastsService.mapForecastToSavedForecast(forecast)
     );
+
+    const savedForecastWithCityCoords: SavedForecastWithCityCoords = {
+      cityCoords: coords,
+      forecast: savedForecast,
+    };
+
+    return savedForecastWithCityCoords;
   }
 }
