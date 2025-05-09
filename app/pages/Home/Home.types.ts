@@ -25,3 +25,11 @@ export type WindProps = {
   units: WindSpeedUnits;
   directionAngle: number;
 }
+
+export type CitiesTabBarProps = {
+  citiesPagesList: {
+    title: string;
+    item: Record<string, never>;
+  }[]
+  selectedCityIndex: number;
+}

@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingVertical: 25,
-    width: '100%',
+    // width: '100%',
     //height: '100%',
     // backgroundColor: '#FAE3D2',
     flexDirection: 'column',
@@ -194,5 +194,29 @@ export const styles = StyleSheet.create({
   },
   tabBarText: {
     fontSize: 18,
+  },
+  citiesTabBarContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    width: '100%',
+    alignItems: 'center',
+    gap: 5,
+  },
+  citiesTabBarTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+  },
+  citiesTabBarDots: {
+    flexDirection: 'row',
+    gap: 3,
+  },
+  citiesTabBarDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 3,
+    backgroundColor: '#ffffff66',
+  },
+  citiesTabBarDotSelected: {
+    backgroundColor: '#ffffff',
   },
 });

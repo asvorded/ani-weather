@@ -1,4 +1,4 @@
-import { Button, ImageBackground, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Button, Dimensions, FlatList, ImageBackground, ScrollView, useWindowDimensions, View } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,7 +7,7 @@ import { TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
-import { HumidityProps, MagneticActivityProps, PressureProps,
+import { CitiesTabBarProps, HumidityProps, MagneticActivityProps, PressureProps,
   WeatherDetailedPanelProps, WindProps,
 } from './Home.types.ts';
 import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
@@ -140,14 +140,12 @@ const WindComponent = ({
   );
 };
 
-const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
+const WeatherPage: React.FC = () => {
   const {userSettings} = useUserSettings();
   let { t } = useTranslation();
   const navigation = useCustomNavigation();
 
   const insets = useSafeAreaInsets();
-
-  const scrollRef = useRef<ScrollView>(null);
 
   const testSavedCity = {
     city: {
@@ -181,19 +179,19 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
     },
   };
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ y: 0, animated: true });
-  }, [pageIndex]);
-
   return (
-    <ScrollView
-      ref={scrollRef}
-      style={{
-        marginLeft: insets.left,
-        marginRight: insets.right,
-      }}
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
+    <View
+      style={
+        [
+          {
+            marginLeft: insets.left,
+            marginRight: insets.right,
+            ...styles.container,
+            width: Dimensions.get('screen').width,
+          },
+          styles.container,
+        ]
+      }
     >
       <WeatherPanel />
       <View style={styles.detailsGrid}>
@@ -310,32 +308,34 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
         onPress={() => WeatherModule.showTestToast()}
       />
       <Button title="Make notification" onPress={() => test()} />
-    </ScrollView>
+    </View>
 
   );
 };
 
-const WeatherTabBar: React.FC<any> = (props) => {
+const CitiesTabBar: React.FC<CitiesTabBarProps> = ({
+  citiesPagesList,
+  selectedCityIndex,
+}) => {
+  const cityName = citiesPagesList[selectedCityIndex]?.title;
+
   return (
-    <TabBar
-      style={styles.tabBar}
-      renderTabBarItem={({key: _, ...props}) =>
-        <TabBarItem
-          label={props =>
-            <CustomText
-              numberOfLines={1}
-              style={[styles.tabBarText, { color: props.color }]}
-            >
-              {props.labelText ?? ''}
-            </CustomText>
-          }
-          {...props}
-        />
-      }
-      scrollEnabled
-      renderIndicator={() => null}
-      {...props}
-    />
+    <View style={styles.citiesTabBarContainer}>
+      <CustomText style={styles.citiesTabBarTitle}>
+        {cityName}
+      </CustomText>
+      <View style={styles.citiesTabBarDots}>
+        {citiesPagesList.map((_, i) => (
+          <View
+            key={i}
+            style={[
+              styles.citiesTabBarDot,
+              i === selectedCityIndex ? styles.citiesTabBarDotSelected : undefined,
+            ]}
+          />
+        ))}
+      </View>
+    </View>
   );
 };
 
@@ -384,18 +384,17 @@ const HomePage = () => {
     });
   }, [testSavedCity.city.latitude, testSavedCity.city.longitude]);
 
-  const [index, setIndex] = React.useState(0);
-  const layout = useWindowDimensions();
+  const [selectedCityIndex, setSelectedCityIndex] = React.useState(0);
 
-  const mockedRoutes = [
-    { key: 'first', title: 'Минск' },
-    { key: 'second', title: 'Москва' },
-    { key: 'second1', title: 'Новосибирск' },
-    { key: 'second2', title: 'Кировск' },
-    { key: 'second3', title: 'Новополоцк' },
-    { key: 'second4', title: 'Могилев' },
-    { key: 'second5', title: 'Гомель' },
-    { key: 'second6', title: 'Лондон' },
+  const citiesPagesList = [
+    { title: 'Минск', item: {} },
+    { title: 'Москва', item: {} },
+    { title: 'Новосибирск', item: {} },
+    { title: 'Кировск', item: {} },
+    { title: 'Новополоцк', item: {} },
+    { title: 'Могилев', item: {} },
+    { title: 'Гомель', item: {} },
+    { title: 'Лондон', item: {} },
   ];
 
   return (
@@ -404,17 +403,29 @@ const HomePage = () => {
       <ImageBackground
         style={styles.imageContainer}
         source={require('../../../assets/images/sample.png')}>
-        <TabView
-          lazy
-          navigationState={{ index, routes: mockedRoutes }}
-          style={{
-            marginTop: insets.top,
-          }}
-          renderTabBar={WeatherTabBar}
-          renderScene={() => <WeatherPage pageIndex={index} />}
-          onIndexChange={setIndex}
-          initialLayout={{ width: layout.width }}
+        <CitiesTabBar
+          selectedCityIndex={selectedCityIndex}
+          citiesPagesList={citiesPagesList}
         />
+        <ScrollView>
+          <FlatList
+            renderItem={() => <WeatherPage />}
+            data={citiesPagesList}
+            horizontal
+            pagingEnabled
+            viewabilityConfig={{
+              itemVisiblePercentThreshold: 50,
+            }}
+            onViewableItemsChanged={({ viewableItems }) => {
+              const pageIndex = viewableItems[0]?.index;
+
+              if (pageIndex !== undefined && pageIndex !== null) {
+                setSelectedCityIndex(pageIndex);
+              }
+            }}
+          />
+        </ScrollView>
+
 
 
         <View
