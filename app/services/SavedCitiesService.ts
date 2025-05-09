@@ -198,9 +198,12 @@ export class SavedCitiesService {
   private static async addCityStorageId(coords: Coords): Promise<void> {
     const citiesIds = await SavedCitiesService.getCitiesStorageIds();
 
-    const newCitiesIds = [...citiesIds, SavedCitiesService.getSavedCityStorageId(coords)];
+    const newCityId = SavedCitiesService.getSavedCityStorageId(coords);
 
-    await AsyncStorage.setItem(SavedCitiesService.citiesStorageIdsKey, JSON.stringify(newCitiesIds));
+    if (!citiesIds.includes(newCityId)) {
+      const newCitiesIds = [...citiesIds, newCityId];
+      await AsyncStorage.setItem(SavedCitiesService.citiesStorageIdsKey, JSON.stringify(newCitiesIds));
+    }
   }
 
   private static async removeCityStorageId(coords: Coords): Promise<void> {
@@ -237,7 +240,6 @@ export class SavedCitiesService {
 
     await SavedCitiesService.addCityStorageId(cityForSave.coords);
     await AsyncStorage.setItem(SavedCitiesService.getSavedCityStorageId(cityForSave.coords), JSON.stringify(cityForSave));
-
 
     const cityWithForecast: SavedCityWithForecast = {
       forecast: forecastObj.forecast,
