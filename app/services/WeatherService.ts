@@ -15,26 +15,26 @@ class WeatherService {
     'https://api.openweathermap.org/data/2.5/forecast';
 
   public static async fetchWeatherByCity(city: string): Promise<Forecast> {
-    console.log(this.API_KEY, this.currentWeatherOWUrl, this.forecastWeatherOWUrl);
+    console.log(WeatherService.API_KEY, WeatherService.currentWeatherOWUrl, WeatherService.forecastWeatherOWUrl);
     try {
       const [currentWeatherResponse, forecastResponse] = await Promise.all([
-        axios.get(this.currentWeatherOWUrl, {
+        axios.get(WeatherService.currentWeatherOWUrl, {
           params: {
             q: city,
-            appid: this.API_KEY,
+            appid: WeatherService.API_KEY,
             units: 'metric',
           },
         }),
-        axios.get(this.forecastWeatherOWUrl, {
+        axios.get(WeatherService.forecastWeatherOWUrl, {
           params: {
             q: city,
-            appid: this.API_KEY,
+            appid: WeatherService.API_KEY,
             units: 'metric',
           },
         }),
       ]);
 
-      return this.mapDataToForecast(
+      return WeatherService.mapDataToForecast(
         currentWeatherResponse.data,
         forecastResponse.data,
       );
@@ -49,25 +49,25 @@ class WeatherService {
   ): Promise<Forecast> {
     try {
       const [currentWeatherResponse, forecastResponse] = await Promise.all([
-        axios.get(this.currentWeatherOWUrl, {
+        axios.get(WeatherService.currentWeatherOWUrl, {
           params: {
             lat: latitude,
             lon: longitude,
-            appid: this.API_KEY,
+            appid: WeatherService.API_KEY,
             units: 'metric',
           },
         }),
-        axios.get(this.currentWeatherOWUrl, {
+        axios.get(WeatherService.forecastWeatherOWUrl, {
           params: {
             lat: latitude,
             lon: longitude,
-            appid: this.API_KEY,
+            appid: WeatherService.API_KEY,
             units: 'metric',
           },
         }),
       ]);
 
-      return this.mapDataToForecast(
+      return WeatherService.mapDataToForecast(
         currentWeatherResponse.data,
         forecastResponse.data,
       );
@@ -83,12 +83,12 @@ class WeatherService {
       hourlyforecast: forecastData.list.map((item: any) => ({
         time: new Date(item.dt * 1000),
         temp: item.main.temp,
-        state: this.mapWeatherIdToStateId(item.main.weather[0].id),
+        state: WeatherService.mapWeatherIdToStateId(item.weather[0].id),
       })),
       moonPhase: MoonPhases.FullMoon,
       pressure: data.main.pressure,
       pressureUnits: PressureUnits.Pascal,
-      state: this.mapWeatherIdToStateId(data.weather[0].id),
+      state: WeatherService.mapWeatherIdToStateId(data.weather[0].id),
       tempUnits: TempUnits.Celsius,
       windDirectionAngle: data.wind.deg,
       windSpeed: data.wind.speed,
