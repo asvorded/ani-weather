@@ -121,7 +121,7 @@ class WeatherService {
       [800, 800, WeatherId.clear],
       [801, 804, WeatherId.clouds],
     ];
-    const [state] = states.find(
+    const [_, __, state] = states.find(
       ([min, max]) => weatherId >= min && weatherId <= max,
     ) || [0, 0, WeatherId.clear];
     return state;

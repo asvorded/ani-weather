@@ -37,6 +37,7 @@ import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast.ts';
 import { SavedCitiesService } from '../../services/SavedCitiesService.ts';
+import { SavedCity } from '../../types/storage/SavedCity.ts';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -175,7 +176,10 @@ const WindComponent = ({
   );
 };
 
-const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
+const WeatherPage: React.FC<{
+  cityWithForecast: SavedCityWithForecast,
+  pageIndex: number
+}> = ({ cityWithForecast, pageIndex }) => {
   const {userSettings} = useUserSettings();
   let { t } = useTranslation();
   const navigation = useCustomNavigation();
@@ -183,38 +187,6 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
   const insets = useSafeAreaInsets();
 
   const scrollRef = useRef<ScrollView>(null);
-
-  const testSavedCity = {
-    city: {
-      name: 'тест',
-      region: 'pdsfuhsdpfiu',
-      country: 'Беларусь',
-      longitude: 53,
-      latitude: 27,
-    },
-    forecast: {
-      currentTemp: 10,
-      tempUnits: TempUnits.Celsius,
-      state: -1,
-      shortDescription: 'Солнышко',
-      maxTemp: 12.5,
-      minTemp: 8.3,
-      moonPhase: MoonPhases.NewMoon,
-      geomagneticActivity: 4,
-      humidity: 78,
-      pressure: 1014,
-      pressureUnits: PressureUnits.Pascal,
-      windSpeed: 8.5,
-      windSpeedUnits: WindSpeedUnits.Ms,
-      windDirectionAngle: 45,
-      airQuality: 78,
-      hourlyforecast: [
-        { time: '12:00', state: -1, temp: 10.1 },
-        { time: '12:00', state: -1,  temp: 10.1 },
-        { time: '12:00', state: -1, temp: 10.1 },
-      ],
-    },
-  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
@@ -228,15 +200,16 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
         marginRight: insets.right,
       }}
       contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}>
+      showsVerticalScrollIndicator={false}
+    >
       <WeatherPanel key="weather panel"
-        temp={convertTemperature(testSavedCity.forecast.currentTemp, testSavedCity.forecast.tempUnits, userSettings.temperature)}
+        temp={convertTemperature(cityWithForecast.forecast.currentTemp, cityWithForecast.forecast.tempUnits, userSettings.temperature)}
         icon={''}
-        description={t(createWeatherState(testSavedCity.forecast.state).translationId)}
-        minTemp={convertTemperature(testSavedCity.forecast.minTemp, testSavedCity.forecast.tempUnits, userSettings.temperature)}
-        maxTemp={convertTemperature(testSavedCity.forecast.maxTemp, testSavedCity.forecast.tempUnits, userSettings.temperature)}
+        description={t(createWeatherState(cityWithForecast.forecast.state).translationId)}
+        minTemp={convertTemperature(cityWithForecast.forecast.minTemp, cityWithForecast.forecast.tempUnits, userSettings.temperature)}
+        maxTemp={convertTemperature(cityWithForecast.forecast.maxTemp, cityWithForecast.forecast.tempUnits, userSettings.temperature)}
         tempUnits={t(getReadableTemperatureUnitsId(userSettings.temperature))}
-        stateId={testSavedCity.forecast.state}
+        stateId={cityWithForecast.forecast.state}
       />
       <View style={styles.detailsGrid}>
         <View style={styles.row}>
@@ -244,7 +217,7 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
             key="moon phase"
             color="#A9E788"
             title={t('forecast.moonPhase.main')}
-            text={t(getReadableMoonPhaseId(testSavedCity.forecast.moonPhase))}
+            text={t(getReadableMoonPhaseId(cityWithForecast.forecast.moonPhase))}
             contentElement={<MoonPhaseComponent />}
           />
           <WeatherDetailedPanel
@@ -253,12 +226,12 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
             title={t('forecast.geomagnetic.main')}
             text={t(
               getReadableGeomagneticDegreeId(
-                testSavedCity.forecast.geomagneticActivity,
+                cityWithForecast.forecast.geomagneticActivity,
               ),
             )}
             contentElement={
               <MagneticActivityComponent
-                degree={testSavedCity.forecast.geomagneticActivity}
+                degree={cityWithForecast.forecast.geomagneticActivity}
               />
             }
           />
@@ -268,9 +241,9 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
             key="humidity"
             color="#FFE179"
             title={t('forecast.humidity.main')}
-            text={t(getReadableHumidityId(testSavedCity.forecast.humidity))}
+            text={t(getReadableHumidityId(cityWithForecast.forecast.humidity))}
             contentElement={
-              <HumidityComponent humidity={testSavedCity.forecast.humidity} />
+              <HumidityComponent humidity={cityWithForecast.forecast.humidity} />
             }
           />
           <WeatherDetailedPanel
@@ -279,15 +252,15 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
             title={t('forecast.pressure.main')}
             text={t(
               getReadablePressureId(
-                testSavedCity.forecast.pressure,
-                testSavedCity.forecast.pressureUnits,
+                cityWithForecast.forecast.pressure,
+                cityWithForecast.forecast.pressureUnits,
               ),
             )}
             contentElement={
               <PressureComponent
                 pressure={convertPressure(
-                  testSavedCity.forecast.pressure,
-                  testSavedCity.forecast.pressureUnits,
+                  cityWithForecast.forecast.pressure,
+                  cityWithForecast.forecast.pressureUnits,
                   userSettings.pressure,
                 )}
                 units={userSettings.pressure}
@@ -301,19 +274,19 @@ const WeatherPage: React.FC<{ pageIndex: number }> = ({ pageIndex }) => {
             color="#FF9A79"
             title={t('forecast.wind.main')}
             text={`${convertWindSpeed(
-              testSavedCity.forecast.windSpeed,
-              testSavedCity.forecast.windSpeedUnits,
+              cityWithForecast.forecast.windSpeed,
+              cityWithForecast.forecast.windSpeedUnits,
               userSettings.windSpeed,
             )} ${t(getReadableWindUnitsId(userSettings.windSpeed))} (${t(
               getReadableWindDirectionId(
-                testSavedCity.forecast.windDirectionAngle,
+                cityWithForecast.forecast.windDirectionAngle,
               ),
             )})`}
             contentElement={
               <WindComponent
-                speed={testSavedCity.forecast.windSpeed}
-                units={testSavedCity.forecast.windSpeedUnits}
-                directionAngle={testSavedCity.forecast.windDirectionAngle}
+                speed={cityWithForecast.forecast.windSpeed}
+                units={cityWithForecast.forecast.windSpeedUnits}
+                directionAngle={cityWithForecast.forecast.windDirectionAngle}
               />
             }
           />
@@ -382,6 +355,7 @@ const HomePage = () => {
           // [x]: replace or navigate?
           navigation.replace(PagesNames.TownSelect);
         } else {
+          savedCities;
           setSavedCities(savedCities);
         }
       })
@@ -390,12 +364,16 @@ const HomePage = () => {
       });
   }, [navigation]);
 
-  const citiesRoutes: Route[] = savedCities.map((savedCity) => (
-    {
-      key: `${savedCity.savedCity.coords.long}-${savedCity.savedCity.coords.lat}`,
+  let routesWithCities: {[key: string]: SavedCityWithForecast} = {};
+
+  const citiesRoutes: Route[] = savedCities.map((savedCity) => {
+    const key: string = `${savedCity.savedCity.coords.long}-${savedCity.savedCity.coords.lat}`;
+    routesWithCities[key] = savedCity;
+    return {
+      key: key,
       title: savedCity.savedCity.name,
-    }
-  ));
+    };
+  });
 
   return (
     <View style={styles.outerContainer} key="home page">
@@ -415,13 +393,15 @@ const HomePage = () => {
           topWindowInset={insets.top}
         />
 
-        <TabView key="tab view for cities"
-          navigationState={{ index, routes: citiesRoutes }}
-          renderTabBar={WeatherTabBar}
-          renderScene={() => <WeatherPage pageIndex={index} />}
-          onIndexChange={setIndex}
-          initialLayout={{ width: layout.width }}
-        />
+        {citiesRoutes.length > 0 ? (
+          <TabView key="tab view for cities"
+            navigationState={{ index, routes: citiesRoutes }}
+            renderTabBar={WeatherTabBar}
+            renderScene={(route) => <WeatherPage cityWithForecast={routesWithCities[route.route.key]} pageIndex={index} />}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+          />
+        ) : null}
 
         <View
           key="system navigation buttons"
