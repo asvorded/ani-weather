@@ -124,6 +124,8 @@ export class SavedCitiesService {
   private static cityNotFoundBySavedKeyErrMsg = 'Invalid async-storage key-value structure: saved city with saved id not found.';
   private static forecastNotFoundByCityErrMsg = 'Invalid async-storage key-value structure: saved forecast for existing city not found.';
 
+  private static emptyCallbacks: Set<() => Promise<void>> = new Set();
+
   private static getCoordsString(coords: Coords): string {
     return `${coords.lat}-${coords.long}`;
   }
@@ -173,6 +175,16 @@ export class SavedCitiesService {
         forecast: foundForecast.forecast,
       };
     });
+  }
+
+  private static async checkIsCitiesListEmpty(): Promise<void> {
+    const savedCitiesIds = await SavedCitiesService.getCitiesStorageIds();
+
+    if (savedCitiesIds.length === 0) {
+      for (const callback of this.emptyCallbacks) {
+        await callback();
+      }
+    }
   }
 
   static async getCitiesStorageIds(): Promise<string[]> {
@@ -239,6 +251,8 @@ export class SavedCitiesService {
     await SavedCitiesService.removeCityStorageId(coords);
     await AsyncStorage.removeItem(SavedCitiesService.getSavedCityStorageId(coords));
 
+    await SavedCitiesService.checkIsCitiesListEmpty();
+
     await SavedForecastsService.removeForecastByCoords(coords);
   }
 
@@ -256,5 +270,17 @@ export class SavedCitiesService {
     };
 
     return savedForecastWithCityCoords;
+  }
+
+  static addListenerForEmptyList(callback: () => Promise<void>): void {
+    SavedCitiesService.emptyCallbacks.add(callback);
+  }
+
+  static removeListenerForEmptyList(callback: () => Promise<void>): void {
+    SavedCitiesService.emptyCallbacks.delete(callback);
+  }
+
+  static removeAllListenersForEmptyList(): void {
+    SavedCitiesService.emptyCallbacks.clear();
   }
 }
