@@ -1,13 +1,13 @@
 import axios from 'axios';
 import Config from 'react-native-config';
 
-import { City } from '../types/api/City';
+import { FoundCity } from '../types/api/FoundCity';
 
 const OSMSearchUrl: string = 'https://nominatim.openstreetmap.org/search';
 const OWMSearchUrl: string = 'http://api.openweathermap.org/geo/1.0/direct';
 
 // TODO: remove export
-export const popularCities: City[] = [
+export const popularCities: FoundCity[] = [
   {
     name: 'Минск',
     region: 'Минская область',
@@ -31,7 +31,7 @@ export const popularCities: City[] = [
   },
 ];
 
-export function getPopularCities(): City[] {
+export function getPopularCities(): FoundCity[] {
   return popularCities;
 }
 
@@ -39,7 +39,7 @@ let inputTimeout: NodeJS.Timeout | null = null;
 
 export function findCitiesWithTimeout(
   query: string,
-  callback: (cities: City[]) => void
+  callback: (cities: FoundCity[]) => void
 ) {
   if (inputTimeout) {
     clearTimeout(inputTimeout);
@@ -50,7 +50,7 @@ export function findCitiesWithTimeout(
   }, 500);
 }
 
-export async function findCitiesOSMAsync(query: string): Promise<City[]> {
+export async function findCitiesOSMAsync(query: string): Promise<FoundCity[]> {
   // Potential exception ignored beacuse there is no need to handle it
   let response = await axios.get(OSMSearchUrl, {
     params: {
@@ -66,7 +66,7 @@ export async function findCitiesOSMAsync(query: string): Promise<City[]> {
   });
 
   let foundCities: any[] = response.data.features;
-  return foundCities.map((cityJson): City => {
+  return foundCities.map((cityJson): FoundCity => {
     let address = cityJson.properties.address;
 
     let name = cityJson.properties.name;
@@ -93,7 +93,7 @@ export async function findCitiesOSMAsync(query: string): Promise<City[]> {
   });
 }
 
-export async function findCitiesOWMAsync(query: string): Promise<City[]> {
+export async function findCitiesOWMAsync(query: string): Promise<FoundCity[]> {
   // Potential exception ignored beacuse there is no need to handle it
   let response = await axios.get(OWMSearchUrl, {
     params: {
@@ -105,7 +105,7 @@ export async function findCitiesOWMAsync(query: string): Promise<City[]> {
 
   let foundCities: any[] = response.data;
   return foundCities.map((cityJson) => {
-    let c: City = {
+    let c: FoundCity = {
       name: cityJson?.local_names?.ru ?? cityJson.name,
       region: cityJson.state ?? '',
       country: cityJson.country,
@@ -117,7 +117,7 @@ export async function findCitiesOWMAsync(query: string): Promise<City[]> {
   });
 }
 
-export function filterCitiesByQuery(cities: City[], query: string) {
+export function filterCitiesByQuery(cities: FoundCity[], query: string) {
   query = query.trim().toLowerCase();
 
   return cities.filter((city) =>
@@ -125,7 +125,7 @@ export function filterCitiesByQuery(cities: City[], query: string) {
   );
 }
 
-export function getReadableCountry(city: City): string {
+export function getReadableCountry(city: FoundCity): string {
   if (city.region.length > 0) {
     return `${city.region}, ${city.country}`;
   } else {

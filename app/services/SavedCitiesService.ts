@@ -5,7 +5,7 @@ import { Coords } from '../types/common/Coords';
 import { SavedCity } from '../types/storage/SavedCity';
 import { SavedCityWithForecast } from '../types/storage/SavedCityWithForecast';
 import { SavedForecast, SavedForecastWithCityCoords } from '../types/storage/SavedForecast';
-import { City } from '../types/api/City';
+import { FoundCity } from '../types/api/FoundCity';
 import WeatherService from './WeatherService';
 import { Forecast } from '../types/api/Forecast';
 
@@ -140,7 +140,7 @@ export class SavedCitiesService {
     return JSON.parse(json) as string[];
   }
 
-  private static toSavedCity(city: City): SavedCity {
+  private static toSavedCity(city: FoundCity): SavedCity {
     return {
       name: city.name,
       country: city.country,
@@ -205,7 +205,7 @@ export class SavedCitiesService {
     return savedCitiesWithForecasts;
   }
 
-  static async addCity(city: City): Promise<SavedCity> {
+  static async addCity(city: FoundCity): Promise<SavedCity> {
     const cityForSave = this.toSavedCity(city);
 
     await this.addCityStorageId(cityForSave.coords);

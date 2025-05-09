@@ -14,8 +14,7 @@ import {initReactI18next} from 'react-i18next';
 import {registerNotificationBackgroundHandler} from './app/services/notifications/notifications';
 
 i18next.use(initReactI18next).init({
-  lng: 'ru',
-  fallbackLng: 'en',
+  fallbackLng: 'ru',
   debug: true,
   resources: {
     ru: {

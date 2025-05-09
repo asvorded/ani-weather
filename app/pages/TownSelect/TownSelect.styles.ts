@@ -3,16 +3,18 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   screen: {
     paddingHorizontal: 15,
-    paddingTop: 15,
+    paddingTop: 8,
   },
   defaultFont: {
     fontFamily: 'BellotaText-Regular',
   },
+
   inputContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
 
+    marginTop: 10,
     paddingHorizontal: 10,
 
     backgroundColor: '#f4f4f4',
@@ -21,10 +23,12 @@ export const styles = StyleSheet.create({
     borderRadius: 150,
     boxShadow: '#9e9e9e 0 1 2',
   },
+
   input: {
     flex: 1,
     fontSize: 16,
   },
+
   locationIcon: {
     width: 28,
     height: 28,
@@ -32,11 +36,54 @@ export const styles = StyleSheet.create({
   locationImage: {
     width: '100%',
     height: '100%',
-    color: '#4B77D1',
+    color: '#4b77d1',
   },
+
   citiesContainer: {
     marginVertical: 20,
   },
+
+  // Saved city
+  savedCityContainer: {
+    marginBottom: 10,
+  },
+  savedCitiesTitle: {
+    fontSize: 16,
+    marginHorizontal: 10,
+  },
+  savedCitiesNoCitiesText: {
+    marginTop: 10,
+    fontSize: 15,
+    textAlign: 'center',
+    color: 'gray',
+  },
+  savedCity: {
+    marginTop: 10,
+    borderRadius: 10,
+    backgroundColor: '#e5e0ff',
+    padding: 15,
+
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  savedCityText: {
+    fontSize: 18,
+  },
+  savedCityTextWhenSaved: {
+    flex: 1,
+  },
+  savedCityLocationIcon: {
+    width: 24,
+    height: 24,
+    marginLeft: 5,
+  },
+  savedCityDeleteIcon: {
+    width: 24,
+    height: 24,
+    alignSelf: 'flex-end',
+  },
+
+  // Popular cities
   popularCitiesText: {
     marginHorizontal: 10,
     marginBottom: 10,
@@ -57,6 +104,10 @@ export const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: '#d9d9d9',
   },
+  popularCityText: {
+    fontSize: 15,
+  },
+
   foundCity: {
     display: 'flex',
     justifyContent: 'center',
@@ -73,6 +124,7 @@ export const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'lightgray',
   },
+
   locationErrorContainer: {
     marginTop: 2,
     marginHorizontal: 30,

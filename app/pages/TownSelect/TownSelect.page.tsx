@@ -7,37 +7,82 @@ import {
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
-import { City } from '../../types/api/City';
-import { filterCitiesByQuery, findCitiesWithTimeout,
-  getPopularCities, getReadableCountry } from '../../services/CitiesService';
+import { useCustomNavigation } from '../../hooks/useCustomNavigation';
+
+import { FoundCity } from '../../types/api/FoundCity';
+import {
+  filterCitiesByQuery, findCitiesWithTimeout,
+  getPopularCities, getReadableCountry,
+} from '../../services/CitiesService';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { findLocationWithCallbacks } from '../../services/LocationService';
-import { SavedCitiesProps, SavedCityProps } from './TownSelect.types';
+import { FoundCityProps, SavedCitiesProps, SavedCityProps } from './TownSelect.types';
 import { SavedCity } from '../../types/storage/SavedCity';
+
+import BackImg from '../../../assets/icons/back-custom.svg';
+import FindLocationImg from '../../../assets/icons/location.svg';
+import LocationDarkImg from '../../../assets/icons/location-filled-dark.svg';
+import DeleteDarkImg from '../../../assets/icons/delete-dark.svg';
 
 function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
 }
 
-const SavedCityBlock = ({city}: SavedCityProps) => {
+const SavedCityBlock = ({city, isLocation}: SavedCityProps) => {
+  const locationWidth = styles.savedCityLocationIcon.width;
+  const locationHeight = styles.savedCityLocationIcon.height;
+  const deleteWidth = styles.savedCityDeleteIcon.width;
+  const deleteHeight = styles.savedCityDeleteIcon.height;
+
   return (
-    <View>
-      <Text>{city.name}</Text>
+    <View style={styles.savedCity}>
+      <Text style={[
+        styles.defaultFont, styles.savedCityText,
+        isLocation ? null : styles.savedCityTextWhenSaved,
+      ]}>{city.name}</Text>
+      {isLocation ? (
+        <LocationDarkImg
+          width={locationWidth} height={locationHeight}
+          style={styles.savedCityLocationIcon}
+        />
+      ) : (
+        <TouchableOpacity onPress={() => {/* TODO */}}>
+          <DeleteDarkImg
+            width={deleteWidth} height={deleteHeight}
+            style={styles.savedCityDeleteIcon}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
 
-const SavedCitiesList = ({savedCities: cities}: SavedCitiesProps) => {
+const SavedCitiesList = ({savedCities}: SavedCitiesProps) => {
   const { t } = useTranslation();
 
   return (
-    <View>
-      <Text>{t('townSelect.savedCities')}</Text>
-      {cities.map((city, index) => (
-        <SavedCityBlock key={`saved city ${index}`} city={city} />
-      ))}
+    <View style={styles.savedCityContainer}>
+      <Text
+        style={[styles.defaultFont, styles.savedCitiesTitle]}
+      >{t('townSelect.savedCities.title')}</Text>
+      {savedCities.length > 0 ? (
+        <View>
+          {savedCities.map((city, index) => (
+            <SavedCityBlock
+              key={`saved city ${index}`}
+              city={city}
+              isLocation={false}
+            />
+          ))}
+        </View>
+      ) : (
+        <Text style={[
+          styles.defaultFont,
+          styles.savedCitiesNoCitiesText,
+        ]}>{t('townSelect.savedCities.noCities')}</Text>
+      )}
     </View>
   );
 };
@@ -53,21 +98,19 @@ const PopularCity = (
       style={styles.popularCity}
       onPress={props.onPress}
     >
-      <Text style={styles.defaultFont}>{props.name}</Text>
+      <Text style={[styles.defaultFont, styles.popularCityText]}>{props.name}</Text>
     </TouchableOpacity>
   );
 };
 
-const FoundCities = (
-  props: {
-    cities: City[]
-  }
-) => {
+const FoundCities = ({
+  foundCities,
+}: FoundCityProps) => {
   const insets = useSafeAreaInsets();
 
   return (
     <FlatList
-      data={props.cities}
+      data={foundCities}
       showsVerticalScrollIndicator={false}
       renderItem={({item}) => (
         <TouchableOpacity style={styles.foundCity}>
@@ -92,20 +135,14 @@ const FoundCities = (
 };
 
 const TownSelect = () => {
-  let { t } = useTranslation();
+  const { t } = useTranslation();
+  const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
 
-  const [savedCities, setSavedCities] = useState<SavedCity[]>([
-    {
-      coords: {lat: 0, long: 0},
-      country: 'hhhh',
-      name: 'ouyfvi',
-      region: 'sfbbf',
-    },
-  ]);
+  const [savedCities, setSavedCities] = useState<SavedCity[]>([]);
 
-  const [ popularCities, setPopularCities ] = useState<City[]>([]);
-  const [ foundCities, setFoundCities ] = useState<City[]>([]);
+  const [ popularCities, setPopularCities ] = useState<FoundCity[]>([]);
+  const [ foundCities, setFoundCities ] = useState<FoundCity[]>([]);
   const [ query, setQuery ] = useState('');
 
   const [ isFindingLocation, setIsFindingLocation ] = useState(false);
@@ -166,6 +203,13 @@ const TownSelect = () => {
     ]}>
       <SystemBars style="dark"/>
 
+      {/* Back button */}
+      {navigation.canGoBack() ? (
+        <TouchableOpacity key="back" onPress={() => { navigation.goBack(); }}>
+          <BackImg width={36} height={36} color={'#4b77d1'}/>
+        </TouchableOpacity>
+      ) : null}
+
       <View style={styles.inputContainer} key="input">
         <TextInput
           style={[styles.input, styles.defaultFont]}
@@ -181,13 +225,8 @@ const TownSelect = () => {
         {/* Find button */}
         <View style={styles.locationIcon}>
           {!isFindingLocation ? (
-            <TouchableOpacity
-              onPress={onFindLocationClick}
-            >
-              <Image
-                style={styles.locationImage}
-                source={require('../../../assets/icons/location.png')}
-              />
+            <TouchableOpacity onPress={onFindLocationClick}>
+              <FindLocationImg width={styles.locationIcon.width} height={styles.locationIcon.height} />
             </TouchableOpacity>
           ) : (
             <ActivityIndicator
@@ -220,25 +259,21 @@ const TownSelect = () => {
       {/* Main content */}
       <View style={styles.citiesContainer} key="cities_list">
         {query.length > 0 ? (
-          <FoundCities cities={foundCities} />
+          <FoundCities foundCities={foundCities} />
         ) : (
           <View>
-            {/* Saved cities */}
-            {savedCities.length > 0 ? (
-              <SavedCitiesList savedCities={savedCities} />
-            ) : null}
-
             {/* Popular cities */}
             <View key="popular cities">
               <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
-              <View>
-                <View style={styles.popularCitiesContainer}>{
-                  popularCities.map((city, index) => (
-                    <PopularCity key={index} name={city.name}/>
-                  ))
-                }</View>
-              </View>
+              <View style={styles.popularCitiesContainer}>{
+                popularCities.map((city, index) => (
+                  <PopularCity key={index} name={city.name}/>
+                ))
+              }</View>
             </View>
+
+            {/* Saved cities */}
+            <SavedCitiesList savedCities={savedCities} />
           </View>
         )}
       </View>

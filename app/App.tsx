@@ -19,6 +19,7 @@ const RootStack = createNativeStackNavigator<RootStackParamsList>({
   initialRouteName: PagesNames.Home,
   screenOptions: {
     headerShown: false,
+    animation: 'simple_push',
   },
   screens: {
     [PagesNames.Home]: HomePage,
@@ -34,6 +35,7 @@ const App = () => {
   useFonts({
     'BellotaText-Regular': require('./../assets/fonts/BellotaText-Regular.ttf'),
   });
+
   return (
     // FIXME: Strict mode breaks fetch functions' logic
     <>

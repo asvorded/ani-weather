@@ -1,9 +1,9 @@
 import { Button, ImageBackground, ScrollView, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
-import { TabBar, TabBarItem, TabView } from 'react-native-tab-view';
+import { Route, TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
@@ -25,7 +25,6 @@ import {
 import WeatherService from '../../services/WeatherService.ts';
 
 import { WeatherModule } from '../../../specs/NativeModules.ts';
-import {test} from '../../services/notifications/notifications.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 
 import AddDarkImg from '../../../assets/icons/add-dark.svg';
@@ -36,6 +35,8 @@ import SettingsDarkImg from '../../../assets/icons/settings-dark.svg';
 import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
 import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
+import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast.ts';
+import { SavedCitiesService } from '../../services/SavedCitiesService.ts';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -365,65 +366,36 @@ const WeatherTabBar: React.FC<any> = (props) => {
 };
 
 const HomePage = () => {
-  const insets = useSafeAreaInsets();
-
   const navigation = useCustomNavigation();
-
-  const [ testSavedCity, setSavedCities ] = useState({
-    city: {
-      name: 'тест',
-      region: 'pdsfuhsdpfiu',
-      country: 'Беларусь',
-      longitude: 53,
-      latitude: 27,
-    },
-    forecast: {
-      currentTemp: 10,
-      tempUnits: TempUnits.Celsius,
-      state: -1,
-      shortDescription: 'Солнышко',
-      maxTemp: 12.5,
-      minTemp: 8.3,
-      moonPhase: MoonPhases.NewMoon,
-      geomagneticActivity: 4,
-      humidity: 78,
-      pressure: 1014,
-      pressureUnits: PressureUnits.Pascal,
-      windSpeed: 8.5,
-      windSpeedUnits: WindSpeedUnits.Ms,
-      windDirectionAngle: 0,
-      airQuality: 78,
-      hourlyforecast: [
-        { time: '12:00', state: -1, temp: 10.1 },
-        { time: '12:00', state: -1,  temp: 10.1 },
-        { time: '12:00', state: -1, temp: 10.1 },
-      ],
-    },
-  });
-
-  useEffect(() => {
-    console.log('calling fetchWeatherByCoords');
-    WeatherService.fetchWeatherWithForecastByCoords(
-      testSavedCity.city.latitude,
-      testSavedCity.city.longitude,
-    ).then(forecast => {
-      setSavedCities(prevState => ({...prevState, forecast}));
-    });
-  }, [testSavedCity.city.latitude, testSavedCity.city.longitude]);
+  const insets = useSafeAreaInsets();
 
   const [index, setIndex] = React.useState(0);
   const layout = useWindowDimensions();
 
-  const mockedRoutes = [
-    { key: 'first', title: 'Минск' },
-    { key: 'second', title: 'Москва' },
-    { key: 'second1', title: 'Новосибирск' },
-    { key: 'second2', title: 'Кировск' },
-    { key: 'second3', title: 'Новополоцк' },
-    { key: 'second4', title: 'Могилев' },
-    { key: 'second5', title: 'Гомель' },
-    { key: 'second6', title: 'Лондон' },
-  ];
+  const [savedCities, setSavedCities] = useState<SavedCityWithForecast[]>([]);
+
+  // Get saved cities on start and go to TownSelect if no city saved
+  useEffect(() => {
+    SavedCitiesService.getAllSavedCities()
+      .then((savedCities) => {
+        if (savedCities.length === 0) {
+          // [x]: replace or navigate?
+          navigation.replace(PagesNames.TownSelect);
+        } else {
+          setSavedCities(savedCities);
+        }
+      })
+      .catch((error) => {
+        console.error(`Unable to get saved cities: ${JSON.stringify(error, null, 2)}`);
+      });
+  }, [navigation]);
+
+  const citiesRoutes: Route[] = savedCities.map((savedCity) => (
+    {
+      key: `${savedCity.savedCity.coords.long}-${savedCity.savedCity.coords.lat}`,
+      title: savedCity.savedCity.name,
+    }
+  ));
 
   return (
     <View style={styles.outerContainer} key="home page">
@@ -444,7 +416,7 @@ const HomePage = () => {
         />
 
         <TabView key="tab view for cities"
-          navigationState={{ index, routes: mockedRoutes }}
+          navigationState={{ index, routes: citiesRoutes }}
           renderTabBar={WeatherTabBar}
           renderScene={() => <WeatherPage pageIndex={index} />}
           onIndexChange={setIndex}

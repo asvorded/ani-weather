@@ -7,7 +7,10 @@
     "location": {
       "errorPrefix": "Ошибка: "
     },
-    "savedCities": "Сохраненные города"
+    "savedCities": {
+      "title": "Сохраненные города",
+      "noCities": "Нет сохраненных городов"
+    }
   },
   "forecast": {
     "temperature": {
@@ -66,25 +69,25 @@
       "units": {
         "kmh": "км/ч",
         "ms": "м/с"
-      },
-      "weatherStates": {
-        "none": "Нет данных",
-        "thunderstorm": "Гроза",
-        "drizzle": "Морось",
-        "rain": "Дождь",
-        "snow": "Снег",
-        "mist": "Мгла",
-        "smoke": "Дым",
-        "haze": "Дымка",
-        "dust": "Пыль",
-        "fog": "Туман",
-        "sand": "Песок",
-        "ash": "Зола",
-        "squall": "Шквал",
-        "tornado": "Торнадо",
-        "clear": "Ясно",
-        "clouds": "Облачно"
       }
+    },
+    "weatherStates": {
+      "none": "<Нет данных>",
+      "thunderstorm": "Гроза",
+      "drizzle": "Морось",
+      "rain": "Дождь",
+      "snow": "Снег",
+      "mist": "Мгла",
+      "smoke": "Дым",
+      "haze": "Дымка",
+      "dust": "Пыль",
+      "fog": "Туман",
+      "sand": "Песок",
+      "ash": "Зола",
+      "squall": "Шквал",
+      "tornado": "Торнадо",
+      "clear": "Ясно",
+      "clouds": "Облачно"
     },
     "airQuality": {
       "main": "Качество воздуха",
@@ -95,9 +98,9 @@
     "title": "Настройки",
     "language": "Язык",
     "units": {
-      "title" : "Единицы измерения",
+      "title": "Единицы измерения",
       "temperature": "Температура",
-      "pressure" : "Давление",
+      "pressure": "Давление",
       "wind": "Ветер"
     },
     "notifications": "Уведомления"

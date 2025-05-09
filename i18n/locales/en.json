@@ -7,7 +7,10 @@
     "location": {
       "errorPrefix": "Error: "
     },
-    "savedCities": "Saved cities"
+    "savedCities": {
+      "title": "Saved cities",
+      "noCities": "No saved cities"
+    }
   },
   "forecast": {
     "temperature": {
