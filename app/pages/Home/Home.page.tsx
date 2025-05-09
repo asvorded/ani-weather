@@ -1,9 +1,8 @@
-import { Button, Dimensions, FlatList, ImageBackground, ScrollView, useWindowDimensions, View } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import { Button, Dimensions, FlatList, ImageBackground, ScrollView, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
-import { TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
