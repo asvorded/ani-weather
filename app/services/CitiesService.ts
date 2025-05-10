@@ -3,33 +3,11 @@ import Config from 'react-native-config';
 
 import { FoundCity } from '../types/api/FoundCity';
 
+import popularCities from '../../assets/jsons/popularCities.json';
+import { SavedCity } from '../types/storage/SavedCity';
+
 const OSMSearchUrl: string = 'https://nominatim.openstreetmap.org/search';
 const OWMSearchUrl: string = 'http://api.openweathermap.org/geo/1.0/direct';
-
-// TODO: remove export
-export const popularCities: FoundCity[] = [
-  {
-    name: 'Минск',
-    region: 'Минская область',
-    country: 'Беларусь',
-    longitude: 27.5618225,
-    latitude: 53.9024716,
-  },
-  {
-    name: 'Кировск',
-    region: 'Могилевская область',
-    country: 'Беларусь',
-    longitude: 29.4716,
-    latitude: 53.27022,
-  },
-  {
-    name: 'Могилев',
-    region: 'Могилевская область',
-    country: 'Беларусь',
-    longitude: 30.3429838,
-    latitude: 53.9090245,
-  },
-];
 
 export function getPopularCities(): FoundCity[] {
   return popularCities;
@@ -39,6 +17,7 @@ let inputTimeout: NodeJS.Timeout | null = null;
 
 export function findCitiesWithTimeout(
   query: string,
+  lang: string,
   callback: (cities: FoundCity[]) => void
 ) {
   if (inputTimeout) {
@@ -46,11 +25,11 @@ export function findCitiesWithTimeout(
   }
 
   inputTimeout = setTimeout(() => {
-    findCitiesOSMAsync(query).then(callback);
+    findCitiesOSMAsync(query, lang).then(callback);
   }, 500);
 }
 
-export async function findCitiesOSMAsync(query: string): Promise<FoundCity[]> {
+export async function findCitiesOSMAsync(query: string, lang: string): Promise<FoundCity[]> {
   // Potential exception ignored beacuse there is no need to handle it
   let response = await axios.get(OSMSearchUrl, {
     params: {
@@ -61,7 +40,7 @@ export async function findCitiesOSMAsync(query: string): Promise<FoundCity[]> {
       addressdetails: 1,
     },
     headers: {
-      'Accept-Language': 'ru', // TODO: Language according to locale
+      'Accept-Language': 'ru', // 'lang' in future
     },
   });
 
@@ -125,7 +104,7 @@ export function filterCitiesByQuery(cities: FoundCity[], query: string) {
   );
 }
 
-export function getReadableCountry(city: FoundCity): string {
+export function getReadableCountry(city: FoundCity | SavedCity): string {
   if (city.region.length > 0) {
     return `${city.region}, ${city.country}`;
   } else {

@@ -34,7 +34,6 @@ import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
 import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast.ts';
-import { SavedCitiesService } from '../../services/SavedCitiesService.ts';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -347,7 +346,6 @@ const HomePage = () => {
 
   useEffect(() => {
     if (savedCities.length === 0) {
-      // FIXME: incorrect behaviour when all cities have been removed
       if (navigation.canGoBack()) {
         navigation.goBack();
       }

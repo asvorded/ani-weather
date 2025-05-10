@@ -2,6 +2,11 @@ import { FoundCity } from '../../types/api/FoundCity';
 import { SavedCity } from '../../types/storage/SavedCity';
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast';
 
+export type PopularCityProps = {
+  city: FoundCity;
+  onClick: (city: FoundCity) => void;
+}
+
 export type FoundCityProps = {
   foundCities: FoundCity[];
   onFoundCityClick: (foundCity: FoundCity) => void;
