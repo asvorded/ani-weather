@@ -90,15 +90,14 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   popularCitiesContainer: {
+    marginBottom: 5,
     position: 'relative',
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 8,
   },
   popularCity: {
-    marginRight: 10,
-    marginBottom: 10,
-
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 50,

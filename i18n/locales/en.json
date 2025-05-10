@@ -5,12 +5,13 @@
     },
     "popularCities": "Popular cities",
     "location": {
-      "errorPrefix": "Error: "
+      "errorPrefix": "Error:"
     },
     "savedCities": {
       "title": "Saved cities",
       "noCities": "No saved cities"
-    }
+    },
+    "addError": "Error adding city. Check your internet connection."
   },
   "forecast": {
     "temperature": {

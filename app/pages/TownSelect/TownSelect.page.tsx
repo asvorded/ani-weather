@@ -1,24 +1,20 @@
 import {
-  ActivityIndicator, FlatList,
-  GestureResponderEvent, Image,
+  ActivityIndicator, FlatList, Image,
   Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 
 import { useTranslation } from 'react-i18next';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useCustomNavigation } from '../../hooks/useCustomNavigation';
 
 import { FoundCity } from '../../types/api/FoundCity';
-import {
-  filterCitiesByQuery, findCitiesWithTimeout,
-  getPopularCities, getReadableCountry,
-} from '../../services/CitiesService';
+import * as CitiesService from '../../services/CitiesService';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
-import { findLocationWithCallbacks } from '../../services/LocationService';
-import { FoundCityProps, SavedCitiesProps, SavedCityProps } from './TownSelect.types';
+import * as LocationService from '../../services/LocationService';
+import { FoundCityProps, PopularCityProps, SavedCitiesProps, SavedCityProps } from './TownSelect.types';
 import { SavedCity } from '../../types/storage/SavedCity';
 
 import BackImg from '../../../assets/icons/back-custom.svg';
@@ -95,18 +91,15 @@ const SavedCitiesList = ({
   );
 };
 
-const PopularCity = (
-  props: {
-    name: string,
-    onPress?: ((event: GestureResponderEvent) => void)
-  }
-) => {
+const PopularCity = ({
+  city, onClick,
+}: PopularCityProps) => {
   return (
     <TouchableOpacity
       style={styles.popularCity}
-      onPress={props.onPress}
+      onPress={() => { onClick(city); }}
     >
-      <Text style={[styles.defaultFont, styles.popularCityText]}>{props.name}</Text>
+      <Text style={[styles.defaultFont, styles.popularCityText]}>{city.name}</Text>
     </TouchableOpacity>
   );
 };
@@ -130,7 +123,7 @@ const FoundCities = ({
           <Text style={[
             styles.foundCityCountryText,
             styles.defaultFont,
-          ]}>{getReadableCountry(item)}</Text>
+          ]}>{CitiesService.getReadableCountry(item)}</Text>
         </TouchableOpacity>
       )}
       ItemSeparatorComponent={() => (
@@ -144,37 +137,43 @@ const FoundCities = ({
 };
 
 const TownSelect = () => {
-  const { t } = useTranslation();
+  const {t, i18n} = useTranslation();
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
 
   const {savedCities} = useSavedCities();
 
-  const [ popularCities, setPopularCities ] = useState<FoundCity[]>([]);
-  const [ foundCities, setFoundCities ] = useState<FoundCity[]>([]);
-  const [ query, setQuery ] = useState('');
+  const [popularCities, setPopularCities] = useState<FoundCity[]>([]);
+  const [foundCities, setFoundCities] = useState<FoundCity[]>([]);
+  const [query, setQuery] = useState('');
 
-  const [ isFindingLocation, setIsFindingLocation ] = useState(false);
-  const [ locationError, setLocationError ] = useState<string | null>(null);
+  const [isFindingLocation, setIsFindingLocation] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Get popular and saved cities on start
+  // Get and filter popular cities on start
   useEffect(() => {
-    setPopularCities(getPopularCities());
-  }, []);
+    let popularCities = CitiesService.getPopularCities();
+    popularCities = popularCities.filter((city) =>
+      savedCities.every((sc) =>
+        sc.savedCity.coords.lat !== city.latitude && sc.savedCity.coords.long !== city.longitude
+      )
+    );
+
+    setPopularCities(popularCities);
+  }, [savedCities]);
 
   // Filter and find cities
   function processQueryAsync(query: string) {
-    if (locationError != null) {
-      hideLocationError();
-    }
+    setErrorMessage(null);
 
     setQuery(query);
     query = query.trim();
 
-    setFoundCities(filterCitiesByQuery(foundCities, query));
+    setFoundCities(CitiesService.filterCitiesByQuery(foundCities, query));
 
     if (isQueryLongEnough(query)) {
-      findCitiesWithTimeout(query, (foundCities) => {
+      const lang = i18n.language;
+      CitiesService.findCitiesWithTimeout(query, lang, (foundCities) => {
         setFoundCities(foundCities);
       });
     }
@@ -183,21 +182,45 @@ const TownSelect = () => {
   // Find geolocation click hadler
   function onFindLocationClick() {
     setIsFindingLocation(true);
-    setLocationError(null);
+    setErrorMessage(null);
 
-    findLocationWithCallbacks((position) => {
+    LocationService.findLocationWithCallbacks((position) => {
       setIsFindingLocation(false);
-      // TODO: Goto to main screen with found location
+
+      CitiesService.getCityFromCoordsOSM(position.coords.latitude, position.coords.longitude, i18n.language)
+        .then((foundCity) => {
+          SavedCitiesService.updateGeolocationCity(foundCity)
+            .then(() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                navigation.replace(PagesNames.Home);
+              }
+            })
+            .catch((err) => {
+              setErrorMessage(t('townSelect.addError'));
+              console.error(`Unable to add city from geolocation: ${err.message}`);
+            });
+        })
+        .catch((err) => {
+          setErrorMessage(t('townSelect.location.errors.default'));
+          console.error(`Unable to get city from coords: ${err.message}`);
+        });
     }, (error) => {
       setIsFindingLocation(false);
-      // TODO: Make error translations
-      setLocationError(error.message);
-    }, 15_000);
-  }
 
-  // Hide location error
-  function hideLocationError() {
-    setLocationError(null);
+      switch (error.code) {
+      case error.PERMISSION_DENIED:
+        setErrorMessage(t('townSelect.location.errors.permissionDenied'));
+        break;
+      case error.POSITION_UNAVAILABLE:
+        setErrorMessage(t('townSelect.location.errors.positionUnavailable'));
+        break;
+      default:
+        setErrorMessage(t('townSelect.location.errors.default'));
+        break;
+      }
+    }, 15_000);
   }
 
   // Get forecast, save city and go to Home page
@@ -211,8 +234,14 @@ const TownSelect = () => {
         }
       })
       .catch((err) => {
-        console.error(`Unable to add city: ${err.message}`);
+        setErrorMessage(t('townSelect.addError'));
+        console.error(`Unable to add found city: ${err.message}`);
       });
+  }
+
+  // Add popular city and go to Home page
+  function onPopularCityClick(foundCity: FoundCity) {
+    onFoundCityClick(foundCity);
   }
 
   // Delete saved city
@@ -267,15 +296,15 @@ const TownSelect = () => {
         </View>
       </View>
 
-      {/* Location error */}
-      {locationError ? (
+      {/* Error message */}
+      {errorMessage ? (
         <View style={styles.locationErrorContainer} key="location_error">
           <Text
             style={[styles.locationErrorText, styles.defaultFont]}
-          >{t('townSelect.location.errorPrefix') + locationError}</Text>
+          >{errorMessage}</Text>
           <TouchableOpacity
             style={styles.locationErrorClose}
-            onPress={hideLocationError}
+            onPress={() => { setErrorMessage(null); }}
           >
             <Image
               style={styles.locationErrorCloseIcon}
@@ -300,7 +329,7 @@ const TownSelect = () => {
               <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
               <View style={styles.popularCitiesContainer}>{
                 popularCities.map((city, index) => (
-                  <PopularCity key={index} name={city.name}/>
+                  <PopularCity key={index} city={city} onClick={onPopularCityClick}/>
                 ))
               }</View>
             </View>

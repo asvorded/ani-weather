@@ -5,12 +5,18 @@
     },
     "popularCities": "Популярные города",
     "location": {
-      "errorPrefix": "Ошибка: "
+      "errorPrefix": "Ошибка:",
+      "errors": {
+        "default": "Ошибка получения местоположения",
+        "permissionDenied": "Не получен доступ к местоположению устройства",
+        "positionUnavailable": "Включите GPS"
+      }
     },
     "savedCities": {
       "title": "Сохраненные города",
       "noCities": "Нет сохраненных городов"
-    }
+    },
+    "addError": "Ошибка добавления города. Проверьте подключение к Интернету"
   },
   "forecast": {
     "temperature": {
