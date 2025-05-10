@@ -402,6 +402,8 @@ export class SavedCitiesService {
   static async updateGeolocationCity(city: FoundCity): Promise<SavedCityWithForecast> {
     const geoCityForSave = SavedCitiesService.toSavedCity(city);
 
+    geoCityForSave.isGeolocation = true;
+
     await AsyncStorage.setItem(SavedCitiesService.geolocationCityKey, JSON.stringify(geoCityForSave));
 
     const coords = geoCityForSave.coords;

@@ -7,4 +7,5 @@ export type SavedCity = {
   name: string;
   region: string;
   country: string;
+  isGeolocation?: true;
 }
