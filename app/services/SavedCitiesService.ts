@@ -12,6 +12,7 @@ import { Forecast } from '../types/api/Forecast';
 class SavedForecastsService {
   private static forecastsStorageIdPrefix = 'forecasts-';
   private static forecastsStorageIdsKey = 'forecasts-ids';
+  private static geolocationForecastKey = 'geo-forecast';
 
   private static forecastNotFoundBySavedKeyErrMsg = 'Invalid async-storage key-value structure: saved forecast with saved id not found.';
 
@@ -114,12 +115,36 @@ class SavedForecastsService {
 
     return actualSavedForecast;
   }
+
+  static async getGeolocationForecast(): Promise<SavedForecastWithCityCoords | null> {
+    const geoForecastJSON = await AsyncStorage.getItem(SavedForecastsService.geolocationForecastKey);
+
+    if (!geoForecastJSON) {
+      return null;
+    }
+
+    const geoForecast = SavedForecastsService.parseSavedForecastJSON(geoForecastJSON);
+
+    return geoForecast;
+  }
+
+  static async addOrUpdateGeolocationForecast(coords: Coords, forecastToSave: SavedForecast): Promise<SavedForecastWithCityCoords> {
+    const actualSavedForecast: SavedForecastWithCityCoords = {
+      cityCoords: coords,
+      forecast: forecastToSave,
+    };
+
+    await AsyncStorage.setItem(SavedForecastsService.geolocationForecastKey, JSON.stringify(actualSavedForecast));
+
+    return actualSavedForecast;
+  }
 }
 
 export class SavedCitiesService {
 
   private static cityStorageIdPrefix = 'city-';
   private static citiesStorageIdsKey = 'cities-ids';
+  private static geolocationCityKey = 'geo-city';
 
   private static cityNotFoundBySavedKeyErrMsg = 'Invalid async-storage key-value structure: saved city with saved id not found.';
   private static forecastNotFoundByCityErrMsg = 'Invalid async-storage key-value structure: saved forecast for existing city not found.';
@@ -320,5 +345,76 @@ export class SavedCitiesService {
 
   static removeRemovedListener(callback: () => Promise<void>): void {
     SavedCitiesService.removedCallbacks.delete(callback);
+  }
+
+  private static async getGeolocationCityWithoutForecast(): Promise<SavedCity | null> {
+    const geoCityJSON = await AsyncStorage.getItem(SavedCitiesService.geolocationCityKey);
+
+    if (!geoCityJSON) {
+      return null;
+    }
+
+    const geoCity = SavedCitiesService.parseCitiesJSONs([geoCityJSON])[0];
+
+    return geoCity;
+  }
+
+  static async getGeolocationCity(): Promise<SavedCityWithForecast | null> {
+    const geoCity = await SavedCitiesService.getGeolocationCityWithoutForecast();
+
+    if (!geoCity) {
+      return null;
+    }
+
+    const geoForecastWithCoords = await SavedForecastsService.getGeolocationForecast();
+
+    if (!geoForecastWithCoords || !SavedCitiesService.areCoordsEqual(geoForecastWithCoords.cityCoords, geoCity.coords)) {
+      return null;
+    }
+
+    return {
+      savedCity: geoCity,
+      forecast: geoForecastWithCoords.forecast,
+    };
+  }
+
+  static async updateGeolocationForecast(): Promise<SavedCityWithForecast | null> {
+    const geoCity = await SavedCitiesService.getGeolocationCityWithoutForecast();
+
+    if (!geoCity) {
+      return null;
+    }
+
+    const coords = geoCity.coords;
+
+    const forecast = await WeatherService.fetchWeatherWithForecastByCoords(coords.lat, coords.long);
+
+    const savedForecastWithCityCoords = await SavedForecastsService.addOrUpdateGeolocationForecast(coords, forecast);
+
+    const savedCityWithForecast: SavedCityWithForecast = {
+      savedCity: geoCity,
+      forecast: savedForecastWithCityCoords.forecast,
+    };
+
+    return savedCityWithForecast;
+  }
+
+  static async updateGeolocationCity(city: FoundCity): Promise<SavedCityWithForecast> {
+    const geoCityForSave = SavedCitiesService.toSavedCity(city);
+
+    await AsyncStorage.setItem(SavedCitiesService.geolocationCityKey, JSON.stringify(geoCityForSave));
+
+    const coords = geoCityForSave.coords;
+
+    const forecast = await WeatherService.fetchWeatherWithForecastByCoords(coords.lat, coords.long);
+
+    const savedForecastWithCityCoords = await SavedForecastsService.addOrUpdateGeolocationForecast(coords, forecast);
+
+    const savedCityWithForecast: SavedCityWithForecast = {
+      savedCity: geoCityForSave,
+      forecast: savedForecastWithCityCoords.forecast,
+    };
+
+    return savedCityWithForecast;
   }
 }
