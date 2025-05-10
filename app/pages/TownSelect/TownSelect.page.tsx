@@ -26,8 +26,8 @@ import FindLocationImg from '../../../assets/icons/location.svg';
 import LocationDarkImg from '../../../assets/icons/location-filled-dark.svg';
 import DeleteDarkImg from '../../../assets/icons/delete-dark.svg';
 import { SavedCitiesService } from '../../services/SavedCitiesService';
-import PagerView from 'react-native-pager-view';
 import { PagesNames } from '../../types/common/root-stack-params-list';
+import { useSavedCities } from '../../hooks/useSavedCities';
 
 function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
@@ -79,7 +79,7 @@ const SavedCitiesList = ({
           {savedCities.map((city, index) => (
             <SavedCityBlock
               key={`saved city ${index}`}
-              city={city}
+              city={city.savedCity}
               isLocation={false}
               onDeleteSavedCityClick={onDeleteSavedCityClick}
             />
@@ -148,7 +148,7 @@ const TownSelect = () => {
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
 
-  const [savedCities, setSavedCities] = useState<SavedCity[]>([]);
+  const {savedCities} = useSavedCities();
 
   const [ popularCities, setPopularCities ] = useState<FoundCity[]>([]);
   const [ foundCities, setFoundCities ] = useState<FoundCity[]>([]);
@@ -160,12 +160,6 @@ const TownSelect = () => {
   // Get popular and saved cities on start
   useEffect(() => {
     setPopularCities(getPopularCities());
-
-    SavedCitiesService.getAllSavedCities()
-      .then((savedCities) => {
-        const savedCitiesToShow = savedCities.map((sc) => sc.savedCity);
-        setSavedCities(savedCitiesToShow);
-      });
   }, []);
 
   // Filter and find cities
@@ -217,21 +211,13 @@ const TownSelect = () => {
         }
       })
       .catch((err) => {
-        console.error(`Unable to add city: ${JSON.stringify(err, null, 2)}`);
+        console.error(`Unable to add city: ${err.message}`);
       });
   }
 
   // Delete saved city
   function onDeleteCity(city: SavedCity) {
-    SavedCitiesService.removeCityByCoords(city.coords)
-      .then(() => {
-        SavedCitiesService.getAllSavedCities()
-          .then((savedCities) => {
-            const savedCitiesToShow = savedCities.map((sc) => sc.savedCity);
-            setSavedCities(savedCitiesToShow);
-          });
-      })
-      .catch();
+    SavedCitiesService.removeCityByCoords(city.coords);
   }
 
   return (

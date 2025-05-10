@@ -1,5 +1,5 @@
-import { AppRegistry, Button, ImageBackground, ScrollView, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import { Button, ImageBackground, ScrollView, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -16,16 +16,14 @@ import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
 import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
 import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
-import {createWeatherState, MoonPhases, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast.ts';
+import {createWeatherState} from '../../types/api/Forecast.ts';
 import {
   convertPressure, convertTemperature, convertWindSpeed, getReadableGeomagneticDegreeId, getReadableHumidityId,
   getReadableMoonPhaseId, getReadablePressureId, getReadablePressureUnitsId, getReadableTemperatureUnitsId,
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
-import WeatherService from '../../services/WeatherService.ts';
-
-import { WeatherModule } from '../../../specs/NativeModules.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
+import { useSavedCities } from '../../hooks/useSavedCities.tsx';
 
 import AddDarkImg from '../../../assets/icons/add-dark.svg';
 import AddLightImg from '../../../assets/icons/add-light.svg';
@@ -37,7 +35,6 @@ import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast.ts';
 import { SavedCitiesService } from '../../services/SavedCitiesService.ts';
-import { SavedCity } from '../../types/storage/SavedCity.ts';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -341,28 +338,22 @@ const WeatherTabBar: React.FC<any> = (props) => {
 const HomePage = () => {
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
-
-  const [index, setIndex] = React.useState(0);
   const layout = useWindowDimensions();
 
-  const [savedCities, setSavedCities] = useState<SavedCityWithForecast[]>([]);
+  const {savedCities} = useSavedCities();
+  const [index, setIndex] = React.useState(0);
 
-  // Get saved cities or go to TownSelect if no city saved
+  //const [savedCities, setSavedCities] = useState<SavedCityWithForecast[]>([]);
+
   useEffect(() => {
-    SavedCitiesService.getAllSavedCities()
-      .then((savedCities) => {
-        if (savedCities.length === 0) {
-          // [x]: replace or navigate?
-          navigation.replace(PagesNames.TownSelect);
-        } else {
-          savedCities;
-          setSavedCities(savedCities);
-        }
-      })
-      .catch((error) => {
-        console.error(`Unable to get saved cities: ${JSON.stringify(error, null, 2)}`);
-      });
-  }, [navigation]);
+    if (savedCities.length === 0) {
+      // FIXME: incorrect behaviour when all cities have been removed
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
+      navigation.replace(PagesNames.TownSelect);
+    }
+  }, [savedCities, navigation]);
 
   let routesWithCities: {[key: string]: SavedCityWithForecast} = {};
 

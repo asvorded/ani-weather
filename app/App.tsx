@@ -14,9 +14,10 @@ import {
   RootStackParamsList,
 } from './types/common/root-stack-params-list';
 import {UserSettingsProvider} from './services/UserSettingsProvider.tsx';
+import { SavedCitiesProvider, useSavedCities } from './hooks/useSavedCities.tsx';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>({
-  initialRouteName: PagesNames.Home,
+  //initialRouteName: PagesNames.Home,
   screenOptions: {
     headerShown: false,
     animation: 'simple_push',
@@ -31,19 +32,29 @@ const RootStack = createNativeStackNavigator<RootStackParamsList>({
 
 const Navigation = createStaticNavigation(RootStack);
 
+const InternalApp = () => {
+  const {ready} = useSavedCities();
+
+  return ready ? (
+    <Navigation />
+  ) : null;
+};
+
 const App = () => {
   useFonts({
     'BellotaText-Regular': require('./../assets/fonts/BellotaText-Regular.ttf'),
   });
 
   return (
-    // FIXME: Strict mode breaks fetch functions' logic
+    // BUG: Strict mode breaks fetch functions' logic (wtf)
     <>
-      <UserSettingsProvider>
-        <SafeAreaProvider>
-          <Navigation />
-        </SafeAreaProvider>
-      </UserSettingsProvider>
+      <SafeAreaProvider>
+        <UserSettingsProvider>
+          <SavedCitiesProvider>
+            <InternalApp />
+          </SavedCitiesProvider>
+        </UserSettingsProvider>
+      </SafeAreaProvider>
     </>
   );
 };

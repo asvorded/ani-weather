@@ -1,5 +1,6 @@
 import { FoundCity } from '../../types/api/FoundCity';
 import { SavedCity } from '../../types/storage/SavedCity';
+import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast';
 
 export type FoundCityProps = {
   foundCities: FoundCity[];
@@ -13,6 +14,6 @@ export type SavedCityProps = {
 }
 
 export type SavedCitiesProps = {
-  savedCities: SavedCity[];
+  savedCities: SavedCityWithForecast[];
   onDeleteSavedCityClick: (SavedCity: SavedCity) => void;
 }
