@@ -6,8 +6,11 @@ import { FoundCity } from '../types/api/FoundCity';
 import popularCities from '../../assets/jsons/popularCities.json';
 import { SavedCity } from '../types/storage/SavedCity';
 
-const OSMSearchUrl: string = 'https://nominatim.openstreetmap.org/search';
-const OWMSearchUrl: string = 'http://api.openweathermap.org/geo/1.0/direct';
+const OSM_SEARCH_URL: string = 'https://nominatim.openstreetmap.org/search';
+const OWM_SEARCH_URL: string = 'http://api.openweathermap.org/geo/1.0/direct';
+const OSM_REVERSE_URL: string = 'https://nominatim.openstreetmap.org/reverse';
+
+const OSM_BOUNDARY_KEY: string = 'ISO3166-2-lvl4';
 
 export function getPopularCities(): FoundCity[] {
   return popularCities;
@@ -29,9 +32,20 @@ export function findCitiesWithTimeout(
   }, 500);
 }
 
+function extractRegionFromOSM(address: any): string {
+  let region = '';
+  let end = Object.keys(address).indexOf(OSM_BOUNDARY_KEY);
+  if (end > 1) {
+    region = Object.values(address)
+      .slice(1, end)
+      .join(', ');
+  }
+  return region;
+}
+
 export async function findCitiesOSMAsync(query: string, lang: string): Promise<FoundCity[]> {
   // Potential exception ignored beacuse there is no need to handle it
-  let response = await axios.get(OSMSearchUrl, {
+  let response = await axios.get(OSM_SEARCH_URL, {
     params: {
       city: query,
       countrycodes: 'by',
@@ -54,13 +68,7 @@ export async function findCitiesOSMAsync(query: string, lang: string): Promise<F
     let lat = cityJson.geometry.coordinates[1];
 
     // Extract region
-    let region = '';
-    let end = Object.keys(cityJson.properties.address).indexOf('ISO3166-2-lvl4');
-    if (end > 1) {
-      region = Object.values(cityJson.properties.address)
-        .slice(1, end)
-        .join(', ');
-    }
+    let region = extractRegionFromOSM(address);
 
     return {
       name: name,
@@ -74,7 +82,7 @@ export async function findCitiesOSMAsync(query: string, lang: string): Promise<F
 
 export async function findCitiesOWMAsync(query: string): Promise<FoundCity[]> {
   // Potential exception ignored beacuse there is no need to handle it
-  let response = await axios.get(OWMSearchUrl, {
+  let response = await axios.get(OWM_SEARCH_URL, {
     params: {
       appid: Config.OWM_API_KEY,
       q: query,
@@ -96,6 +104,57 @@ export async function findCitiesOWMAsync(query: string): Promise<FoundCity[]> {
   });
 }
 
+export async function getCityFromCoordsOSM(lat: number, lon: number, lang: string): Promise<FoundCity> {
+  const response = await axios.get(OSM_REVERSE_URL, {
+    params: {
+      lat: lat,
+      lon: lon,
+      format: 'geojson',
+      zoom: 15, // 'any settlement'
+      addressdetails: 1,
+    },
+    headers: {
+      'Accept-Language': 'ru', // 'lang' in future
+    },
+  });
+
+  if (response.data.features === undefined || response.data.features[0] === undefined) {
+    throw new Error('Unable to determine location');
+  }
+
+  let cityJson = response.data.features[0];
+  let address = cityJson.properties.address;
+  let name = cityJson.properties.name;
+  let country = address.country;
+
+  // Extract region
+  let region = extractRegionFromOSM(address);
+
+  return {
+    name: name,
+    region: region,
+    country: country,
+    longitude: lon,
+    latitude: lat,
+  };
+}
+
+export async function getCityFromCoordsOWM(longitude: number, latitude: number): Promise<string> {
+  const response = await axios.get(OWM_SEARCH_URL, {
+    params: {
+      appid: Config.OWM_API_KEY,
+      limit: 1,
+      lon: longitude,
+      lat: latitude,
+    },
+  });
+
+  const cityObj = response.data[0];
+  const cityName = cityObj.local_names.ru as string;
+
+  return cityName;
+}
+
 export function filterCitiesByQuery(cities: FoundCity[], query: string) {
   query = query.trim().toLowerCase();
 
@@ -110,20 +169,4 @@ export function getReadableCountry(city: FoundCity | SavedCity): string {
   } else {
     return city.country;
   }
-}
-
-export async function getCityNameByCoordinates(longitude: number, latitude: number): Promise<string> {
-  const response = await axios.get(OWMSearchUrl, {
-    params: {
-      appid: Config.OWM_API_KEY,
-      limit: 1,
-      lon: longitude,
-      lat: latitude,
-    },
-  });
-
-  const cityObj = response.data[0];
-  const cityName = cityObj.local_names.ru as string;
-
-  return cityName;
 }

@@ -1,23 +1,19 @@
 import {
-  ActivityIndicator, FlatList,
-  GestureResponderEvent, Image,
+  ActivityIndicator, FlatList, Image,
   Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 
 import { useTranslation } from 'react-i18next';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useCustomNavigation } from '../../hooks/useCustomNavigation';
 
 import { FoundCity } from '../../types/api/FoundCity';
-import {
-  filterCitiesByQuery, findCitiesWithTimeout,
-  getPopularCities, getReadableCountry,
-} from '../../services/CitiesService';
+import * as CitiesService from '../../services/CitiesService';
 import { styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
-import { findLocationWithCallbacks } from '../../services/LocationService';
+import * as LocationService from '../../services/LocationService';
 import { FoundCityProps, PopularCityProps, SavedCitiesProps, SavedCityProps } from './TownSelect.types';
 import { SavedCity } from '../../types/storage/SavedCity';
 
@@ -127,7 +123,7 @@ const FoundCities = ({
           <Text style={[
             styles.foundCityCountryText,
             styles.defaultFont,
-          ]}>{getReadableCountry(item)}</Text>
+          ]}>{CitiesService.getReadableCountry(item)}</Text>
         </TouchableOpacity>
       )}
       ItemSeparatorComponent={() => (
@@ -156,7 +152,7 @@ const TownSelect = () => {
 
   // Get and filter popular cities on start
   useEffect(() => {
-    let popularCities = getPopularCities();
+    let popularCities = CitiesService.getPopularCities();
     popularCities = popularCities.filter((city) =>
       savedCities.every((sc) =>
         sc.savedCity.coords.lat !== city.latitude && sc.savedCity.coords.long !== city.longitude
@@ -168,18 +164,16 @@ const TownSelect = () => {
 
   // Filter and find cities
   function processQueryAsync(query: string) {
-    if (errorMessage != null) {
-      hideLocationError();
-    }
+    setErrorMessage(null);
 
     setQuery(query);
     query = query.trim();
 
-    setFoundCities(filterCitiesByQuery(foundCities, query));
+    setFoundCities(CitiesService.filterCitiesByQuery(foundCities, query));
 
     if (isQueryLongEnough(query)) {
       const lang = i18n.language;
-      findCitiesWithTimeout(query, lang, (foundCities) => {
+      CitiesService.findCitiesWithTimeout(query, lang, (foundCities) => {
         setFoundCities(foundCities);
       });
     }
@@ -190,9 +184,28 @@ const TownSelect = () => {
     setIsFindingLocation(true);
     setErrorMessage(null);
 
-    findLocationWithCallbacks((position) => {
+    LocationService.findLocationWithCallbacks((position) => {
       setIsFindingLocation(false);
-      // TODO: Goto to main screen with found location
+
+      CitiesService.getCityFromCoordsOSM(position.coords.latitude, position.coords.longitude, i18n.language)
+        .then((foundCity) => {
+          SavedCitiesService.updateGeolocationCity(foundCity)
+            .then(() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                navigation.replace(PagesNames.Home);
+              }
+            })
+            .catch((err) => {
+              setErrorMessage(t('townSelect.addError'));
+              console.error(`Unable to add city from geolocation: ${err.message}`);
+            });
+        })
+        .catch((err) => {
+          setErrorMessage(t('townSelect.location.errors.default'));
+          console.error(`Unable to get city from coords: ${err.message}`);
+        });
     }, (error) => {
       setIsFindingLocation(false);
 
@@ -210,11 +223,6 @@ const TownSelect = () => {
     }, 15_000);
   }
 
-  // Hide location error
-  function hideLocationError() {
-    setErrorMessage(null);
-  }
-
   // Get forecast, save city and go to Home page
   function onFoundCityClick(foundCity: FoundCity) {
     SavedCitiesService.addCity(foundCity)
@@ -227,7 +235,7 @@ const TownSelect = () => {
       })
       .catch((err) => {
         setErrorMessage(t('townSelect.addError'));
-        console.error(`Unable to add city: ${err.message}`);
+        console.error(`Unable to add found city: ${err.message}`);
       });
   }
 
@@ -296,7 +304,7 @@ const TownSelect = () => {
           >{errorMessage}</Text>
           <TouchableOpacity
             style={styles.locationErrorClose}
-            onPress={hideLocationError}
+            onPress={() => { setErrorMessage(null); }}
           >
             <Image
               style={styles.locationErrorCloseIcon}
