@@ -1,6 +1,5 @@
 import {
-  ActivityIndicator, FlatList, Image,
-  ScrollView,
+  ActivityIndicator, FlatList, ScrollView,
   Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 
@@ -19,10 +18,10 @@ import { FoundCityProps, PopularCityProps, SavedCitiesProps, SavedCityProps } fr
 import { SavedCity } from '../../types/storage/SavedCity';
 
 import BackImg from '../../../assets/icons/back-custom.svg';
-import FindLocationImg from '../../../assets/icons/location.svg';
+import FindLocationImg from '../../../assets/icons/location-custom.svg';
 import LocationDarkImg from '../../../assets/icons/location-filled-dark.svg';
 import DeleteDarkImg from '../../../assets/icons/delete-dark.svg';
-//import { SavedCitiesService } from '../../services/SavedCitiesService';
+import CloseLightImg from '../../../assets/icons/close-light.svg';
 import { PagesNames } from '../../types/common/root-stack-params-list';
 import { useSavedCities } from '../../hooks/useSavedCities';
 
@@ -310,10 +309,7 @@ const TownSelect = () => {
               style={styles.locationErrorClose}
               onPress={() => { setErrorMessage(null); }}
             >
-              <Image
-                style={styles.locationErrorCloseIcon}
-                source={require('../../../assets/icons/close.png')}
-              />
+              <CloseLightImg width={35} height={35} />
             </TouchableOpacity>
           </View>
         ) : null}
