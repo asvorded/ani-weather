@@ -339,6 +339,7 @@ const CitiesTabBar: React.FC<CitiesTabBarProps> = ({
       <View style={styles.citiesTabBarDots}>
         {citiesPagesList.map((city, i) => city.savedCity.isGeolocation ? (
           <LocationLightImg
+            key={i}
             width={10} height={10}
             opacity={i === selectedCityIndex ? 1 : 0.5} />
         ) : (
