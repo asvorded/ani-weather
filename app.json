@@ -1,7 +1,5 @@
 {
   "name": "BelWeather",
   "displayName": "BelWeather",
-  "plugins": [
-    "expo-localization"
-  ]
+  "plugins": []
 }
