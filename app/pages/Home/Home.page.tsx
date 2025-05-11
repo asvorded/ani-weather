@@ -1,4 +1,12 @@
-import { Button, ImageBackground, ScrollView, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import {
+  Button,
+  ImageBackground,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,6 +42,7 @@ import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
 import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast.ts';
+import {SavedCitiesService} from '../../services/SavedCitiesService.ts';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -93,7 +102,7 @@ const WeatherDetailedPanel = ({
 
 const WeatherPanel = ({
   temp, tempUnits, maxTemp, minTemp,
-  icon, description, stateId
+  icon, description, stateId,
 }: WeatherPanelProps) => {
   const [cityWrapperWidth, setCityWrapperWidth] = useState(0);
   return (
@@ -187,7 +196,19 @@ const WeatherPage: React.FC<{
   useEffect(() => {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [pageIndex]);
+  const [refreshing, setRefreshing] = React.useState(false);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    SavedCitiesService.updateForecastByCoords(cityWithForecast.savedCity.coords).then((forecast) => {
+      if(forecast.forecast.lastUpdated !== cityWithForecast.forecast.lastUpdated){
+        cityWithForecast.forecast = forecast.forecast;
+      }else{
+        console.log('forecast is up to date');
+      }
+      setRefreshing(false);
+    });
+  }, [cityWithForecast]);
   return (
     <ScrollView
       ref={scrollRef}
@@ -197,7 +218,9 @@ const WeatherPage: React.FC<{
       }}
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
-    >
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <WeatherPanel key="weather panel"
         temp={convertTemperature(cityWithForecast.forecast.currentTemp, cityWithForecast.forecast.tempUnits, userSettings.temperature)}
         icon={''}
