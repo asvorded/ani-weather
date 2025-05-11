@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/app_widget_description"
+    android:initialKeyguardLayout="@layout/weather_classic_widget"
+    android:initialLayout="@layout/weather_classic_widget"
+    android:minWidth="180dp"
+    android:minHeight="48dp"
+    android:previewImage="@drawable/weather_logo"
+    android:previewLayout="@layout/weather_classic_widget"
+    android:resizeMode="horizontal"
+    android:targetCellWidth="4"
+    android:targetCellHeight="1"
+    android:widgetCategory="home_screen" />

@@ -1,0 +1,98 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:paddingHorizontal="10dp"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <!-- Time -->
+        <TextClock
+            android:id="@+id/time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/bellota_text_regular"
+            android:textColor="#FFFFFF"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:shadowDx="@dimen/widget_shadow_dx"
+            android:shadowDy="@dimen/widget_shadow_dy"
+            android:shadowColor="#B0000000"
+            android:shadowRadius="@dimen/widget_shadow_radius"
+            />
+
+        <!-- Date -->
+        <TextClock
+            android:id="@+id/date_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/bellota_text_regular"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:format12Hour="EE, d MMMM"
+            android:format24Hour="EE, d MMMM"
+            android:shadowDx="@dimen/widget_shadow_dx"
+            android:shadowDy="@dimen/widget_shadow_dy"
+            android:shadowColor="#B0000000"
+            android:shadowRadius="@dimen/widget_shadow_radius" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/weather_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end|center">
+
+        <!-- Weather icon -->
+        <ImageView
+            android:id="@+id/weather_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/widget_default_icon"
+            android:contentDescription="@string/app_widget_description"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <!-- Current temp -->
+            <TextView
+                android:id="@+id/current_temp_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/bellota_text_regular"
+                android:shadowDx="@dimen/widget_shadow_dx"
+                android:shadowDy="@dimen/widget_shadow_dy"
+                android:shadowColor="#B0000000"
+                android:shadowRadius="@dimen/widget_shadow_radius"
+                android:text="@string/widget_default_current_weather"/>
+
+            <!-- Min/max temp -->
+            <TextView
+                android:id="@+id/max_min_temp_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/bellota_text_regular"
+                android:shadowDx="@dimen/widget_shadow_dx"
+                android:shadowDy="@dimen/widget_shadow_dy"
+                android:shadowColor="#B0000000"
+                android:shadowRadius="@dimen/widget_shadow_radius"
+                android:text="@string/widget_default_max_min_weather"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

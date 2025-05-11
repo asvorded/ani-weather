@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="widget_shadow_dx">1</dimen>
+    <dimen name="widget_shadow_dy">1</dimen>
+    <dimen name="widget_shadow_radius">2</dimen>
+</resources>
