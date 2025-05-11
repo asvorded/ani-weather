@@ -316,11 +316,11 @@ export class SavedCitiesService {
     };
   }
 
-  static async updateGeolocationForecast(): Promise<SavedCityWithForecast> {
+  static async updateGeolocationForecast(): Promise<SavedCityWithForecast | null> {
     const geoCity = await SavedCitiesService.getGeolocationCityWithoutForecast();
 
     if (!geoCity) {
-      throw new Error('updateGeolocationForecast invalid usage: called when no location is saved');
+      return null;
     }
 
     const coords = geoCity.coords;

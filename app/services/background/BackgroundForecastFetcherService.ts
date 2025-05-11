@@ -1,33 +1,52 @@
 import * as BackgroundTask from 'expo-background-task';
-import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 
 import { WidgetService } from '../WidgetService';
 import { ShortForecast } from '../../types/widgets/ShortForecast';
+import { SavedCitiesService } from '../SavedCitiesService';
 
 export const BACKGROUND_WEATHER_FETCH_TASK = 'BACKGROUND_WEATHER_FETCH_TASK';
 export const BACKGROUND_WEATHER_FETCH_INTERVAL = 60;
 
 export function defineWeatherFetchTask() {
-  // TODO: Support for iOS
-
   TaskManager.defineTask(BACKGROUND_WEATHER_FETCH_TASK, async () => {
     console.log(`${BACKGROUND_WEATHER_FETCH_TASK} started`);
 
-    // Get last chosen or favourite city
-    // TODO: get city from SavedCitiesService
+    try {
+      let forecastToShow: ShortForecast | undefined;
 
-    const testForecast: ShortForecast = {
-      name: 'Test',
-      state: -1,
-      currentTemp: Math.random() * 50,
-      minTemp: -10,
-      maxTemp: 10,
-    };
-    WidgetService.setForecastOnWidget(testForecast);
+      const geoCity = await SavedCitiesService.updateGeolocationForecast();
+      if (geoCity !== null) {
+        forecastToShow = {
+          name: geoCity.savedCity.name,
+          state: geoCity.forecast.state,
+          currentTemp: geoCity.forecast.currentTemp,
+          minTemp: geoCity.forecast.minTemp,
+          maxTemp: geoCity.forecast.maxTemp,
+        };
+      } else {
+        let savedCity = (await SavedCitiesService.getAllSavedCities())[0];
+        if (savedCity !== undefined && savedCity !== null) {
+          const newForecast = await SavedCitiesService.updateForecastByCoords(savedCity.savedCity.coords);
+          forecastToShow = {
+            name: savedCity.savedCity.name,
+            state: newForecast.forecast.state,
+            currentTemp: newForecast.forecast.currentTemp,
+            minTemp: newForecast.forecast.minTemp,
+            maxTemp: newForecast.forecast.maxTemp,
+          };
+        }
+      }
 
-    console.log(`${BACKGROUND_WEATHER_FETCH_TASK} finished`);
-    return BackgroundFetch.BackgroundFetchResult.NewData;
+      if (forecastToShow !== undefined) {
+        WidgetService.setForecastOnWidget(forecastToShow);
+      }
+
+      console.log(`${BACKGROUND_WEATHER_FETCH_TASK} finished successfully`);
+      return BackgroundTask.BackgroundTaskResult.Success;
+    } catch (e: any) {
+      console.error(`${BACKGROUND_WEATHER_FETCH_TASK} failed: ${e.message}`);
+    }
   });
 }
 
