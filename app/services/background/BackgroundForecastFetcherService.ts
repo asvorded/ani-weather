@@ -2,13 +2,11 @@ import * as BackgroundTask from 'expo-background-task';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 
-import * as WeatherService from '../WeatherService';
+import { WidgetService } from '../WidgetService';
 import { ShortForecast } from '../../types/widgets/ShortForecast';
 
-import { WeatherModule } from '../../../specs/NativeModules';
-
 export const BACKGROUND_WEATHER_FETCH_TASK = 'BACKGROUND_WEATHER_FETCH_TASK';
-export const BACKGROUND_WEATHER_FETCH_INTERVAL = 15;
+export const BACKGROUND_WEATHER_FETCH_INTERVAL = 60;
 
 export function defineWeatherFetchTask() {
   // TODO: Support for iOS
@@ -26,7 +24,7 @@ export function defineWeatherFetchTask() {
       minTemp: -10,
       maxTemp: 10,
     };
-    WeatherModule.setForecastOnWidget(testForecast);
+    WidgetService.setForecastOnWidget(testForecast);
 
     console.log(`${BACKGROUND_WEATHER_FETCH_TASK} finished`);
     return BackgroundFetch.BackgroundFetchResult.NewData;

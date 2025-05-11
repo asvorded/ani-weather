@@ -40,8 +40,38 @@ class WeatherModule(context: ReactApplicationContext) : ReactContextBaseJavaModu
                     R.id.max_min_temp_text,
                     String.format(Locale.getDefault(), "%.1f°/%.1f°", maxTemp, minTemp)
                 )
+                // TODO: set image from state
             }
             appWidgetManager.partiallyUpdateAppWidget(id, views)
+        }
+    }
+
+    @ReactMethod
+    fun resetWidget() {
+        val context = reactApplicationContext.applicationContext
+
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val ids = appWidgetManager.getAppWidgetIds(
+            ComponentName(context, WeatherClassicWidget::class.java)
+        )
+
+        ids.forEach { id ->
+            val views = RemoteViews(context.packageName, R.layout.weather_classic_widget).apply {
+                setTextViewText(
+                    R.id.current_temp_text,
+                    context.resources.getString(R.string.widget_default_current_weather)
+                )
+                setTextViewText(
+                    R.id.max_min_temp_text,
+                    context.resources.getString(R.string.widget_default_max_min_weather)
+                )
+                setImageViewResource(
+                    R.id.weather_icon,
+                    R.drawable.widget_default_icon
+                )
+            }
+
+            appWidgetManager.updateAppWidget(id, views)
         }
     }
 }

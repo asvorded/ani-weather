@@ -27,6 +27,7 @@ import * as BacgroundService from '../../services/background/BackgroundForecastF
 
 import {fetchWeatherByCoords} from '../../services/WeatherService.ts';
 import {test} from '../../services/notifications/notifications.ts';
+import { WidgetService } from '../../services/WidgetService.ts';
 
 const WeatherDetailedPanel = ({
   color,
@@ -266,10 +267,16 @@ const HomePage = () => {
           </View>
 
           {/* TODO: remove in production code */}
-          <Button title="town select" onPress={() => navigation.navigate(PagesNames.TownSelect)}/>
-          <Button title="рябов ответит (за всё)" onPress={() => navigation.navigate(PagesNames.MeteoChannel)}/>
-          <Button title="Make notification" onPress={() => test()} />
-          <Button title="Disable background upadates" onPress={() => BacgroundService.unregisterWeatherFetchTask()} />
+          <Button title="Set widget" onPress={() => {
+            WidgetService.setForecastOnWidget({
+              name: 'sgrgf',
+              state: 0,
+              currentTemp: 10,
+              maxTemp: 10,
+              minTemp: -10,
+            });
+          }} />
+          <Button title="Reset widget" onPress={() => WidgetService.resetWidget()} />
         </ScrollView>
 
         <View key="system navigation buttons"
