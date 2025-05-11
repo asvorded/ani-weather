@@ -1,11 +1,25 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { SavedCityWithForecast } from '../types/storage/SavedCityWithForecast';
 import { SavedCitiesService } from '../services/SavedCitiesService';
+import { SavedCityWithForecast } from '../types/storage/SavedCityWithForecast';
+import { FoundCity } from '../types/api/FoundCity';
+import { SavedCity } from '../types/storage/SavedCity';
+
+export interface ISavedCitiesService {
+  addCity(foundCity: FoundCity): Promise<void>;
+
+  removeCity(city: SavedCity): Promise<void>;
+
+  updateCityForecast(city: SavedCityWithForecast): Promise<void>;
+
+  updateExistingGeolocationForecast(): Promise<void>
+
+  updateGeolocationCity(city: FoundCity): Promise<void>
+}
 
 interface ISavedCitiesState {
-  savedCities: SavedCityWithForecast[];
-  //setSavedCities: React.Dispatch<SetStateAction<SavedCityWithForecast[]>>;
-  ready: boolean;
+  readonly savedCities: SavedCityWithForecast[];
+  readonly ready: boolean;
+  readonly service: ISavedCitiesService;
 }
 
 const SavedCitiesContext = createContext<ISavedCitiesState | undefined>(undefined);
@@ -22,35 +36,59 @@ export const SavedCitiesProvider = ({children}: {children: ReactNode}) => {
   const [savedCities, setSavedCities] = useState<SavedCityWithForecast[]>([]);
   const [ready, setReady] = useState(false);
 
-  async function updateSavedCities(): Promise<void> {
-    try {
-      const savedCities = await SavedCitiesService.getAllSavedCities();
+  async function updateAllCities() {
+    const savedCities = await SavedCitiesService.getAllSavedCities();
+    const geoCity = await SavedCitiesService.getGeolocationCity();
+    if (geoCity === null) {
       setSavedCities(savedCities);
-    } catch (e: any) {
-      console.error(`Unable to get cities: ${JSON.stringify(e)}`);
+    } else {
+      setSavedCities([geoCity, ...savedCities]);
     }
   }
 
-  // Set up automatic update
-  useEffect(() => {
-    SavedCitiesService.addAddedListener(updateSavedCities);
-    SavedCitiesService.addRemovedListener(updateSavedCities);
+  async function addCity(foundCity: FoundCity) {
+    await SavedCitiesService.addCity(foundCity);
+    await updateAllCities();
+  }
 
-    return () => {
-      SavedCitiesService.removeAddedListener(updateSavedCities);
-      SavedCitiesService.removeRemovedListener(updateSavedCities);
-    };
-  }, []);
+  async function removeCity(city: SavedCity) {
+    await SavedCitiesService.removeCityByCoords(city.coords);
+    await updateAllCities();
+  }
+
+  async function updateCityForecast(city: SavedCityWithForecast) {
+    await SavedCitiesService.updateForecastByCoords(city.savedCity.coords);
+    await updateAllCities();
+  }
+
+  async function updateGeolocationCity(city: FoundCity) {
+    await SavedCitiesService.updateGeolocationCity(city);
+    await updateAllCities();
+  }
+
+  async function updateGeolocationForecast() {
+    await SavedCitiesService.updateGeolocationForecast();
+    await updateAllCities();
+  }
 
   // Initialize cities
   useEffect(() => {
-    updateSavedCities().then(() => {
+    updateAllCities().then(() => {
       setReady(true);
     });
   }, []);
 
   return (
-    <SavedCitiesContext.Provider value={{savedCities, ready}}>
+    <SavedCitiesContext.Provider value={{
+      savedCities, ready,
+      service: {
+        addCity,
+        removeCity,
+        updateCityForecast,
+        updateGeolocationCity,
+        updateExistingGeolocationForecast: updateGeolocationForecast,
+      },
+    }}>
       {children}
     </SavedCitiesContext.Provider>
   );

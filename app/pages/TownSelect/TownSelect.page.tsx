@@ -21,7 +21,7 @@ import BackImg from '../../../assets/icons/back-custom.svg';
 import FindLocationImg from '../../../assets/icons/location.svg';
 import LocationDarkImg from '../../../assets/icons/location-filled-dark.svg';
 import DeleteDarkImg from '../../../assets/icons/delete-dark.svg';
-import { SavedCitiesService } from '../../services/SavedCitiesService';
+//import { SavedCitiesService } from '../../services/SavedCitiesService';
 import { PagesNames } from '../../types/common/root-stack-params-list';
 import { useSavedCities } from '../../hooks/useSavedCities';
 
@@ -29,9 +29,7 @@ function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
 }
 
-const SavedCityBlock = ({
-  city, isLocation, onDeleteSavedCityClick,
-}: SavedCityProps) => {
+const SavedCityBlock = ({city, onDeleteSavedCityClick}: SavedCityProps) => {
   const locationWidth = styles.savedCityLocationIcon.width;
   const locationHeight = styles.savedCityLocationIcon.height;
   const deleteWidth = styles.savedCityDeleteIcon.width;
@@ -39,11 +37,14 @@ const SavedCityBlock = ({
 
   return (
     <View style={styles.savedCity}>
-      <Text style={[
-        styles.defaultFont, styles.savedCityText,
-        isLocation ? null : styles.savedCityTextWhenSaved,
-      ]}>{city.name}</Text>
-      {isLocation ? (
+      <View style={city.isGeolocation === true ? null : styles.savedCityTextWhenSaved}>
+        <Text style={[styles.defaultFont, styles.savedCityText]}>{city.name}</Text>
+        <Text style={[styles.defaultFont, styles.savedCityCountryText]}>
+          {CitiesService.getReadableCountry(city)}
+        </Text>
+      </View>
+
+      {city.isGeolocation === true ? (
         <LocationDarkImg
           width={locationWidth} height={locationHeight}
           style={styles.savedCityLocationIcon}
@@ -141,7 +142,7 @@ const TownSelect = () => {
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
 
-  const {savedCities} = useSavedCities();
+  const {savedCities, service} = useSavedCities();
 
   const [popularCities, setPopularCities] = useState<FoundCity[]>([]);
   const [foundCities, setFoundCities] = useState<FoundCity[]>([]);
@@ -185,11 +186,9 @@ const TownSelect = () => {
     setErrorMessage(null);
 
     LocationService.findLocationWithCallbacks((position) => {
-      setIsFindingLocation(false);
-
       CitiesService.getCityFromCoordsOSM(position.coords.latitude, position.coords.longitude, i18n.language)
         .then((foundCity) => {
-          SavedCitiesService.updateGeolocationCity(foundCity)
+          service.updateGeolocationCity(foundCity)
             .then(() => {
               if (navigation.canGoBack()) {
                 navigation.goBack();
@@ -205,6 +204,9 @@ const TownSelect = () => {
         .catch((err) => {
           setErrorMessage(t('townSelect.location.errors.default'));
           console.error(`Unable to get city from coords: ${err.message}`);
+        })
+        .finally(() => {
+          setIsFindingLocation(false);
         });
     }, (error) => {
       setIsFindingLocation(false);
@@ -225,7 +227,7 @@ const TownSelect = () => {
 
   // Get forecast, save city and go to Home page
   function onFoundCityClick(foundCity: FoundCity) {
-    SavedCitiesService.addCity(foundCity)
+    service.addCity(foundCity)
       .then(() => {
         if (navigation.canGoBack()) {
           navigation.goBack();
@@ -246,7 +248,7 @@ const TownSelect = () => {
 
   // Delete saved city
   function onDeleteCity(city: SavedCity) {
-    SavedCitiesService.removeCityByCoords(city.coords);
+    service.removeCity(city);
   }
 
   return (

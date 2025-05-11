@@ -149,10 +149,6 @@ export class SavedCitiesService {
   private static cityNotFoundBySavedKeyErrMsg = 'Invalid async-storage key-value structure: saved city with saved id not found.';
   private static forecastNotFoundByCityErrMsg = 'Invalid async-storage key-value structure: saved forecast for existing city not found.';
 
-  private static addedCallbacks: Set<() => Promise<void>> = new Set();
-  private static removedCallbacks: Set<() => Promise<void>> = new Set();
-  private static emptyCallbacks: Set<() => Promise<void>> = new Set();
-
   private static getCoordsString(coords: Coords): string {
     return `${coords.lat}-${coords.long}`;
   }
@@ -202,28 +198,6 @@ export class SavedCitiesService {
         forecast: foundForecast.forecast,
       };
     });
-  }
-
-  private static async callAddedCallbacks(): Promise<void> {
-    for (const callback of SavedCitiesService.addedCallbacks) {
-      await callback();
-    }
-  }
-
-  private static async callRemovedCallbacks(): Promise<void> {
-    for (const callback of SavedCitiesService.removedCallbacks) {
-      await callback();
-    }
-  }
-
-  private static async checkIsCitiesListEmpty(): Promise<void> {
-    const savedCitiesIds = await SavedCitiesService.getCitiesStorageIds();
-
-    if (savedCitiesIds.length === 0) {
-      for (const callback of SavedCitiesService.emptyCallbacks) {
-        await callback();
-      }
-    }
   }
 
   static async getCitiesStorageIds(): Promise<string[]> {
@@ -285,8 +259,6 @@ export class SavedCitiesService {
       savedCity: cityForSave,
     };
 
-    await SavedCitiesService.callAddedCallbacks();
-
     return cityWithForecast;
   }
 
@@ -295,9 +267,6 @@ export class SavedCitiesService {
     await AsyncStorage.removeItem(SavedCitiesService.getSavedCityStorageId(coords));
 
     await SavedForecastsService.removeForecastByCoords(coords);
-
-    await SavedCitiesService.callRemovedCallbacks();
-    await SavedCitiesService.checkIsCitiesListEmpty();
   }
 
   static async updateForecastByCoords(coords: Coords): Promise<SavedForecastWithCityCoords> {
@@ -314,37 +283,6 @@ export class SavedCitiesService {
     };
 
     return savedForecastWithCityCoords;
-  }
-
-  // Listener for empty list
-  static addListenerForEmptyList(callback: () => Promise<void>): void {
-    SavedCitiesService.emptyCallbacks.add(callback);
-  }
-
-  static removeListenerForEmptyList(callback: () => Promise<void>): void {
-    SavedCitiesService.emptyCallbacks.delete(callback);
-  }
-
-  static removeAllListenersForEmptyList(): void {
-    SavedCitiesService.emptyCallbacks.clear();
-  }
-
-  // Listener for adding
-  static addAddedListener(callback: () => Promise<void>): void {
-    SavedCitiesService.addedCallbacks.add(callback);
-  }
-
-  static removeAddedListener(callback: () => Promise<void>): void {
-    SavedCitiesService.addedCallbacks.delete(callback);
-  }
-
-  // Listener for removing
-  static addRemovedListener(callback: () => Promise<void>): void {
-    SavedCitiesService.removedCallbacks.add(callback);
-  }
-
-  static removeRemovedListener(callback: () => Promise<void>): void {
-    SavedCitiesService.removedCallbacks.delete(callback);
   }
 
   private static async getGeolocationCityWithoutForecast(): Promise<SavedCity | null> {
@@ -378,11 +316,11 @@ export class SavedCitiesService {
     };
   }
 
-  static async updateGeolocationForecast(): Promise<SavedCityWithForecast | null> {
+  static async updateGeolocationForecast(): Promise<SavedCityWithForecast> {
     const geoCity = await SavedCitiesService.getGeolocationCityWithoutForecast();
 
     if (!geoCity) {
-      return null;
+      throw new Error('updateGeolocationForecast invalid usage: called when no location is saved');
     }
 
     const coords = geoCity.coords;
@@ -401,15 +339,12 @@ export class SavedCitiesService {
 
   static async updateGeolocationCity(city: FoundCity): Promise<SavedCityWithForecast> {
     const geoCityForSave = SavedCitiesService.toSavedCity(city);
-
     geoCityForSave.isGeolocation = true;
-
-    await AsyncStorage.setItem(SavedCitiesService.geolocationCityKey, JSON.stringify(geoCityForSave));
-
     const coords = geoCityForSave.coords;
 
     const forecast = await WeatherService.fetchWeatherWithForecastByCoords(coords.lat, coords.long);
 
+    await AsyncStorage.setItem(SavedCitiesService.geolocationCityKey, JSON.stringify(geoCityForSave));
     const savedForecastWithCityCoords = await SavedForecastsService.addOrUpdateGeolocationForecast(coords, forecast);
 
     const savedCityWithForecast: SavedCityWithForecast = {

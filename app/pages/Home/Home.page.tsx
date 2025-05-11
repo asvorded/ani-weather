@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
@@ -31,18 +31,20 @@ import {
   getReadableWindDirectionId, getReadableWindUnitsId,
 } from './Home.utils.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
-import { useSavedCities } from '../../hooks/useSavedCities.tsx';
 
 import AddDarkImg from '../../../assets/icons/add-dark.svg';
 import AddLightImg from '../../../assets/icons/add-light.svg';
 import SettingsLightImg from '../../../assets/icons/settings-light.svg';
 import SettingsDarkImg from '../../../assets/icons/settings-dark.svg';
-
 import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
 import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
+
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast.ts';
-import {SavedCitiesService} from '../../services/SavedCitiesService.ts';
+//import {SavedCitiesService} from '../../services/SavedCitiesService.ts';
+import * as LocationService from '../../services/LocationService.ts';
+import * as CitiesService from '../../services/CitiesService.ts';
+import { useSavedCities } from '../../hooks/useSavedCities.tsx';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -186,32 +188,45 @@ const WeatherPage: React.FC<{
   pageIndex: number
 }> = ({ cityWithForecast, pageIndex }) => {
   const {userSettings} = useUserSettings();
-  let { t } = useTranslation();
+  let { t, i18n } = useTranslation();
   const navigation = useCustomNavigation();
-
   const insets = useSafeAreaInsets();
 
-  const scrollRef = useRef<ScrollView>(null);
+  const {service} = useSavedCities();
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ y: 0, animated: false });
-  }, [pageIndex]);
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    SavedCitiesService.updateForecastByCoords(cityWithForecast.savedCity.coords).then((forecast) => {
-      if(forecast.forecast.lastUpdated !== cityWithForecast.forecast.lastUpdated){
-        cityWithForecast.forecast = forecast.forecast;
-      }else{
-        console.log('forecast is up to date');
-      }
+
+    if (cityWithForecast.savedCity.isGeolocation === true) {
+      // Try update location
+      LocationService.findLocationWithCallbacks((position) => {
+        // Set new location and get new forecast
+        CitiesService.getCityFromCoordsOSM(position.coords.latitude, position.coords.longitude, i18n.language)
+          .then((foundCity) => {
+            service.updateGeolocationCity(foundCity);
+          })
+          .catch(() => {
+            service.updateExistingGeolocationForecast();
+          })
+          .finally(() => {
+            setRefreshing(false);
+          });
+      }, () => {
+        service.updateExistingGeolocationForecast()
+          .finally(() => {
+            setRefreshing(false);
+          });
+      });
+    } else {
+      service.updateCityForecast(cityWithForecast);
       setRefreshing(false);
-    });
-  }, [cityWithForecast]);
+    }
+  }, [service, cityWithForecast, i18n]);
+
   return (
     <ScrollView
-      ref={scrollRef}
       style={{
         marginLeft: insets.left,
         marginRight: insets.right,
@@ -365,8 +380,6 @@ const HomePage = () => {
   const {savedCities} = useSavedCities();
   const [index, setIndex] = React.useState(0);
 
-  //const [savedCities, setSavedCities] = useState<SavedCityWithForecast[]>([]);
-
   useEffect(() => {
     if (savedCities.length === 0) {
       if (navigation.canGoBack()) {
@@ -384,6 +397,7 @@ const HomePage = () => {
     return {
       key: key,
       title: savedCity.savedCity.name,
+      icon: savedCity.savedCity.isGeolocation === true ? 'location' : undefined,
     };
   });
 
@@ -392,6 +406,7 @@ const HomePage = () => {
       <SystemBars style="light" />
       <ImageBackground
         style={styles.imageContainer}
+        // TODO: background from weather state
         source={require('../../../assets/images/sample.png')}
       >
         <ActionsPanel
@@ -427,4 +442,5 @@ const HomePage = () => {
     </View>
   );
 };
+
 export default HomePage;

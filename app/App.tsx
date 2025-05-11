@@ -14,7 +14,8 @@ import {
   RootStackParamsList,
 } from './types/common/root-stack-params-list';
 import {UserSettingsProvider} from './services/UserSettingsProvider.tsx';
-import { SavedCitiesProvider, useSavedCities } from './hooks/useSavedCities.tsx';
+import { SavedCitiesProvider } from './hooks/useSavedCities.tsx';
+import { useSavedCities } from './hooks/useSavedCities.tsx';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>({
   //initialRouteName: PagesNames.Home,

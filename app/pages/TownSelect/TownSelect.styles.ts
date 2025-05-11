@@ -59,7 +59,7 @@ export const styles = StyleSheet.create({
   },
   savedCity: {
     marginTop: 10,
-    borderRadius: 10,
+    borderRadius: 15,
     backgroundColor: '#e5e0ff',
     padding: 15,
 
@@ -68,6 +68,9 @@ export const styles = StyleSheet.create({
   },
   savedCityText: {
     fontSize: 18,
+  },
+  savedCityCountryText: {
+    color: 'gray',
   },
   savedCityTextWhenSaved: {
     flex: 1,
