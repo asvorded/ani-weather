@@ -1,4 +1,5 @@
 import { PressureUnits, WindSpeedUnits } from '../../types/api/Forecast';
+import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast';
 
 export type ActionsPanelProps = {
   navOnCitySelectClick: () => void;
@@ -33,7 +34,6 @@ export type WindProps = {
   directionAngle: number;
 }
 
-
 export type WeatherPanelProps = {
   temp: number;
   icon: string;
@@ -42,4 +42,13 @@ export type WeatherPanelProps = {
   maxTemp: number;
   tempUnits: string;
   stateId: number;
+}
+
+export type CitiesTabBarProps = {
+  // citiesList: {
+  //   title: string;
+  //   item: Record<string, never>;
+  // }[]
+  citiesList: SavedCityWithForecast[];
+  selectedCityIndex: number;
 }

@@ -1,5 +1,6 @@
 import {
   Button,
+  FlatList,
   ImageBackground,
   RefreshControl,
   ScrollView,
@@ -17,9 +18,11 @@ import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
 import {
   ActionsPanelProps,
+  CitiesTabBarProps,
   HumidityProps, MagneticActivityProps, PressureProps,
   WeatherDetailedPanelProps, WeatherPanelProps, WindProps,
 } from './Home.types.ts';
+
 import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
 import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
 import { PagesNames } from '../../types/common/root-stack-params-list.ts';
@@ -348,27 +351,29 @@ const WeatherPage: React.FC<{
   );
 };
 
-const WeatherTabBar: React.FC<any> = (props) => {
+const CitiesTabBar: React.FC<CitiesTabBarProps> = ({
+  citiesList: citiesPagesList,
+  selectedCityIndex,
+}) => {
+  const cityName = citiesPagesList[selectedCityIndex]?.savedCity.name;
+
   return (
-    <TabBar key="cities tab bar"
-      style={styles.tabBar}
-      renderTabBarItem={({key: _, ...props}) =>
-        <TabBarItem
-          label={props =>
-            <CustomText
-              numberOfLines={1}
-              style={[styles.tabBarText, { color: props.color }]}
-            >
-              {props.labelText ?? ''}
-            </CustomText>
-          }
-          {...props}
-        />
-      }
-      scrollEnabled
-      renderIndicator={() => null}
-      {...props}
-    />
+    <View style={styles.citiesTabBarContainer}>
+      <CustomText style={styles.citiesTabBarTitle}>
+        {cityName}
+      </CustomText>
+      <View style={styles.citiesTabBarDots}>
+        {citiesPagesList.map((_, i) => (
+          <View
+            key={i}
+            style={[
+              styles.citiesTabBarDot,
+              i === selectedCityIndex ? styles.citiesTabBarDotSelected : undefined,
+            ]}
+          />
+        ))}
+      </View>
+    </View>
   );
 };
 
@@ -378,7 +383,7 @@ const HomePage = () => {
   const layout = useWindowDimensions();
 
   const {savedCities} = useSavedCities();
-  const [index, setIndex] = React.useState(0);
+  const [selectedCityIndex, setSelectedCityIndex] = React.useState(0);
 
   useEffect(() => {
     if (savedCities.length === 0) {
@@ -387,19 +392,7 @@ const HomePage = () => {
       }
       navigation.replace(PagesNames.TownSelect);
     }
-  }, [savedCities, navigation]);
-
-  let routesWithCities: {[key: string]: SavedCityWithForecast} = {};
-
-  const citiesRoutes: Route[] = savedCities.map((savedCity) => {
-    const key: string = `${savedCity.savedCity.coords.long}-${savedCity.savedCity.coords.lat}`;
-    routesWithCities[key] = savedCity;
-    return {
-      key: key,
-      title: savedCity.savedCity.name,
-      icon: savedCity.savedCity.isGeolocation === true ? 'location' : undefined,
-    };
-  });
+  }, [savedCities, selectedCityIndex, navigation]);
 
   return (
     <View style={styles.outerContainer} key="home page">
@@ -420,7 +413,30 @@ const HomePage = () => {
           topWindowInset={insets.top}
         />
 
-        {citiesRoutes.length > 0 ? (
+        <CitiesTabBar
+          selectedCityIndex={selectedCityIndex}
+          citiesList={savedCities}
+        />
+        <ScrollView>
+          <FlatList
+            data={savedCities}
+            renderItem={(item) => <WeatherPage cityWithForecast={item.item} pageIndex={selectedCityIndex} />}
+            horizontal
+            pagingEnabled
+            viewabilityConfig={{
+              itemVisiblePercentThreshold: 50,
+            }}
+            onViewableItemsChanged={({ viewableItems }) => {
+              const pageIndex = viewableItems[0]?.index;
+
+              if (pageIndex !== undefined && pageIndex !== null) {
+                setSelectedCityIndex(pageIndex);
+              }
+            }}
+          />
+        </ScrollView>
+
+        {/* {citiesRoutes.length > 0 ? (
           <TabView key="tab view for cities"
             navigationState={{ index, routes: citiesRoutes }}
             renderTabBar={WeatherTabBar}
@@ -428,7 +444,7 @@ const HomePage = () => {
             onIndexChange={setIndex}
             initialLayout={{ width: layout.width }}
           />
-        ) : null}
+        ) : null} */}
 
         <View
           key="system navigation buttons"
