@@ -1,3 +1,4 @@
+import { EdgeInsets } from 'react-native-safe-area-context';
 import { PressureUnits, WindSpeedUnits } from '../../types/api/Forecast';
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast';
 
@@ -5,7 +6,7 @@ export type ActionsPanelProps = {
   navOnCitySelectClick: () => void;
   navOnSettingsClick: () => void;
   isDarkMode: boolean;
-  topWindowInset: number;
+  windowInsets: EdgeInsets;
 }
 
 export type WeatherDetailedPanelProps = {
@@ -45,10 +46,6 @@ export type WeatherPanelProps = {
 }
 
 export type CitiesTabBarProps = {
-  // citiesList: {
-  //   title: string;
-  //   item: Record<string, never>;
-  // }[]
   citiesList: SavedCityWithForecast[];
   selectedCityIndex: number;
 }

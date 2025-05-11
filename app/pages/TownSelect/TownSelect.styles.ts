@@ -9,12 +9,14 @@ export const styles = StyleSheet.create({
     fontFamily: 'BellotaText-Regular',
   },
 
+  backButton: {
+    marginBottom: 8,
+  },
+
   inputContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-
-    marginTop: 10,
     paddingHorizontal: 10,
 
     backgroundColor: '#f4f4f4',

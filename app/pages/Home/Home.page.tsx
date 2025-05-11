@@ -12,7 +12,6 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
-import { Route, TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 
 import { styles } from './Home.styles.ts';
 import { CustomText } from '../../components/CustomText/CustomText.tsx';
@@ -42,6 +41,7 @@ import SettingsDarkImg from '../../../assets/icons/settings-dark.svg';
 import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
 import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
+import LocationLightImg from '../../../assets/icons/location-small-light.svg';
 
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast.ts';
 //import {SavedCitiesService} from '../../services/SavedCitiesService.ts';
@@ -53,13 +53,20 @@ const ActionsPanel = ({
   navOnCitySelectClick,
   navOnSettingsClick,
   isDarkMode,
-  topWindowInset,
+  windowInsets,
 }: ActionsPanelProps) => {
   const buttonWidth = styles.actionButtonIcon.width;
   const buttonHeight = styles.actionButtonIcon.height;
 
   return (
-    <View style={[styles.actionsPanel, {paddingTop: topWindowInset + 7}]}>
+    <View style={[
+      styles.actionsPanel,
+      {
+        marginTop: windowInsets.top,
+        marginLeft: windowInsets.left,
+        marginRight: windowInsets.right, 
+      },
+    ]}>
       <TouchableOpacity key="city select"
         style={styles.actionButton}
         onPress={() => navOnCitySelectClick()}
@@ -194,51 +201,18 @@ const WeatherPage: React.FC<{
   let { t, i18n } = useTranslation();
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
-
-  const {service} = useSavedCities();
-
-  const [refreshing, setRefreshing] = React.useState(false);
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-
-    if (cityWithForecast.savedCity.isGeolocation === true) {
-      // Try update location
-      LocationService.findLocationWithCallbacks((position) => {
-        // Set new location and get new forecast
-        CitiesService.getCityFromCoordsOSM(position.coords.latitude, position.coords.longitude, i18n.language)
-          .then((foundCity) => {
-            service.updateGeolocationCity(foundCity);
-          })
-          .catch(() => {
-            service.updateExistingGeolocationForecast();
-          })
-          .finally(() => {
-            setRefreshing(false);
-          });
-      }, () => {
-        service.updateExistingGeolocationForecast()
-          .finally(() => {
-            setRefreshing(false);
-          });
-      });
-    } else {
-      service.updateCityForecast(cityWithForecast);
-      setRefreshing(false);
-    }
-  }, [service, cityWithForecast, i18n]);
+  const dimensions = useWindowDimensions();
 
   return (
-    <ScrollView
-      style={{
+    <View style={[
+      {
         marginLeft: insets.left,
         marginRight: insets.right,
-      }}
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }>
+        ...styles.container,
+        width: dimensions.width - insets.left - insets.right,
+      },
+      styles.container,
+    ]}>
       <WeatherPanel key="weather panel"
         temp={convertTemperature(cityWithForecast.forecast.currentTemp, cityWithForecast.forecast.tempUnits, userSettings.temperature)}
         icon={''}
@@ -347,7 +321,7 @@ const WeatherPage: React.FC<{
         title="рябов ответит (за всё)"
         onPress={() => navigation.navigate(PagesNames.MeteoChannel)}
       />
-    </ScrollView>
+    </View>
   );
 };
 
@@ -363,12 +337,16 @@ const CitiesTabBar: React.FC<CitiesTabBarProps> = ({
         {cityName}
       </CustomText>
       <View style={styles.citiesTabBarDots}>
-        {citiesPagesList.map((_, i) => (
+        {citiesPagesList.map((city, i) => city.savedCity.isGeolocation ? (
+          <LocationLightImg
+            width={10} height={10}
+            opacity={i === selectedCityIndex ? 1 : 0.5} />
+        ) : (
           <View
             key={i}
             style={[
               styles.citiesTabBarDot,
-              i === selectedCityIndex ? styles.citiesTabBarDotSelected : undefined,
+              i !== selectedCityIndex ? styles.citiesTabBarDotInactive : undefined,
             ]}
           />
         ))}
@@ -380,10 +358,12 @@ const CitiesTabBar: React.FC<CitiesTabBarProps> = ({
 const HomePage = () => {
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
-  const layout = useWindowDimensions();
+  const {i18n} = useTranslation();
 
-  const {savedCities} = useSavedCities();
+  const {savedCities, service} = useSavedCities();
   const [selectedCityIndex, setSelectedCityIndex] = React.useState(0);
+
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     if (savedCities.length === 0) {
@@ -392,7 +372,38 @@ const HomePage = () => {
       }
       navigation.replace(PagesNames.TownSelect);
     }
-  }, [savedCities, selectedCityIndex, navigation]);
+  }, [savedCities, navigation]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    const currentCity = savedCities[selectedCityIndex];
+
+    if (currentCity.savedCity.isGeolocation === true) {
+      // Try update location
+      LocationService.findLocationWithCallbacks((position) => {
+        // Set new location and get new forecast
+        CitiesService.getCityFromCoordsOSM(position.coords.latitude, position.coords.longitude, i18n.language)
+          .then((foundCity) => {
+            service.updateGeolocationCity(foundCity);
+          })
+          .catch(() => {
+            service.updateExistingGeolocationForecast();
+          })
+          .finally(() => {
+            setRefreshing(false);
+          });
+      }, () => {
+        service.updateExistingGeolocationForecast()
+          .finally(() => {
+            setRefreshing(false);
+          });
+      });
+    } else {
+      service.updateCityForecast(currentCity);
+      setRefreshing(false);
+    }
+  }, [service, savedCities, selectedCityIndex, i18n]);
 
   return (
     <View style={styles.outerContainer} key="home page">
@@ -410,18 +421,24 @@ const HomePage = () => {
             navigation.navigate(PagesNames.Settings);
           }}
           isDarkMode={true}
-          topWindowInset={insets.top}
+          windowInsets={insets}
         />
 
         <CitiesTabBar
           selectedCityIndex={selectedCityIndex}
           citiesList={savedCities}
         />
-        <ScrollView>
+        <ScrollView key="city pages"
+          showsVerticalScrollIndicator={false}
+          refreshControl={selectedCityIndex < savedCities.length ? (
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          ) : undefined}
+        >
           <FlatList
             data={savedCities}
             renderItem={(item) => <WeatherPage cityWithForecast={item.item} pageIndex={selectedCityIndex} />}
             horizontal
+            showsHorizontalScrollIndicator={false}
             pagingEnabled
             viewabilityConfig={{
               itemVisiblePercentThreshold: 50,
@@ -435,16 +452,6 @@ const HomePage = () => {
             }}
           />
         </ScrollView>
-
-        {/* {citiesRoutes.length > 0 ? (
-          <TabView key="tab view for cities"
-            navigationState={{ index, routes: citiesRoutes }}
-            renderTabBar={WeatherTabBar}
-            renderScene={(route) => <WeatherPage cityWithForecast={routesWithCities[route.route.key]} pageIndex={index} />}
-            onIndexChange={setIndex}
-            initialLayout={{ width: layout.width }}
-          />
-        ) : null} */}
 
         <View
           key="system navigation buttons"
