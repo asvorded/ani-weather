@@ -16,6 +16,7 @@ import {
 import {UserSettingsProvider} from './services/UserSettingsProvider.tsx';
 import { SavedCitiesProvider } from './hooks/useSavedCities.tsx';
 import { useSavedCities } from './hooks/useSavedCities.tsx';
+import {ThemeProvider} from './hooks/useTheme.tsx';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>({
   //initialRouteName: PagesNames.Home,
@@ -50,11 +51,13 @@ const App = () => {
     // BUG: Strict mode breaks fetch functions' logic (wtf)
     <>
       <SafeAreaProvider>
-        <UserSettingsProvider>
-          <SavedCitiesProvider>
-            <InternalApp />
-          </SavedCitiesProvider>
-        </UserSettingsProvider>
+        <ThemeProvider>
+          <UserSettingsProvider>
+            <SavedCitiesProvider>
+              <InternalApp />
+            </SavedCitiesProvider>
+          </UserSettingsProvider>
+        </ThemeProvider>
       </SafeAreaProvider>
     </>
   );

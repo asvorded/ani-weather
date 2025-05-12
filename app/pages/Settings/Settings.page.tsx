@@ -18,6 +18,7 @@ import {Languages} from '../../types/storage/Languages.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 import {CustomText} from '../../components/CustomText/CustomText.tsx';
 import {styles} from './Settings.styles.ts';
+import {useTheme} from '../../hooks/useTheme.tsx';
 
 type SettingsPanelProps = {
   color: string;
@@ -37,6 +38,7 @@ const SettingsPage = () => {
   const {userSettings, setUserSettings} = useUserSettings();
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
+  const {currentTheme, toggleTheme} = useTheme();
 
   function setLanguage(value: Languages) {
     const updatedSettings = {...userSettings, language: value};
@@ -63,6 +65,11 @@ const SettingsPage = () => {
     setUserSettings(updatedSettings);
   }
 
+  function setTheme(value: boolean) {
+    toggleTheme();
+    console.log(value);
+  }
+
   return (
     <ImageBackground
       style={styles.background}
@@ -73,7 +80,7 @@ const SettingsPage = () => {
           marginBottom: insets.bottom,
           marginLeft: insets.left,
           marginRight: insets.right,
-          padding: 16,
+          padding: 20,
         }}
         showsVerticalScrollIndicator={false}>
         <SystemBars style="light" />
@@ -102,7 +109,19 @@ const SettingsPage = () => {
             </Picker>
           }
         />
-
+        <SettingsPanel
+          color="#B3DBFF"
+          title={'theme'}
+          contentElement={
+            <Switch
+              trackColor={{false: '#767577', true: '#81b0ff'}}
+              thumbColor={userSettings.notifications ? '#f5dd4b' : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+              value={currentTheme === 'dark'}
+              onValueChange={value => setTheme(value)}
+            />
+          }
+        />
         <SettingsPanel
           color="#B3DBFF"
           title={t('settings.units.temperature')}

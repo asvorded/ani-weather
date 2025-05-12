@@ -148,7 +148,10 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
+    transform: [
+      { translateX: -10 },//May break, cant use "translate(-50%, -50%)"
+      { translateY: -20},
+    ],
     lineHeight: 40,
   },
   humidityComponent: {

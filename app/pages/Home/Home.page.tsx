@@ -48,6 +48,8 @@ import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast
 import * as LocationService from '../../services/LocationService.ts';
 import * as CitiesService from '../../services/CitiesService.ts';
 import { useSavedCities } from '../../hooks/useSavedCities.tsx';
+import {useTheme} from '../../hooks/useTheme.tsx';
+import CustomIcon from '../../components/CustomIcon/CustomIcon.tsx';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -57,25 +59,30 @@ const ActionsPanel = ({
 }: ActionsPanelProps) => {
   const buttonWidth = styles.actionButtonIcon.width;
   const buttonHeight = styles.actionButtonIcon.height;
-
   return (
     <View style={[
       styles.actionsPanel,
       {
         marginTop: windowInsets.top,
         marginLeft: windowInsets.left,
-        marginRight: windowInsets.right, 
+        marginRight: windowInsets.right,
       },
     ]}>
       <TouchableOpacity key="city select"
         style={styles.actionButton}
         onPress={() => navOnCitySelectClick()}
       >
-        {isDarkMode ? (
+        {/* {isDarkMode ? (
           <AddLightImg width={buttonWidth} height={buttonHeight} />
         ) : (
           <AddDarkImg width={buttonWidth} height={buttonHeight} />
-        )}
+        )}*/}
+        <CustomIcon
+          DarkIcon={AddLightImg}
+          LightIcon={AddDarkImg}
+          width={buttonWidth}
+          height={buttonHeight}
+        />
       </TouchableOpacity>
       <TouchableOpacity key="settings"
         style={styles.actionButton}
@@ -412,7 +419,7 @@ const HomePage = () => {
       <ImageBackground
         style={styles.imageContainer}
         // TODO: background from weather state
-        source={require('../../../assets/images/sample.png')}
+        source={require('../../../assets/images/background-light.jpg')}
       >
         <ActionsPanel
           navOnCitySelectClick={() => {

@@ -19,3 +19,5 @@ export const WeatherIcon: React.FC<WeatherIconProps> = ({ type, size = 20 }) => 
     <SelectedWeatherIcon width={size} height={size} />
   );
 };
+
+
