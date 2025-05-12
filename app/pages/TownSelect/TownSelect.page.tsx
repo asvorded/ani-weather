@@ -270,79 +270,77 @@ const TownSelect = () => {
         </TouchableOpacity>
       ) : null}
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.inputContainer} key="input">
-          <TextInput
-            style={[styles.input, styles.defaultFont]}
-            placeholder={t('townSelect.textField.placeholder')}
-            numberOfLines={1}
-            value={query}
-            onChange={({nativeEvent}) => {
-              processQueryAsync(nativeEvent.text);
-            }}
-            editable={!isFindingLocation}
-          />
+      <View style={styles.inputContainer} key="input">
+        <TextInput
+          style={[styles.input, styles.defaultFont]}
+          placeholder={t('townSelect.textField.placeholder')}
+          numberOfLines={1}
+          value={query}
+          onChange={({nativeEvent}) => {
+            processQueryAsync(nativeEvent.text);
+          }}
+          editable={!isFindingLocation}
+        />
 
-          {/* Find button */}
-          <View style={styles.locationIcon}>
-            {!isFindingLocation ? (
-              <TouchableOpacity onPress={onFindLocationClick}>
-                <FindLocationImg width={styles.locationIcon.width} height={styles.locationIcon.height} />
-              </TouchableOpacity>
-            ) : (
-              <ActivityIndicator
-                style={styles.locationImage}
-                size="small"
-                color={styles.locationImage.color}
-              />
-            )}
-          </View>
-        </View>
-
-        {/* Error message */}
-        {errorMessage ? (
-          <View style={styles.locationErrorContainer} key="location_error">
-            <Text
-              style={[styles.locationErrorText, styles.defaultFont]}
-            >{errorMessage}</Text>
-            <TouchableOpacity
-              style={styles.locationErrorClose}
-              onPress={() => { setErrorMessage(null); }}
-            >
-              <CloseLightImg width={35} height={35} />
+        {/* Find button */}
+        <View style={styles.locationIcon}>
+          {!isFindingLocation ? (
+            <TouchableOpacity onPress={onFindLocationClick}>
+              <FindLocationImg width={styles.locationIcon.width} height={styles.locationIcon.height} />
             </TouchableOpacity>
-          </View>
-        ) : null}
-
-        {/* Main content */}
-        <View style={styles.citiesContainer} key="main content">
-          {query.length > 0 ? (
-            // Found cities
-            <FoundCities
-              foundCities={foundCities}
-              onFoundCityClick={onFoundCityClick}
-            />
           ) : (
-            <View>
-              {/* Popular cities */}
-              <View key="popular cities">
-                <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
-                <View style={styles.popularCitiesContainer}>{
-                  popularCities.map((city, index) => (
-                    <PopularCity key={index} city={city} onClick={onPopularCityClick}/>
-                  ))
-                }</View>
-              </View>
-
-              {/* Saved cities */}
-              <SavedCitiesList
-                savedCities={savedCities}
-                onDeleteSavedCityClick={onDeleteCity}
-              />
-            </View>
+            <ActivityIndicator
+              style={styles.locationImage}
+              size="small"
+              color={styles.locationImage.color}
+            />
           )}
         </View>
-      </ScrollView>
+      </View>
+
+      {/* Error message */}
+      {errorMessage ? (
+        <View style={styles.locationErrorContainer} key="location_error">
+          <Text
+            style={[styles.locationErrorText, styles.defaultFont]}
+          >{errorMessage}</Text>
+          <TouchableOpacity
+            style={styles.locationErrorClose}
+            onPress={() => { setErrorMessage(null); }}
+          >
+            <CloseLightImg width={35} height={35} />
+          </TouchableOpacity>
+        </View>
+      ) : null}
+
+      {/* Main content */}
+      <View style={styles.citiesContainer} key="main content">
+        {query.length > 0 ? (
+          // Found cities
+          <FoundCities
+            foundCities={foundCities}
+            onFoundCityClick={onFoundCityClick}
+          />
+        ) : (
+          <View>
+            {/* Popular cities */}
+            <View key="popular cities">
+              <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
+              <View style={styles.popularCitiesContainer}>{
+                popularCities.map((city, index) => (
+                  <PopularCity key={index} city={city} onClick={onPopularCityClick}/>
+                ))
+              }</View>
+            </View>
+
+            {/* Saved cities */}
+            <SavedCitiesList
+              savedCities={savedCities}
+              onDeleteSavedCityClick={onDeleteCity}
+            />
+          </View>
+        )}
+      </View>
     </View>
   );
 };

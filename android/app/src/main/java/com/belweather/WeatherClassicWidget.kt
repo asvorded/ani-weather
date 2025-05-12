@@ -8,8 +8,15 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.AlarmClock
 import android.widget.RemoteViews
+import androidx.work.Constraints
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 
 class WeatherClassicWidget : AppWidgetProvider() {
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -44,15 +51,26 @@ class WeatherClassicWidget : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 
-        // Start application to get latest weather
-        val intent = Intent(context, MainActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        pendingIntent.send()
+        /*
+        * TODO: IT IS IMPOSSIBLE TO UPDATE WIDGET BY RUNNING JAVASCRIPT CODE
+        *  IN ANY TIME BECAUSE OF ANDROID RESTRICTIONS
+        *  For better development experience rewrite services on Kotlin
+        * */
+        // Maybe it works...
+        val workRequest = OneTimeWorkRequestBuilder<WidgetInitWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(workRequest)
     }
+}
+
+class WidgetInitWorker(val appContext: Context, workerParams: WorkerParameters)
+    : Worker(appContext, workerParams) {
+    override fun doWork(): Result {
+        val intent = Intent(appContext, WidgetInitService::class.java)
+        appContext.startService(intent)
+        return Result.success()
+    }
+
 }

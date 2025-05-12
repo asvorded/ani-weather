@@ -4,14 +4,18 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.widget.RemoteViews
 import android.widget.Toast
+import com.facebook.react.bridge.Callback
+import com.facebook.react.bridge.JavaScriptExecutor
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.util.Locale
 
 class WeatherModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
-    private val NAME = "WeatherModule";
+    private val NAME = "WeatherModule"
 
     override fun getName() = NAME
 
