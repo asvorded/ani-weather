@@ -2,8 +2,9 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   screen: {
-    paddingHorizontal: 15,
-    paddingTop: 8,
+    paddingLeft: 15,
+    paddingRight: 15,
+    flex: 1,
   },
   defaultFont: {
     fontFamily: 'BellotaText-Regular',

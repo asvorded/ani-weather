@@ -482,8 +482,10 @@ const HomePage = () => {
           });
       });
     } else {
-      service.updateCityForecast(currentCity);
-      setRefreshing(false);
+      service.updateCityForecast(currentCity)
+        .finally(() => {
+          setRefreshing(false);
+        });
     }
   }, [service, savedCities, selectedCityIndex, i18n]);
 

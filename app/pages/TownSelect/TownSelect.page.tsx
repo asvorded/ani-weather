@@ -130,9 +130,9 @@ const FoundCities = ({
       ItemSeparatorComponent={() => (
         <View style={styles.foundCitiesSeparator}/>
       )}
-      ListFooterComponent={(
-        <View style={{height: insets.bottom}}/>
-      )}
+      // ListFooterComponent={(
+      //   <View style={{height: insets.bottom}}/>
+      // )}
     />
   );
 };
@@ -252,12 +252,12 @@ const TownSelect = () => {
   }
 
   return (
-    <View style={[
+    <View key="root" style={[
       {
-        marginTop: insets.top,
-        marginBottom: insets.bottom,
-        marginLeft: insets.left,
-        marginRight: insets.right,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
       },
       styles.screen,
     ]}>
@@ -314,33 +314,33 @@ const TownSelect = () => {
       ) : null}
 
       {/* Main content */}
-      <View style={styles.citiesContainer} key="main content">
-        {query.length > 0 ? (
-          // Found cities
-          <FoundCities
-            foundCities={foundCities}
-            onFoundCityClick={onFoundCityClick}
-          />
-        ) : (
-          <View>
-            {/* Popular cities */}
-            <View key="popular cities">
-              <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
-              <View style={styles.popularCitiesContainer}>{
-                popularCities.map((city, index) => (
-                  <PopularCity key={index} city={city} onClick={onPopularCityClick}/>
-                ))
-              }</View>
-            </View>
-
-            {/* Saved cities */}
-            <SavedCitiesList
-              savedCities={savedCities}
-              onDeleteSavedCityClick={onDeleteCity}
-            />
+      {/* <View style={styles.citiesContainer} key="main content"> */}
+      {query.length > 0 ? (
+        // Found cities
+        <FoundCities key="found cities"
+          foundCities={foundCities}
+          onFoundCityClick={onFoundCityClick}
+        />
+      ) : (
+        <ScrollView style={styles.citiesContainer} showsVerticalScrollIndicator={false}>
+          {/* Popular cities */}
+          <View key="popular cities">
+            <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
+            <View style={styles.popularCitiesContainer}>{
+              popularCities.map((city, index) => (
+                <PopularCity key={index} city={city} onClick={onPopularCityClick}/>
+              ))
+            }</View>
           </View>
-        )}
-      </View>
+
+          {/* Saved cities */}
+          <SavedCitiesList
+            savedCities={savedCities}
+            onDeleteSavedCityClick={onDeleteCity}
+          />
+        </ScrollView>
+      )}
+      {/* </View> */}
     </View>
   );
 };
