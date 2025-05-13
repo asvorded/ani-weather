@@ -294,6 +294,14 @@ const WeatherPage: React.FC<{
       />
       <View style={styles.detailsGrid}>
         <View style={styles.row}>
+          <View style={styles.cell}>
+            <ForecastPanel
+              hourlyForecast={cityWithForecast.forecast.hourlyforecast}
+              newTempUnits={userSettings.temperature}
+              tempUnits={cityWithForecast.forecast.tempUnits} />
+          </View>
+        </View>
+        <View style={styles.row}>
           <WeatherDetailedPanel
             key="moon phase"
             color="#A9E788"
@@ -386,14 +394,6 @@ const WeatherPage: React.FC<{
             text={t(getReadableAqiId(cityWithForecast.forecast.airQuality))}
             contentElement={<AqiComponent aqi={cityWithForecast.forecast.airQuality} />}
           />
-        </View>
-        <View style={styles.row}>
-          <View style={styles.cell}>
-            <ForecastPanel
-              hourlyForecast={cityWithForecast.forecast.hourlyforecast}
-              newTempUnits={userSettings.temperature}
-              tempUnits={cityWithForecast.forecast.tempUnits} />
-          </View>
         </View>
       </View>
 
