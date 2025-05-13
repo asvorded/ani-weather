@@ -101,11 +101,10 @@ const ActionsPanel = ({
         style={styles.actionButton}
         onPress={() => navOnSettingsClick()}
       >
-        {isDarkMode ? (
-          <SettingsLightImg width={buttonWidth} height={buttonHeight} />
-        ) : (
-          <SettingsDarkImg width={buttonWidth} height={buttonHeight} />
-        )}
+        <CustomIcon
+          DarkIcon={SettingsLightImg} LightIcon={SettingsDarkImg}
+          width={buttonWidth} height={buttonHeight}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -238,8 +237,7 @@ const ForecastPanel = ({hourlyForecast, tempUnits ,newTempUnits}: ForecastPanelP
         horizontal={true}
         nestedScrollEnabled={true}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ flexDirection: 'row', alignItems: 'center' }} // Layout children correctly
-        style={{ paddingHorizontal: 10 }} // Optional padding for better appearance
+        contentContainerStyle={styles.forecastPanelScroll}
       >
         {hourlyForecast.map((item, index) => {
           const { state, temp, time } = item;
@@ -255,6 +253,7 @@ const ForecastPanel = ({hourlyForecast, tempUnits ,newTempUnits}: ForecastPanelP
                   hour: '2-digit',
                   minute: '2-digit',
                   hourCycle: 'h23',
+                  timeZone: 'UTC',
                 })}
               </CustomText>
             </View>
@@ -489,6 +488,7 @@ const HomePage = () => {
         });
     }
   }, [service, savedCities, selectedCityIndex, i18n]);
+
   return (
     <View style={styles.outerContainer} key="home page">
       <SystemBars style="light" />

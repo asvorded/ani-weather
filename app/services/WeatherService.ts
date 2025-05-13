@@ -106,7 +106,7 @@ class WeatherService {
         temp: item.main.temp,
         state: WeatherService.mapWeatherIdToStateId(
           item.weather[0].id,
-          data.sys.pod === 'd',
+          item.sys.pod === 'd',
         ),
       })),
       moonPhase: MoonPhase.FullMoon,
@@ -135,8 +135,7 @@ class WeatherService {
     dt: number,
     timezoneOffsetSeconds: number,
   ): Date => {
-    const utcTime = new Date(dt * 1000);
-    return new Date(utcTime.getTime() + timezoneOffsetSeconds * 1000);
+    return new Date((dt + timezoneOffsetSeconds) * 1000);
   };
   private static getCaqi(airQualityData: any) {
     const CAQI_THRESHOLDS = {

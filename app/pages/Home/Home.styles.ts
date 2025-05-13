@@ -134,6 +134,11 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
   },
+  forecastPanelScroll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
   forecastItem: {
     justifyContent: 'center',
     alignItems: 'center',
