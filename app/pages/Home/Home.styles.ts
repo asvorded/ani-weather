@@ -125,6 +125,8 @@ export const styles = StyleSheet.create({
     fontSize: 18,
   },
   forecastPanel: {
+    flexDirection: 'row',
+    overflow: 'hidden',
     width: '100%',
     borderRadius: 20,
     height: 150,
@@ -132,13 +134,35 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
   },
+  forecastItem: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 60,
+    height: 150,
+    marginHorizontal: 5,
+    flexDirection: 'column',
+  },
+  weatherIcon: {
+    width: 50,
+    height: 50,
+    marginBottom: 5,
+  },
+  temperature: {
+    fontSize: 16,
+    color: '#333',
+  },
+  time: {
+    fontSize: 14,
+  },
   moonPhaseComponent: {
     height: 65,
+    maxWidth:65,
+    maxHeight:65,
     width: 65,
     borderRadius: '50%',
     backgroundColor: '#F7F7F7',
   },
-  magneticActivityComponent: {
+  sunsetSunriseComponent: {
     height: 65,
     width: 65,
     position: 'relative',
@@ -148,7 +172,10 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
+    transform: [
+      { translateX: -10 },//May break, cant use "translate(-50%, -50%)"
+      { translateY: -20},
+    ],
     lineHeight: 40,
   },
   humidityComponent: {
@@ -167,6 +194,13 @@ export const styles = StyleSheet.create({
     height: 65,
     width: 65,
     backgroundColor: '#FFE6CD',
+    borderRadius: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  aiqComponent: {
+    height: 65,
+    width: 65,
     borderRadius: '50%',
     justifyContent: 'center',
     alignItems: 'center',

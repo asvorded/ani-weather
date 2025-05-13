@@ -19,7 +19,7 @@ export const UserSettingsContext = createContext<UserSettingsContextInterface | 
 export const useUserSettings = () => {
   const context = useContext(UserSettingsContext);
   if (context === undefined) {
-    throw new Error('UserSettingsContext must be used within a CookieProvider');
+    throw new Error('UserSettingsContext must be used within a UserSettingsProvider');
   }
   return context;
 };

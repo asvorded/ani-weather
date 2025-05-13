@@ -1,8 +1,27 @@
-export enum MoonPhases {
-  NewMoon = 1,
-  FirstHalf,
+import React from 'react';
+import {SvgProps} from 'react-native-svg';
+import clearDay from '../../../assets/images/weather_icons/clearDay.svg';
+import clearNight from '../../../assets/images/weather_icons/clearNight.svg';
+import cloudsDay from '../../../assets/images/weather_icons/cloudyDay.svg';
+import cloudsNight from '../../../assets/images/weather_icons/cloudyNight.svg';
+import thunderstorm from '../../../assets/images/weather_icons/thunderstorm.svg';
+import rain from '../../../assets/images/weather_icons/rain.svg';
+import snow from '../../../assets/images/weather_icons/snow.svg';
+import dust from '../../../assets/images/weather_icons/dust.svg';
+import fog from '../../../assets/images/weather_icons/fog.svg';
+import squall from '../../../assets/images/weather_icons/squall.svg';
+import tornado from '../../../assets/images/weather_icons/tornado.svg';
+
+
+export enum MoonPhase {
+  NewMoon,
+  WaxingCrescent,
+  FirstQuarter,
+  WaxingGibbous,
   FullMoon,
-  LastHalf,
+  WaningGibbous,
+  ThirdQuarter,
+  WaningCrescent,
 }
 
 export enum TempUnits {
@@ -22,7 +41,7 @@ export enum WindSpeedUnits {
 }
 
 export type HourForecast = {
-  time: string;
+  time: Date;
   state: WeatherId;
   temp: number;
 };
@@ -41,95 +60,107 @@ export enum WeatherId {
   ash,
   squall,
   tornado,
-  clear,
-  clouds,
+  clearDay,
+  clearNight,
+  cloudsDay,
+  cloudsNight
 }
 export type WeatherState = {
   id: WeatherId;
   translationId: string;
-  imageId: string;
+  image: React.FC<SvgProps>;
 };
 export const createWeatherState = (id: WeatherId): WeatherState => {
   const resourceMap = {
     [WeatherId.none]: {
       id: WeatherId.none,
       translationId: 'forecast.weatherStates.none',
-      imageId: 'icons/none.png',
+      image: clearDay,
     },
     [WeatherId.thunderstorm]: {
       id: WeatherId.thunderstorm,
       translationId: 'forecast.weatherStates.thunderstorm',
-      imageId: 'icons/thunderstorm.png',
+      image: thunderstorm,
     },
     [WeatherId.drizzle]: {
       id: WeatherId.drizzle,
       translationId: 'forecast.weatherStates.drizzle',
-      imageId: 'icons/drizzle.png',
+      image: fog,
     },
     [WeatherId.rain]: {
       id: WeatherId.rain,
       translationId: 'forecast.weatherStates.rain',
-      imageId: 'icons/rain.png',
+      image: rain,
     },
     [WeatherId.snow]: {
       id: WeatherId.snow,
       translationId: 'forecast.weatherStates.snow',
-      imageId: 'icons/snow.png',
+      image: snow,
     },
     [WeatherId.mist]: {
       id: WeatherId.mist,
       translationId: 'forecast.weatherStates.mist',
-      imageId: 'icons/mist.png',
+      image: fog,
     },
     [WeatherId.smoke]: {
       id: WeatherId.smoke,
       translationId: 'forecast.weatherStates.smoke',
-      imageId: 'icons/smoke.png',
+      image: dust,
     },
     [WeatherId.haze]: {
       id: WeatherId.haze,
       translationId: 'forecast.weatherStates.haze',
-      imageId: 'icons/haze.png',
+      image: dust,
     },
     [WeatherId.dust]: {
       id: WeatherId.dust,
       translationId: 'forecast.weatherStates.dust',
-      imageId: 'icons/dust.png',
+      image: dust,
     },
     [WeatherId.fog]: {
       id: WeatherId.fog,
       translationId: 'forecast.weatherStates.fog',
-      imageId: 'icons/fog.png',
+      image: fog,
     },
     [WeatherId.sand]: {
       id: WeatherId.sand,
       translationId: 'forecast.weatherStates.sand',
-      imageId: 'icons/sand.png',
+      image: dust,
     },
     [WeatherId.ash]: {
       id: WeatherId.ash,
       translationId: 'forecast.weatherStates.ash',
-      imageId: 'icons/ash.png',
+      image: dust,
     },
     [WeatherId.squall]: {
       id: WeatherId.squall,
       translationId: 'forecast.weatherStates.squall',
-      imageId: 'icons/squall.png',
+      image: squall,
     },
     [WeatherId.tornado]: {
       id: WeatherId.tornado,
       translationId: 'forecast.weatherStates.tornado',
-      imageId: 'icons/tornado.png',
+      image: tornado,
     },
-    [WeatherId.clear]: {
-      id: WeatherId.clear,
+    [WeatherId.clearDay]: {
+      id: WeatherId.clearDay,
       translationId: 'forecast.weatherStates.clear',
-      imageId: 'icons/clear.png',
+      image: clearDay,
     },
-    [WeatherId.clouds]: {
-      id: WeatherId.clouds,
+    [WeatherId.cloudsDay]: {
+      id: WeatherId.cloudsDay,
       translationId: 'forecast.weatherStates.clouds',
-      imageId: 'icons/clouds.png',
+      image: cloudsDay,
+    },
+    [WeatherId.clearNight]: {
+      id: WeatherId.clearNight,
+      translationId: 'forecast.weatherStates.clear',
+      image: clearNight,
+    },
+    [WeatherId.cloudsNight]: {
+      id: WeatherId.cloudsNight,
+      translationId: 'forecast.weatherStates.clouds',
+      image: cloudsNight,
     },
   };
 
@@ -138,7 +169,7 @@ export const createWeatherState = (id: WeatherId): WeatherState => {
   return {
     id,
     translationId: resources.translationId,
-    imageId: resources.imageId,
+    image: resources.image,
   };
 };
 export type Forecast = {
@@ -148,7 +179,7 @@ export type Forecast = {
   shortDescription: string;
   maxTemp: number;
   minTemp: number;
-  moonPhase: MoonPhases;
+  moonPhase: MoonPhase;
   geomagneticActivity: number;
   humidity: number;
   pressure: number;
@@ -159,4 +190,7 @@ export type Forecast = {
   airQuality: number;
   hourlyforecast: HourForecast[];
   lastUpdated: number;
+  timezone: number;
+  sunrise: number;
+  sunset: number;
 };

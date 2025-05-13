@@ -21,20 +21,19 @@
         "fahrenheit": "°F"
       }
     },
-    "moonPhase": {
+    "moonPhases": {
       "main": "Moon phase",
-      "default": "<No data>",
-      "newMoon": "New moon",
-      "firstHalf": "First half",
-      "fullMoon": "Full moon",
-      "lastHalf": "Last half"
+      "newMoon": "New Moon",
+      "waxingCrescent": "Waxing Crescent",
+      "firstQuarter": "First Quarter",
+      "waxingGibbous": "Waxing Gibbous",
+      "fullMoon": "Full Moon",
+      "waningGibbous": "Waning Gibbous",
+      "thirdQuarter": "Third Quarter",
+      "waningCrescent": "Waning Crescent"
     },
-    "geomagnetic": {
-      "main": "geomagnetic activity",
-      "default": "<No data>",
-      "weak": "Weak",
-      "medium": "Medium",
-      "strong": "Strong"
+    "sunsetSunrise": {
+      "main": "Sunrise and sunset"
     },
     "humidity": {
       "main": "Humidity",
@@ -92,7 +91,12 @@
     },
     "airQuality": {
       "main": "Air Quality",
-      "title": "AQI"
+      "title": "AQI",
+      "default": "<No data>",
+      "good": "Good",
+      "medium": "Medium",
+      "bad": "Bad",
+      "veryBad": "Very bad"
     }
   },
   "settings": {

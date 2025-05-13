@@ -5,10 +5,16 @@ export const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
   },
+  headerContainer: {
+    flexDirection: 'row',
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    marginBottom: 20,
+  },
+  backButton: {
     marginBottom: 20,
   },
   settingsPanel: {

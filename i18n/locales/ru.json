@@ -26,20 +26,19 @@
         "fahrenheit": "°F"
       }
     },
-    "moonPhase": {
+    "moonPhases": {
       "main": "Фаза луны",
-      "default": "<Нет данных>",
       "newMoon": "Новолуние",
-      "firstHalf": "Первая четверть",
+      "waxingCrescent": "Растущий серп",
+      "firstQuarter": "Первая четверть",
+      "waxingGibbous": "Прибывающая луна",
       "fullMoon": "Полнолуние",
-      "lastHalf": "Последняя четверть"
+      "waningGibbous": "Убывающая луна",
+      "thirdQuarter": "Последняя четверть",
+      "waningCrescent": "Стареющий серп"
     },
-    "geomagnetic": {
-      "main": "Геомагнитная активность",
-      "default": "<Нет данных>",
-      "weak": "Слабая",
-      "medium": "Средняя",
-      "strong": "Сильная"
+    "sunsetSunrise": {
+      "main": "Восход и заход"
     },
     "humidity": {
       "main": "Влажность",
@@ -97,7 +96,12 @@
     },
     "airQuality": {
       "main": "Качество воздуха",
-      "title": "ИКВ"
+      "title": "ИКВ",
+      "default": "<Нет данных>",
+      "good": "Хорошее",
+      "medium": "Среднее",
+      "bad": "Плохое",
+      "veryBad": "Очень плохое"
     }
   },
   "settings": {

@@ -3,7 +3,7 @@ import {
   View,
   Switch,
   ImageBackground,
-  ScrollView,
+  ScrollView, TouchableOpacity,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -18,6 +18,9 @@ import {Languages} from '../../types/storage/Languages.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 import {CustomText} from '../../components/CustomText/CustomText.tsx';
 import {styles} from './Settings.styles.ts';
+import {useTheme} from '../../hooks/useTheme.tsx';
+import BackImg from '../../../assets/icons/back-custom.svg';
+import {useCustomNavigation} from '../../hooks/useCustomNavigation.ts';
 
 type SettingsPanelProps = {
   color: string;
@@ -37,7 +40,8 @@ const SettingsPage = () => {
   const {userSettings, setUserSettings} = useUserSettings();
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
-
+  const {currentTheme, toggleTheme} = useTheme();
+  const navigation = useCustomNavigation();
   function setLanguage(value: Languages) {
     const updatedSettings = {...userSettings, language: value};
     setUserSettings(updatedSettings);
@@ -63,6 +67,11 @@ const SettingsPage = () => {
     setUserSettings(updatedSettings);
   }
 
+  function setTheme(value: boolean) {
+    toggleTheme();
+    console.log(value);
+  }
+
   return (
     <ImageBackground
       style={styles.background}
@@ -73,11 +82,16 @@ const SettingsPage = () => {
           marginBottom: insets.bottom,
           marginLeft: insets.left,
           marginRight: insets.right,
-          padding: 16,
+          padding: 20,
         }}
         showsVerticalScrollIndicator={false}>
         <SystemBars style="light" />
-        <CustomText style={styles.header}>{t('settings.title')}</CustomText>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity key="back" style={styles.backButton} onPress={() => { navigation.goBack(); }}>
+            <BackImg width={36} height={36} color={'#4b77d1'}/>
+          </TouchableOpacity>
+          <CustomText style={styles.header}>{t('settings.title')}</CustomText>
+        </View>
 
         <SettingsPanel
           color="#A9E788"
@@ -102,7 +116,19 @@ const SettingsPage = () => {
             </Picker>
           }
         />
-
+        <SettingsPanel
+          color="#B3DBFF"
+          title={'theme'}
+          contentElement={
+            <Switch
+              trackColor={{false: '#767577', true: '#81b0ff'}}
+              thumbColor={userSettings.notifications ? '#f5dd4b' : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+              value={currentTheme === 'dark'}
+              onValueChange={value => setTheme(value)}
+            />
+          }
+        />
         <SettingsPanel
           color="#B3DBFF"
           title={t('settings.units.temperature')}
