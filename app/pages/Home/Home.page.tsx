@@ -140,11 +140,11 @@ const WeatherPanel = ({
       <View style={styles.weatherMainContainer}>
         <Icon width={130} height={130} />
         <View />
-        <CustomText style={styles.temperatureMain}>{temp.toPrecision(3)}{tempUnits}</CustomText>
+        <CustomText style={styles.temperatureMain}>{temp.toFixed(1)}{tempUnits}</CustomText>
       </View>
       <View style={styles.weatherDescriptionContainer}>
         <CustomText style={styles.weatherDescriptionText}>{description}</CustomText>
-        <CustomText style={styles.temperatureAmplitudeText}>{maxTemp.toPrecision(3)}{tempUnits}/{minTemp.toPrecision(3)}{tempUnits}</CustomText>
+        <CustomText style={styles.temperatureAmplitudeText}>{maxTemp.toFixed(1)}{tempUnits}/{minTemp.toFixed(1)}{tempUnits}</CustomText>
       </View>
     </View>
   );
@@ -189,7 +189,7 @@ const PressureComponent = ({
 
   return (
     <View style={styles.pressureComponent}>
-      <CustomText style={styles.pressureText}>{pressure.toPrecision(4)}</CustomText>
+      <CustomText style={styles.pressureText}>{pressure.toFixed(0)}</CustomText>
       <CustomText style={styles.pressureUnits}>
         {t(getReadablePressureUnitsId(units))}
       </CustomText>
@@ -246,7 +246,7 @@ const ForecastPanel = ({hourlyForecast, tempUnits ,newTempUnits}: ForecastPanelP
             <View style={styles.forecastItem} key={index}>
               {React.createElement(createWeatherState(state).image, { style: styles.weatherIcon })}
               <CustomText style={styles.temperature}>
-                {convertTemperature(temp, tempUnits, newTempUnits).toPrecision(3)} {t(getReadableTemperatureUnitsId(newTempUnits))}
+                {convertTemperature(temp, tempUnits, newTempUnits).toFixed(1)} {t(getReadableTemperatureUnitsId(newTempUnits))}
               </CustomText>
               <CustomText style={styles.time}>
                 {new Date(time).toLocaleTimeString([], {
@@ -374,7 +374,7 @@ const WeatherPage: React.FC<{
               cityWithForecast.forecast.windSpeed,
               cityWithForecast.forecast.windSpeedUnits,
               userSettings.windSpeed,
-            )} ${t(getReadableWindUnitsId(userSettings.windSpeed))} (${t(
+            ).toFixed(1)} ${t(getReadableWindUnitsId(userSettings.windSpeed))} (${t(
               getReadableWindDirectionId(
                 cityWithForecast.forecast.windDirectionAngle,
               ),

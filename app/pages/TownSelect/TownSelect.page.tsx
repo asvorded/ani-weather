@@ -1,6 +1,6 @@
 import {
   ActivityIndicator, FlatList, ScrollView,
-  Text, TextInput, TouchableOpacity, View,
+  Text, TextInput, TouchableOpacity, useColorScheme, View,
 } from 'react-native';
 
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import { useCustomNavigation } from '../../hooks/useCustomNavigation';
 
 import { FoundCity } from '../../types/api/FoundCity';
 import * as CitiesService from '../../services/CitiesService';
-import { styles } from './TownSelect.styles';
+import { darkStyles, lightStyles, styles } from './TownSelect.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
 import * as LocationService from '../../services/LocationService';
@@ -18,12 +18,16 @@ import { FoundCityProps, PopularCityProps, SavedCitiesProps, SavedCityProps } fr
 import { SavedCity } from '../../types/storage/SavedCity';
 
 import BackImg from '../../../assets/icons/back-custom.svg';
+import BackLightImg from '../../../assets/icons/back-light.svg';
 import FindLocationImg from '../../../assets/icons/location-custom.svg';
 import LocationDarkImg from '../../../assets/icons/location-filled-dark.svg';
+import LocationLightImg from '../../../assets/icons/location-filled-light.svg';
 import DeleteDarkImg from '../../../assets/icons/delete-dark.svg';
+import DeleteLightImg from '../../../assets/icons/delete-light.svg';
 import CloseLightImg from '../../../assets/icons/close-light.svg';
 import { PagesNames } from '../../types/common/root-stack-params-list';
 import { useSavedCities } from '../../hooks/useSavedCities';
+import { CustomText } from '../../components/CustomText/CustomText';
 
 function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
@@ -35,26 +39,45 @@ const SavedCityBlock = ({city, onDeleteSavedCityClick}: SavedCityProps) => {
   const deleteWidth = styles.savedCityDeleteIcon.width;
   const deleteHeight = styles.savedCityDeleteIcon.height;
 
+  const colorScheme = useColorScheme();
+  const colorStyles = colorScheme === 'light' ? lightStyles : darkStyles;
+
   return (
-    <View style={styles.savedCity}>
+    <View style={[styles.savedCity, colorStyles.savedCity]}>
       <View style={city.isGeolocation === true ? null : styles.savedCityTextWhenSaved}>
-        <Text style={[styles.defaultFont, styles.savedCityText]}>{city.name}</Text>
+        <CustomText style={styles.savedCityText}>{city.name}</CustomText>
         <Text style={[styles.defaultFont, styles.savedCityCountryText]}>
           {CitiesService.getReadableCountry(city)}
         </Text>
       </View>
 
       {city.isGeolocation === true ? (
-        <LocationDarkImg
-          width={locationWidth} height={locationHeight}
-          style={styles.savedCityLocationIcon}
-        />
+        colorScheme === 'light' ? (
+          <LocationDarkImg
+            width={locationWidth} height={locationHeight}
+            style={styles.savedCityLocationIcon}
+          />
+        ) : (
+          <LocationLightImg
+            width={locationWidth} height={locationHeight}
+            style={styles.savedCityLocationIcon}
+          />
+        )
       ) : (
         <TouchableOpacity onPress={() => onDeleteSavedCityClick(city)}>
-          <DeleteDarkImg
-            width={deleteWidth} height={deleteHeight}
-            style={styles.savedCityDeleteIcon}
-          />
+          {
+            colorScheme === 'light' ? (
+              <DeleteDarkImg
+                width={deleteWidth} height={deleteHeight}
+                style={styles.savedCityDeleteIcon}
+              />
+            ) : (
+              <DeleteLightImg
+                width={deleteWidth} height={deleteHeight}
+                style={styles.savedCityDeleteIcon}
+              />
+            )
+          }
         </TouchableOpacity>
       )}
     </View>
@@ -68,9 +91,9 @@ const SavedCitiesList = ({
 
   return (
     <View style={styles.savedCityContainer}>
-      <Text
-        style={[styles.defaultFont, styles.savedCitiesTitle]}
-      >{t('townSelect.savedCities.title')}</Text>
+      <CustomText
+        style={styles.savedCitiesTitle}
+      >{t('townSelect.savedCities.title')}</CustomText>
       {savedCities.length > 0 ? (
         <View>
           {savedCities.map((city, index) => (
@@ -83,10 +106,7 @@ const SavedCitiesList = ({
           ))}
         </View>
       ) : (
-        <Text style={[
-          styles.defaultFont,
-          styles.savedCitiesNoCitiesText,
-        ]}>{t('townSelect.savedCities.noCities')}</Text>
+        <CustomText style={styles.savedCitiesNoCitiesText}>{t('townSelect.savedCities.noCities')}</CustomText>
       )}
     </View>
   );
@@ -95,12 +115,15 @@ const SavedCitiesList = ({
 const PopularCity = ({
   city, onClick,
 }: PopularCityProps) => {
+  const colorScheme = useColorScheme();
+  const colorStyles = colorScheme === 'light' ? lightStyles : darkStyles;
+
   return (
     <TouchableOpacity
-      style={styles.popularCity}
+      style={[styles.popularCity, colorStyles.popularCity]}
       onPress={() => { onClick(city); }}
     >
-      <Text style={[styles.defaultFont, styles.popularCityText]}>{city.name}</Text>
+      <CustomText style={styles.popularCityText}>{city.name}</CustomText>
     </TouchableOpacity>
   );
 };
@@ -110,6 +133,8 @@ const FoundCities = ({
   onFoundCityClick,
 }: FoundCityProps) => {
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const colorStyles = colorScheme === 'light' ? lightStyles : darkStyles;
 
   return (
     <FlatList
@@ -117,22 +142,13 @@ const FoundCities = ({
       showsVerticalScrollIndicator={false}
       renderItem={({item}) => (
         <TouchableOpacity style={styles.foundCity} onPress={() => onFoundCityClick(item)}>
-          <Text style={[
-            styles.foundCityText,
-            styles.defaultFont,
-          ]}>{item.name}</Text>
-          <Text style={[
-            styles.foundCityCountryText,
-            styles.defaultFont,
-          ]}>{CitiesService.getReadableCountry(item)}</Text>
+          <CustomText style={styles.foundCityText}>{item.name}</CustomText>
+          <Text style={styles.foundCityCountryText}>{CitiesService.getReadableCountry(item)}</Text>
         </TouchableOpacity>
       )}
       ItemSeparatorComponent={() => (
-        <View style={styles.foundCitiesSeparator}/>
+        <View style={[styles.foundCitiesSeparator, colorStyles.foundCitiesSeparator]}/>
       )}
-      // ListFooterComponent={(
-      //   <View style={{height: insets.bottom}}/>
-      // )}
     />
   );
 };
@@ -141,6 +157,9 @@ const TownSelect = () => {
   const {t, i18n} = useTranslation();
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
+
+  const colorScheme = useColorScheme();
+  const colorStyles = colorScheme === 'light' ? lightStyles : darkStyles;
 
   const {savedCities, service} = useSavedCities();
 
@@ -260,19 +279,24 @@ const TownSelect = () => {
         paddingRight: insets.right,
       },
       styles.screen,
+      colorStyles.screen,
     ]}>
       <SystemBars style="dark"/>
 
       {/* Back button */}
       {navigation.canGoBack() ? (
         <TouchableOpacity key="back" style={styles.backButton} onPress={() => { navigation.goBack(); }}>
-          <BackImg width={36} height={36} color={'#4b77d1'}/>
+          {colorScheme === 'light' ? (
+            <BackImg width={36} height={36} color={'#4b77d1'}/>
+          ) : (
+            <BackLightImg width={36} height={36} />
+          )}
         </TouchableOpacity>
       ) : null}
 
       <View style={styles.inputContainer} key="input">
         <TextInput
-          style={[styles.input, styles.defaultFont]}
+          style={[styles.input, styles.defaultFont, colorStyles.cityInput]}
           placeholder={t('townSelect.textField.placeholder')}
           numberOfLines={1}
           value={query}
@@ -325,12 +349,12 @@ const TownSelect = () => {
         <ScrollView style={styles.citiesContainer} showsVerticalScrollIndicator={false}>
           {/* Popular cities */}
           <View key="popular cities">
-            <Text style={[styles.popularCitiesText, styles.defaultFont]}>{t('townSelect.popularCities')}</Text>
-            <View style={styles.popularCitiesContainer}>{
-              popularCities.map((city, index) => (
+            <CustomText style={styles.popularCitiesText}>{t('townSelect.popularCities')}</CustomText>
+            <View style={styles.popularCitiesContainer}>
+              {popularCities.map((city, index) => (
                 <PopularCity key={index} city={city} onClick={onPopularCityClick}/>
-              ))
-            }</View>
+              ))}
+            </View>
           </View>
 
           {/* Saved cities */}

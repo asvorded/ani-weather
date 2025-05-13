@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
   },
 
   backButton: {
+    marginTop: 8,
     marginBottom: 8,
   },
 
@@ -20,7 +21,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
 
-    backgroundColor: '#f4f4f4',
     borderColor: '#d0d0d0',
     borderWidth: 1,
     borderRadius: 150,
@@ -63,7 +63,6 @@ export const styles = StyleSheet.create({
   savedCity: {
     marginTop: 10,
     borderRadius: 15,
-    backgroundColor: '#e5e0ff',
     padding: 15,
 
     flexDirection: 'row',
@@ -107,7 +106,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 50,
-    backgroundColor: '#d9d9d9',
   },
   popularCityText: {
     fontSize: 15,
@@ -127,7 +125,6 @@ export const styles = StyleSheet.create({
   foundCitiesSeparator: {
     width: '100%',
     height: 1,
-    backgroundColor: 'lightgray',
   },
 
   locationErrorContainer: {
@@ -151,5 +148,47 @@ export const styles = StyleSheet.create({
   locationErrorCloseIcon: {
     width: '100%',
     height: '100%',
+  },
+});
+
+export const lightStyles = StyleSheet.create({
+  screen: {
+    backgroundColor: 'white',
+  },
+  cityInput: {
+    color: 'black',
+  },
+  inputContainer: {
+    backgroundColor: '#f4f4f4',
+  },
+  foundCitiesSeparator: {
+    backgroundColor: 'lightgray',
+  },
+  popularCity: {
+    backgroundColor: '#d9d9d9',
+  },
+  savedCity: {
+    backgroundColor: '#e5e0ff',
+  },
+});
+
+export const darkStyles = StyleSheet.create({
+  screen: {
+    backgroundColor: 'black',
+  },
+  cityInput: {
+    color: 'white',
+  },
+  inputContainer: {
+    backgroundColor: '#363636',
+  },
+  foundCitiesSeparator: {
+    backgroundColor: 'gray',
+  },
+  popularCity: {
+    backgroundColor: '#595959',
+  },
+  savedCity: {
+    backgroundColor: '#393939',
   },
 });
