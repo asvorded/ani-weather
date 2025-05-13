@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { WeatherIconProps, WeatherIconType } from './WeatherIcon.types';
-import PartlyCloudyImg from '../../../assets/images/weather_icons/sunny-cloudy.svg';
+import PartlyCloudyImg from '../../../assets/images/weather_icons/cloudyDay.svg';
 
 const getWeatherIconByType = (type: WeatherIconType) => {
   switch (type) {

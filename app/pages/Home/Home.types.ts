@@ -1,6 +1,13 @@
 import { EdgeInsets } from 'react-native-safe-area-context';
-import { PressureUnits, WindSpeedUnits } from '../../types/api/Forecast';
+import {
+  HourForecast,
+  MoonPhase,
+  PressureUnits, TempUnits,
+  WindSpeedUnits,
+} from '../../types/api/Forecast';
 import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast';
+import React from 'react';
+import {SvgProps} from 'react-native-svg';
 
 export type ActionsPanelProps = {
   navOnCitySelectClick: () => void;
@@ -16,8 +23,8 @@ export type WeatherDetailedPanelProps = {
   contentElement: React.ReactNode;
 };
 
-export type MagneticActivityProps = {
-  degree: number;
+export type SunsetSunriseProps = {
+  Icon: React.FC<SvgProps>;
 }
 
 export type HumidityProps = {
@@ -28,7 +35,12 @@ export type PressureProps = {
   pressure: number;
   units: PressureUnits;
 }
-
+export type AqiProps = {
+  aqi: number;
+}
+export type MoonProps = {
+  phase: MoonPhase;
+}
 export type WindProps = {
   speed: number;
   units: WindSpeedUnits;
@@ -37,12 +49,16 @@ export type WindProps = {
 
 export type WeatherPanelProps = {
   temp: number;
-  icon: string;
+  Icon: React.FC<SvgProps>;
   description: string;
   minTemp: number;
   maxTemp: number;
   tempUnits: string;
-  stateId: number;
+}
+export type ForecastPanelProps = {
+  hourlyForecast: HourForecast[];
+  tempUnits: TempUnits;
+  newTempUnits: TempUnits;
 }
 
 export type CitiesTabBarProps = {

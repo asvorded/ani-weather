@@ -3,7 +3,7 @@ import {
   View,
   Switch,
   ImageBackground,
-  ScrollView,
+  ScrollView, TouchableOpacity,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -19,6 +19,8 @@ import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 import {CustomText} from '../../components/CustomText/CustomText.tsx';
 import {styles} from './Settings.styles.ts';
 import {useTheme} from '../../hooks/useTheme.tsx';
+import BackImg from '../../../assets/icons/back-custom.svg';
+import {useCustomNavigation} from '../../hooks/useCustomNavigation.ts';
 
 type SettingsPanelProps = {
   color: string;
@@ -39,7 +41,7 @@ const SettingsPage = () => {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const {currentTheme, toggleTheme} = useTheme();
-
+  const navigation = useCustomNavigation();
   function setLanguage(value: Languages) {
     const updatedSettings = {...userSettings, language: value};
     setUserSettings(updatedSettings);
@@ -84,7 +86,12 @@ const SettingsPage = () => {
         }}
         showsVerticalScrollIndicator={false}>
         <SystemBars style="light" />
-        <CustomText style={styles.header}>{t('settings.title')}</CustomText>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity key="back" style={styles.backButton} onPress={() => { navigation.goBack(); }}>
+            <BackImg width={36} height={36} color={'#4b77d1'}/>
+          </TouchableOpacity>
+          <CustomText style={styles.header}>{t('settings.title')}</CustomText>
+        </View>
 
         <SettingsPanel
           color="#A9E788"

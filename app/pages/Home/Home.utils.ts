@@ -1,18 +1,39 @@
-import {MoonPhases, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast';
+import {MoonPhase, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast';
+const MOON_PHASE_TRANSLATIONS: Record<MoonPhase, string> = {
+  [MoonPhase.NewMoon]: 'forecast.moonPhases.newMoon',
+  [MoonPhase.WaxingCrescent]: 'forecast.moonPhases.waxingCrescent',
+  [MoonPhase.FirstQuarter]: 'forecast.moonPhases.firstHalf',
+  [MoonPhase.WaxingGibbous]: 'forecast.moonPhases.waxingGibbous',
+  [MoonPhase.FullMoon]: 'forecast.moonPhases.fullMoon',
+  [MoonPhase.WaningGibbous]: 'forecast.moonPhases.waningGibbous',
+  [MoonPhase.ThirdQuarter]: 'forecast.moonPhases.lastHalf',
+  [MoonPhase.WaningCrescent]: 'forecast.moonPhases.waningCrescent',
+};
 
-export function getReadableMoonPhaseId(phase: MoonPhases): string {
-  switch (phase) {
-  case MoonPhases.NewMoon:
-    return 'forecast.moonPhase.newMoon';
-  case MoonPhases.FirstHalf:
-    return 'forecast.moonPhase.firstHalf';
-  case MoonPhases.FullMoon:
-    return 'forecast.moonPhase.fullMoon';
-  case MoonPhases.LastHalf:
-    return 'forecast.moonPhase.lastHalf';
-  }
-}
-
+export const getReadableMoonPhaseId = (phase: MoonPhase): string => {
+  return MOON_PHASE_TRANSLATIONS[phase] || 'forecast.moonPhases.default';
+};
+const moonPhaseIconMap = {
+  [MoonPhase.NewMoon]: require('../../../assets/images/moon_phases/new-moon.png'),
+  [MoonPhase.WaxingCrescent]:
+    require('../../../assets/images/moon_phases/waxing-crescent.png'),
+  [MoonPhase.FirstQuarter]:
+require('../../../assets/images/moon_phases/first-quarter.png'),
+  [MoonPhase.WaxingGibbous]:
+require('../../../assets/images/moon_phases/waxing-gibbous.png'),
+  [MoonPhase.FullMoon]: require('../../../assets/images/moon_phases/full-moon.png'),
+  [MoonPhase.WaningGibbous]:
+require('../../../assets/images/moon_phases/waning-gibbous.png'),
+  [MoonPhase.ThirdQuarter]:
+require('../../../assets/images/moon_phases/third-quarter.png'),
+  [MoonPhase.WaningCrescent]:
+require('../../../assets/images/moon_phases/waning-crescent.png'),
+};
+export const getMoonPhaseImagePath = (phase: MoonPhase): number => {
+  return (
+    moonPhaseIconMap[phase]
+  );
+};
 export function getReadableGeomagneticDegreeId(degree: number): string {
   const geomagneticLevels = [
     {min: 0, max: 4, id: 'forecast.geomagnetic.weak'},
@@ -46,8 +67,56 @@ export function getReadablePressureId(
   value: number,
   units: PressureUnits,
 ): string {
+  if (units === PressureUnits.Pascal) {
+    if (value < 980) {
+      return 'forecast.pressure.low';
+    }
+    if (value <= 1040) {
+      return 'forecast.pressure.medium';
+    }
+    return 'forecast.pressure.high';
+  }
+  if (units === PressureUnits.MmHg) {
+    if (value < 735) {
+      return 'forecast.pressure.low';
+    }
+    if (value <= 780) {
+      return 'forecast.pressure.medium';
+    }
+    return 'forecast.pressure.high';
+  }
   return 'forecast.pressure.default';
 }
+export function getReadableAqiId(value: number): string {
+  if (value < 0 || value > 100) {
+    return 'forecast.airQuality.default';
+  }
+  const aqiLevels = [
+    {min: 0, max: 25, id: 'forecast.airQuality.good'},
+    {min: 26, max: 50, id: 'forecast.airQuality.medium'},
+    {min: 51, max: 75, id: 'forecast.airQuality.bad'},
+    {min: 76, max: 100, id: 'forecast.airQuality.veryBad'},
+  ];
+
+  const level = aqiLevels.find(({min, max}) => value >= min && value <= max);
+  return level ? level.id : 'forecast.airQuality.default';
+}
+export function getBackgroundForAqi(value: number): string {
+  const defaultBackground = '#a2fb99';
+  if (value < 0 || value > 5) {
+    return defaultBackground;
+  }
+  const aqiLevels = [
+    {min: 0, max: 1, background: '#a2fb99'},
+    {min: 2, max: 2, background: '#a8cf62'},
+    {min: 3, max: 3, background: '#f4e964'},
+    {min: 4, max: 5, background: '#fa655c'},
+  ];
+
+  const level = aqiLevels.find(({min, max}) => value >= min && value <= max);
+  return level ? level.background : defaultBackground;
+}
+
 
 export function getReadablePressureUnitsId(units: PressureUnits): string {
   switch (units) {
