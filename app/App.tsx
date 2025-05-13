@@ -17,6 +17,8 @@ import {UserSettingsProvider} from './services/UserSettingsProvider.tsx';
 import { SavedCitiesProvider } from './hooks/useSavedCities.tsx';
 import { useSavedCities } from './hooks/useSavedCities.tsx';
 import {ThemeProvider} from './hooks/useTheme.tsx';
+import AnimatedBackground from './components/AnimatedBackground/AnimatedBackgroundImage.tsx';
+import {BackgroundProvider} from './hooks/useAnimatedBackground.tsx';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>({
   //initialRouteName: PagesNames.Home,
@@ -54,7 +56,9 @@ const App = () => {
         <ThemeProvider>
           <UserSettingsProvider>
             <SavedCitiesProvider>
-              <InternalApp />
+              <BackgroundProvider initialBackground={require('../assets/images/backgrounds/background-light.jpg')}>
+                <InternalApp />
+              </BackgroundProvider>
             </SavedCitiesProvider>
           </UserSettingsProvider>
         </ThemeProvider>

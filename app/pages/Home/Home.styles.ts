@@ -165,7 +165,9 @@ export const styles = StyleSheet.create({
   sunsetSunriseComponent: {
     height: 65,
     width: 65,
+    borderRadius: '50%',
     position: 'relative',
+    backgroundColor: '#fbefef',
   },
   magneticActivityText: {
     fontSize: 30,

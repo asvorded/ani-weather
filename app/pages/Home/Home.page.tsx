@@ -61,6 +61,8 @@ import * as CitiesService from '../../services/CitiesService.ts';
 import { useSavedCities } from '../../hooks/useSavedCities.tsx';
 import {useTheme} from '../../hooks/useTheme.tsx';
 import CustomIcon from '../../components/CustomIcon/CustomIcon.tsx';
+import AnimatedBackground from '../../components/AnimatedBackground/AnimatedBackgroundImage.tsx';
+import {useAnimatedBackground} from '../../hooks/useAnimatedBackground.tsx';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -235,7 +237,7 @@ const ForecastPanel = ({hourlyForecast, tempUnits ,newTempUnits}: ForecastPanelP
       <ScrollView
         horizontal={true}
         nestedScrollEnabled={true}
-        showsHorizontalScrollIndicator={true} // Show the horizontal scroll bar
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ flexDirection: 'row', alignItems: 'center' }} // Layout children correctly
         style={{ paddingHorizontal: 10 }} // Optional padding for better appearance
       >
@@ -441,12 +443,11 @@ const HomePage = () => {
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
   const {i18n} = useTranslation();
-
+  const {setNewBackground} = useAnimatedBackground();
   const {savedCities, service} = useSavedCities();
   const [selectedCityIndex, setSelectedCityIndex] = React.useState(0);
 
   const [refreshing, setRefreshing] = React.useState(false);
-
   useEffect(() => {
     if (savedCities.length === 0) {
       if (navigation.canGoBack()) {
@@ -488,14 +489,12 @@ const HomePage = () => {
         });
     }
   }, [service, savedCities, selectedCityIndex, i18n]);
-
   return (
     <View style={styles.outerContainer} key="home page">
       <SystemBars style="light" />
-      <ImageBackground
+      <AnimatedBackground />
+      <View
         style={styles.imageContainer}
-        // TODO: background from weather state
-        source={require('../../../assets/images/background-light.jpg')}
       >
         <ActionsPanel
           navOnCitySelectClick={() => {
@@ -529,9 +528,9 @@ const HomePage = () => {
             }}
             onViewableItemsChanged={({ viewableItems }) => {
               const pageIndex = viewableItems[0]?.index;
-
               if (pageIndex !== undefined && pageIndex !== null) {
                 setSelectedCityIndex(pageIndex);
+                setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
               }
             }}
           />
@@ -541,7 +540,7 @@ const HomePage = () => {
           key="system navigation buttons"
           style={[styles.systemNavButtons, {height: insets.bottom}]}
         />
-      </ImageBackground>
+      </View>
       <View
         key="system status bar"
         style={[styles.systemStatusBar, {height: insets.top}]}
