@@ -48,7 +48,6 @@ export async function findCitiesOSMAsync(query: string, lang: string): Promise<F
   let response = await axios.get(OSM_SEARCH_URL, {
     params: {
       city: query,
-      countrycodes: 'by',
       format: 'geojson',
       featureType: 'settlement',
       addressdetails: 1,

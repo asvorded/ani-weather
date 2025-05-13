@@ -23,6 +23,7 @@ export function defineWeatherFetchTask() {
           currentTemp: geoCity.forecast.currentTemp,
           minTemp: geoCity.forecast.minTemp,
           maxTemp: geoCity.forecast.maxTemp,
+          time: geoCity.forecast.lastUpdated + geoCity.forecast.timezone,
         };
       } else {
         let savedCity = (await SavedCitiesService.getAllSavedCities())[0];
@@ -34,6 +35,7 @@ export function defineWeatherFetchTask() {
             currentTemp: newForecast.forecast.currentTemp,
             minTemp: newForecast.forecast.minTemp,
             maxTemp: newForecast.forecast.maxTemp,
+            time: newForecast.forecast.lastUpdated + newForecast.forecast.timezone,
           };
         }
       }

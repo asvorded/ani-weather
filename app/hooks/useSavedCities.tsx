@@ -47,6 +47,7 @@ export const SavedCitiesProvider = ({children}: {children: ReactNode}) => {
         currentTemp: geoCity.forecast.currentTemp,
         minTemp: geoCity.forecast.minTemp,
         maxTemp: geoCity.forecast.maxTemp,
+        time: geoCity.forecast.lastUpdated + geoCity.forecast.timezone,
       });
 
       setSavedCities([geoCity, ...savedCities]);
@@ -59,6 +60,7 @@ export const SavedCitiesProvider = ({children}: {children: ReactNode}) => {
           currentTemp: cityToShow.forecast.currentTemp,
           minTemp: cityToShow.forecast.minTemp,
           maxTemp: cityToShow.forecast.maxTemp,
+          time: cityToShow.forecast.lastUpdated + cityToShow.forecast.timezone,
         });
       } else {
         WidgetService.resetWidget();

@@ -26,6 +26,7 @@ export async function widgetInit() {
         currentTemp: geoCity.forecast.currentTemp,
         minTemp: geoCity.forecast.minTemp,
         maxTemp: geoCity.forecast.maxTemp,
+        time: geoCity.forecast.lastUpdated + geoCity.forecast.timezone,
       });
     } else {
       // Try get first saved city
@@ -48,6 +49,7 @@ export async function widgetInit() {
             currentTemp: newForecast.forecast.currentTemp,
             minTemp: newForecast.forecast.minTemp,
             maxTemp: newForecast.forecast.maxTemp,
+            time: newForecast.forecast.lastUpdated + newForecast.forecast.timezone,
           });
         } else {
           WidgetService.setForecastOnWidget({
@@ -56,6 +58,7 @@ export async function widgetInit() {
             currentTemp: savedCity.forecast.currentTemp,
             minTemp: savedCity.forecast.minTemp,
             maxTemp: savedCity.forecast.maxTemp,
+            time: savedCity.forecast.lastUpdated + savedCity.forecast.timezone,
           });
         }
       }
