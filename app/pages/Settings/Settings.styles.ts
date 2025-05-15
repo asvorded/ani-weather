@@ -32,9 +32,10 @@ export const styles = StyleSheet.create({
     height: 50,
     width: '100%',
     color: '#fff',
-    backgroundColor: 'rgba(0, 32, 129, 0.6)',
+    backgroundColor: 'rgba(41,61,133,0.6)',
     textAlign: 'center',
     textAlignVertical: 'center',
+    fontFamily: 'BellotaText-Regular',
   },
   pickerItem: {
     color: '#a30000',
@@ -44,6 +45,10 @@ export const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   text: {
+    fontFamily: 'BellotaText-Regular',
+  },
+  pickerItemText:{
+    fontSize: 16,
     fontFamily: 'BellotaText-Regular',
   },
 });

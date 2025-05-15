@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Switch,
@@ -21,6 +21,7 @@ import {styles} from './Settings.styles.ts';
 import {useTheme} from '../../hooks/useTheme.tsx';
 import BackImg from '../../../assets/icons/back-custom.svg';
 import {useCustomNavigation} from '../../hooks/useCustomNavigation.ts';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 
 type SettingsPanelProps = {
   color: string;
@@ -36,12 +37,21 @@ const SettingsPanel = ({color, title, contentElement}: SettingsPanelProps) => {
     </View>
   );
 };
+const tempOptions = ['Celsius', 'Fahrenheit', 'Kelvin'];
+const tempUnitsOptions = [TempUnits.Celsius, TempUnits.Fahrenheit, TempUnits.Kelvin];
+const pressureOptions = ['Pascals', 'Millimeters of Mercury'];
+const pressureUnitsOptions = [PressureUnits.Pascal, PressureUnits.MmHg];
+const windSpeedOptions = ['M/s', 'Km/s'];
+const windSpeedUnitsOptions = [WindSpeedUnits.Ms, WindSpeedUnits.Kmh];
 const SettingsPage = () => {
   const {userSettings, setUserSettings} = useUserSettings();
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const {currentTheme, toggleTheme} = useTheme();
   const navigation = useCustomNavigation();
+  const [selectedTempIndex, setSelectedTempIndex] = useState(tempUnitsOptions.indexOf(userSettings.temperature));
+  const [selectedPressureIndex, setSelectedPressureIndex] = useState(pressureUnitsOptions.indexOf(userSettings.pressure));
+  const [selectedWindSpeedIndex, setSelectedWindSpeedIndex] = useState(windSpeedUnitsOptions.indexOf(userSettings.windSpeed));
   function setLanguage(value: Languages) {
     const updatedSettings = {...userSettings, language: value};
     setUserSettings(updatedSettings);
@@ -124,43 +134,19 @@ const SettingsPage = () => {
         />
         <SettingsPanel
           color="#B3DBFF"
-          title={t('settings.theme')}
-          contentElement={
-            <Switch
-              trackColor={{false: '#767577', true: '#81b0ff'}}
-              thumbColor={userSettings.notifications ? '#f5dd4b' : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              value={currentTheme === 'dark'}
-              onValueChange={value => setTheme(value)}
-            />
-          }
-        />
-        <SettingsPanel
-          color="#B3DBFF"
           title={t('settings.units.temperature')}
           contentElement={
-            <Picker
-              selectedValue={userSettings.temperature}
+            <SegmentedControl
+              values={tempOptions}
+              selectedIndex={selectedTempIndex}
               style={styles.picker}
-              mode="dropdown"
-              itemStyle={[styles.pickerItem]}
-              onValueChange={value => setTemperatureUnits(value)}>
-              <Picker.Item
-                style={styles.text}
-                label="Celsius"
-                value={TempUnits.Celsius}
-              />
-              <Picker.Item
-                style={styles.text}
-                label="Fahrenheit"
-                value={TempUnits.Fahrenheit}
-              />
-              <Picker.Item
-                style={styles.text}
-                label="Kelvin"
-                value={TempUnits.Kelvin}
-              />
-            </Picker>
+              fontStyle={styles.pickerItemText}
+              onChange={(event) => {
+                setSelectedTempIndex(event.nativeEvent.selectedSegmentIndex);
+                setTemperatureUnits(tempUnitsOptions[event.nativeEvent.selectedSegmentIndex]);
+              }}
+              appearance={'light'}
+            />
           }
         />
 
@@ -168,23 +154,19 @@ const SettingsPage = () => {
           color="#FFE179"
           title={t('settings.units.pressure')}
           contentElement={
-            <Picker
-              selectedValue={userSettings.pressure}
-              style={[styles.text, styles.picker]}
-              mode="dropdown"
-              itemStyle={[styles.pickerItem]}
-              onValueChange={value => setPressureUnits(value)}>
-              <Picker.Item
-                style={styles.text}
-                label="Pascals"
-                value={PressureUnits.Pascal}
-              />
-              <Picker.Item
-                style={styles.text}
-                label="Millimeters of Mercury"
-                value={PressureUnits.MmHg}
-              />
-            </Picker>
+            <SegmentedControl
+              values={pressureOptions}
+              selectedIndex={selectedPressureIndex}
+              style={styles.picker}
+              fontStyle={styles.pickerItemText}
+              onChange={(event) => {
+                setSelectedPressureIndex(event.nativeEvent.selectedSegmentIndex);
+                setPressureUnits(
+                  pressureUnitsOptions[event.nativeEvent.selectedSegmentIndex],
+                );
+              }}
+              appearance={'light'}
+            />
           }
         />
 
@@ -192,23 +174,19 @@ const SettingsPage = () => {
           color="#FBB9BA"
           title={t('settings.units.wind')}
           contentElement={
-            <Picker
-              selectedValue={userSettings.windSpeed}
+            <SegmentedControl
+              values={windSpeedOptions}
+              selectedIndex={selectedWindSpeedIndex}
               style={styles.picker}
-              mode="dropdown"
-              itemStyle={[styles.pickerItem]}
-              onValueChange={value => setWindSpeedUnits(value)}>
-              <Picker.Item
-                style={styles.text}
-                label="M/s"
-                value={WindSpeedUnits.Ms}
-              />
-              <Picker.Item
-                label="Km/s"
-                style={styles.text}
-                value={WindSpeedUnits.Kmh}
-              />
-            </Picker>
+              fontStyle={styles.pickerItemText}
+              onChange={(event) => {
+                setSelectedWindSpeedIndex(event.nativeEvent.selectedSegmentIndex);
+                setWindSpeedUnits(
+                  windSpeedUnitsOptions[event.nativeEvent.selectedSegmentIndex],
+                );
+              }}
+              appearance={'light'}
+            />
           }
         />
 
