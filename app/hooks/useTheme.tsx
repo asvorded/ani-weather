@@ -1,5 +1,6 @@
-import React, { createContext, useState, ReactNode, FC, useContext } from 'react';
+import React, {createContext, useState, ReactNode, FC, useContext, useEffect} from 'react';
 import {useDerivedValue, withTiming} from 'react-native-reanimated';
+import {Appearance} from 'react-native';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -29,6 +30,12 @@ export const useTheme = () => {
 
 export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('light');
+  useEffect(() => {
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      setCurrentTheme(colorScheme === 'dark' ? 'dark' : 'light');
+    });
+    return () => subscription.remove();
+  }, []);
   const progress = useDerivedValue(()=>{
     return withTiming(currentTheme === 'light' ? 0 : 1);
   });
