@@ -524,6 +524,7 @@ const HomePage = () => {
         />
         <ScrollView key="city pages"
           showsVerticalScrollIndicator={false}
+          overScrollMode="never"
           refreshControl={selectedCityIndex < savedCities.length ? (
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           ) : undefined}

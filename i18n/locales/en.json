@@ -5,7 +5,12 @@
     },
     "popularCities": "Popular cities",
     "location": {
-      "errorPrefix": "Error:"
+      "errorPrefix": "Error:",
+      "errors": {
+        "default": "Error finding location",
+        "permissionDenied": "Please enable location permission",
+        "positionUnavailable": "Turn on GPS"
+      }
     },
     "savedCities": {
       "title": "Saved cities",
@@ -108,6 +113,10 @@
       "pressure": "Pressure",
       "wind": "Wind"
     },
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "theme": "Dark theme"
+  },
+  "meteoChannel": {
+    "noContent": "No news. Stay tuned!"
   }
 }
