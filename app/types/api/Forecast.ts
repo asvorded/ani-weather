@@ -99,8 +99,8 @@ export const createWeatherState = (id: WeatherId): WeatherState => {
       id: WeatherId.rain,
       translationId: 'forecast.weatherStates.rain',
       image: rain,
-      background: require('../../../assets/images/backgrounds/background-light.jpg'),
-      lightDarkThemeFactor: 0,
+      background: require('../../../assets/images/backgrounds/background-rain.jpg'),
+      lightDarkThemeFactor: 0.2,
     },
     [WeatherId.snow]: {
       id: WeatherId.snow,
@@ -190,7 +190,7 @@ export const createWeatherState = (id: WeatherId): WeatherState => {
       id: WeatherId.clearNight,
       translationId: 'forecast.weatherStates.clear',
       image: clearNight,
-      background: require('../../../assets/images/backgrounds/background-cloudyDay.jpg'),
+      background: require('../../../assets/images/backgrounds/background-clearNight.jpg'),
       lightDarkThemeFactor: 1,
     },
     [WeatherId.cloudsNight]: {

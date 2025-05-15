@@ -69,7 +69,6 @@ const SettingsPage = () => {
 
   function setTheme(value: boolean) {
     toggleTheme();
-    console.log(value);
   }
 
   return (

@@ -19,6 +19,7 @@ import { useSavedCities } from './hooks/useSavedCities.tsx';
 import {ThemeProvider} from './hooks/useTheme.tsx';
 import AnimatedBackground from './components/AnimatedBackground/AnimatedBackgroundImage.tsx';
 import {BackgroundProvider} from './hooks/useAnimatedBackground.tsx';
+import {WeatherThemeProvider} from './hooks/useWeatherTheme.tsx';
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>({
   //initialRouteName: PagesNames.Home,
@@ -54,13 +55,15 @@ const App = () => {
     <>
       <SafeAreaProvider>
         <ThemeProvider>
-          <UserSettingsProvider>
-            <SavedCitiesProvider>
-              <BackgroundProvider initialBackground={require('../assets/images/backgrounds/background-light.jpg')}>
-                <InternalApp />
-              </BackgroundProvider>
-            </SavedCitiesProvider>
-          </UserSettingsProvider>
+          <WeatherThemeProvider theme={0}>
+            <UserSettingsProvider>
+              <SavedCitiesProvider>
+                <BackgroundProvider initialBackground={require('../assets/images/backgrounds/background-light.jpg')}>
+                  <InternalApp />
+                </BackgroundProvider>
+              </SavedCitiesProvider>
+            </UserSettingsProvider>
+          </WeatherThemeProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </>

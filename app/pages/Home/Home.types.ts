@@ -59,6 +59,7 @@ export type ForecastPanelProps = {
   hourlyForecast: HourForecast[];
   tempUnits: TempUnits;
   newTempUnits: TempUnits;
+  color: string;
 }
 
 export type CitiesTabBarProps = {

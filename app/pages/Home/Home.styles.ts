@@ -70,7 +70,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   weatherDescriptionText: {
-    fontSize: 16,
+    fontSize: 24,
+    marginLeft: 20,
   },
   temperatureMain: {
     fontSize: 70,
@@ -130,19 +131,23 @@ export const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 20,
     height: 150,
-    backgroundColor: '#CEBBFF88',
+    opacity: 0.75,
     borderWidth: 1,
     borderStyle: 'solid',
   },
   forecastPanelScroll: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 10,
+    paddingVertical: 10,
+    width: '100%',
+    height: '100%',
   },
   forecastItem: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 60,
+    width: 70,
     height: 150,
     marginHorizontal: 5,
     flexDirection: 'column',
@@ -167,12 +172,20 @@ export const styles = StyleSheet.create({
     borderRadius: '50%',
     backgroundColor: '#F7F7F7',
   },
+  moonPhaseImage:{
+    height: 65,
+    maxWidth:65,
+  },
   sunsetSunriseComponent: {
     height: 65,
     width: 65,
     borderRadius: '50%',
     position: 'relative',
     backgroundColor: '#fbefef',
+  },
+  sunsetSunriseImage:{
+    height: 65,
+    maxWidth:65,
   },
   magneticActivityText: {
     fontSize: 30,
@@ -271,5 +284,23 @@ export const styles = StyleSheet.create({
   },
   citiesTabBarDotInactive: {
     opacity: 0.5,
+  },
+  customButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    opacity: 0.9,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#F0F0F0',
+    borderWidth: 0.75,
+    borderColor: '#656565',
+    marginTop: 20,
+  },
+  customButtonText: {
+    color: '#171717',
+    fontSize: 16,
   },
 });

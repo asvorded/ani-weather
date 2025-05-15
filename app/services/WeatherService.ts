@@ -83,7 +83,6 @@ class WeatherService {
             },
           }),
         ]);
-      console.log(airQualityResponse.data);
       return WeatherService.mapDataToForecast(
         currentWeatherResponse.data,
         forecastResponse.data,

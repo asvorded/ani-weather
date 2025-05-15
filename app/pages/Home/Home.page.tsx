@@ -1,21 +1,21 @@
+// noinspection t
+
 import {
   Button,
   FlatList,
   Image,
-  ImageBackground,
   RefreshControl,
   ScrollView,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
 
 import { styles } from './Home.styles.ts';
-import { CustomText } from '../../components/CustomText/CustomText.tsx';
 import {
   ActionsPanelProps, AqiProps,
   CitiesTabBarProps,
@@ -24,17 +24,14 @@ import {
   WeatherDetailedPanelProps, WeatherPanelProps, WindProps,
 } from './Home.types.ts';
 
-import { WeatherIcon } from '../../components/WeatherIcon/WeatherIcon.tsx';
-import { WeatherIconType } from '../../components/WeatherIcon/WeatherIcon.types.ts';
 import { PagesNames } from '../../types/common/root-stack-params-list.ts';
 import { useCustomNavigation } from '../../hooks/useCustomNavigation.ts';
-import {createWeatherState, HourForecast, WeatherId} from '../../types/api/Forecast.ts';
+import {createWeatherState, WeatherId} from '../../types/api/Forecast.ts';
 import {
   convertPressure,
   convertTemperature,
   convertWindSpeed,
   getBackgroundForAqi, getMoonPhaseImagePath, getReadableAqiId,
-  getReadableGeomagneticDegreeId,
   getReadableHumidityId,
   getReadableMoonPhaseId,
   getReadablePressureId,
@@ -49,7 +46,6 @@ import AddDarkImg from '../../../assets/icons/add-dark.svg';
 import AddLightImg from '../../../assets/icons/add-light.svg';
 import SettingsLightImg from '../../../assets/icons/settings-light.svg';
 import SettingsDarkImg from '../../../assets/icons/settings-dark.svg';
-import MagneticActivityImg from '../../../assets/images/magnet_activity_5.svg';
 import WindCompassImg from '../../../assets/images/compass.svg';
 import WindCompassArrowImg from '../../../assets/images/compass_arrow.svg';
 import LocationLightImg from '../../../assets/icons/location-small-light.svg';
@@ -59,15 +55,20 @@ import { SavedCityWithForecast } from '../../types/storage/SavedCityWithForecast
 import * as LocationService from '../../services/LocationService.ts';
 import * as CitiesService from '../../services/CitiesService.ts';
 import { useSavedCities } from '../../hooks/useSavedCities.tsx';
-import {useTheme} from '../../hooks/useTheme.tsx';
 import CustomIcon from '../../components/CustomIcon/CustomIcon.tsx';
 import AnimatedBackground from '../../components/AnimatedBackground/AnimatedBackgroundImage.tsx';
 import {useAnimatedBackground} from '../../hooks/useAnimatedBackground.tsx';
+import {useWeatherTheme, WeatherThemeProvider} from '../../hooks/useWeatherTheme.tsx';
+import {CustomWeatherText} from '../../components/CustomWeatherText/CustomWeatherText.tsx';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle, useDerivedValue,
+} from 'react-native-reanimated';
+import {CustomText} from '../../components/CustomText/CustomText.tsx';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
   navOnSettingsClick,
-  isDarkMode,
   windowInsets,
 }: ActionsPanelProps) => {
   const buttonWidth = styles.actionButtonIcon.width;
@@ -85,11 +86,6 @@ const ActionsPanel = ({
         style={styles.actionButton}
         onPress={() => navOnCitySelectClick()}
       >
-        {/* {isDarkMode ? (
-          <AddLightImg width={buttonWidth} height={buttonHeight} />
-        ) : (
-          <AddDarkImg width={buttonWidth} height={buttonHeight} />
-        )}*/}
         <CustomIcon
           DarkIcon={AddLightImg}
           LightIcon={AddDarkImg}
@@ -118,15 +114,15 @@ const WeatherDetailedPanel = ({
 }: WeatherDetailedPanelProps) => {
   return (
     <View style={styles.cell}>
-      <View style={[styles.detailsPanel, { backgroundColor: color + 'C0' }]}>
+      <Animated.View style={[styles.detailsPanel, { backgroundColor: color, opacity: 0.75}]}>
         <View style={styles.detailsPanelContentWrapper}>
           {contentElement}
         </View>
         <View style={styles.detailsTextPanel}>
-          <CustomText style={styles.detailsPanelTitle}>{title}</CustomText>
-          <CustomText style={styles.detailsPanelText}>{text}</CustomText>
+          <CustomWeatherText style={styles.detailsPanelTitle}>{title}</CustomWeatherText>
+          <CustomWeatherText style={styles.detailsPanelText}>{text}</CustomWeatherText>
         </View>
-      </View>
+      </Animated.View>
     </View>
   );
 };
@@ -135,17 +131,16 @@ const WeatherPanel = ({
   temp, tempUnits, maxTemp, minTemp,
   Icon, description,
 }: WeatherPanelProps) => {
-  const [cityWrapperWidth, setCityWrapperWidth] = useState(0);
   return (
     <View style={styles.topContainer}>
       <View style={styles.weatherMainContainer}>
         <Icon width={130} height={130} />
         <View />
-        <CustomText style={styles.temperatureMain}>{temp.toFixed(1)}{tempUnits}</CustomText>
+        <CustomWeatherText style={styles.temperatureMain}>{temp.toFixed(1)}{tempUnits}</CustomWeatherText>
       </View>
       <View style={styles.weatherDescriptionContainer}>
-        <CustomText style={styles.weatherDescriptionText}>{description}</CustomText>
-        <CustomText style={styles.temperatureAmplitudeText}>{maxTemp.toFixed(1)}{tempUnits}/{minTemp.toFixed(1)}{tempUnits}</CustomText>
+        <CustomWeatherText style={styles.weatherDescriptionText}>{description}</CustomWeatherText>
+        <CustomWeatherText style={styles.temperatureAmplitudeText}>{maxTemp.toFixed(1)}{tempUnits}/{minTemp.toFixed(1)}{tempUnits}</CustomWeatherText>
       </View>
     </View>
   );
@@ -155,7 +150,7 @@ const MoonPhaseComponent = ({phase}:MoonProps) => {
   return (
     <View style={styles.moonPhaseComponent}>
       <Image source={getMoonPhaseImagePath(phase)}
-        style={{ width: 65, height: 65 }}
+        style={styles.moonPhaseImage}
         resizeMethod="auto"
         resizeMode="center"/>
     </View>
@@ -177,7 +172,7 @@ const HumidityComponent = ({
 }: HumidityProps) => {
   return (
     <View style={styles.humidityComponent}>
-      <CustomText style={styles.humidityText}>{`${humidity}%`}</CustomText>
+      <CustomWeatherText style={styles.humidityText}>{`${humidity}%`}</CustomWeatherText>
     </View>
   );
 };
@@ -190,10 +185,10 @@ const PressureComponent = ({
 
   return (
     <View style={styles.pressureComponent}>
-      <CustomText style={styles.pressureText}>{pressure.toFixed(0)}</CustomText>
-      <CustomText style={styles.pressureUnits}>
+      <CustomWeatherText style={styles.pressureText}>{pressure.toFixed(0)}</CustomWeatherText>
+      <CustomWeatherText style={styles.pressureUnits}>
         {t(getReadablePressureUnitsId(units))}
-      </CustomText>
+      </CustomWeatherText>
     </View>
   );
 };
@@ -204,17 +199,15 @@ const AqiComponent = ({
 
   return (
     <View style={[{backgroundColor: getBackgroundForAqi(aqi)}, styles.aiqComponent]}>
-      <CustomText style={styles.pressureUnits}>
+      <CustomWeatherText style={styles.pressureUnits}>
         {t('forecast.airQuality.title')}
-      </CustomText>
-      <CustomText style={styles.pressureText}>{aqi}</CustomText>
+      </CustomWeatherText>
+      <CustomWeatherText style={styles.pressureText}>{aqi}</CustomWeatherText>
     </View>
   );
 };
 
-const WindComponent = ({
-  speed, units, directionAngle,
-}: WindProps) => {
+const WindComponent = ({directionAngle}: WindProps) => {
   return (
     <View style={styles.windComponent}>
       <WindCompassImg
@@ -229,10 +222,10 @@ const WindComponent = ({
     </View>
   );
 };
-const ForecastPanel = ({hourlyForecast, tempUnits ,newTempUnits}: ForecastPanelProps) => {
+const ForecastPanel = React.memo(({hourlyForecast, tempUnits ,newTempUnits, color}: ForecastPanelProps) => {
   const { t } = useTranslation();
   return (
-    <View style={styles.forecastPanel}>
+    <View style={[styles.forecastPanel, {backgroundColor: color}]}>
       <ScrollView
         horizontal={true}
         nestedScrollEnabled={true}
@@ -245,24 +238,24 @@ const ForecastPanel = ({hourlyForecast, tempUnits ,newTempUnits}: ForecastPanelP
           return (
             <View style={styles.forecastItem} key={index}>
               {React.createElement(createWeatherState(state).image, { style: styles.weatherIcon })}
-              <CustomText style={styles.temperature}>
+              <CustomWeatherText style={styles.temperature}>
                 {convertTemperature(temp, tempUnits, newTempUnits).toFixed(1)} {t(getReadableTemperatureUnitsId(newTempUnits))}
-              </CustomText>
-              <CustomText style={styles.time}>
+              </CustomWeatherText>
+              <CustomWeatherText style={styles.time}>
                 {new Date(time).toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit',
                   hourCycle: 'h23',
                   timeZone: 'UTC',
                 })}
-              </CustomText>
+              </CustomWeatherText>
             </View>
           );
         })}
       </ScrollView>
     </View>
   );
-};
+});
 
 
 const WeatherPage: React.FC<{
@@ -270,10 +263,24 @@ const WeatherPage: React.FC<{
   pageIndex: number
 }> = ({ cityWithForecast, pageIndex }) => {
   const {userSettings} = useUserSettings();
-  let { t, i18n } = useTranslation();
+  const {progress} = useWeatherTheme();
+  let { t } = useTranslation();
   const navigation = useCustomNavigation();
   const insets = useSafeAreaInsets();
   const dimensions = useWindowDimensions();
+  const interpolatedColors = useDerivedValue(() => {
+    return {
+      moon: interpolateColor(progress.value, [0, 1], ['#A9E788', '#71c144']),
+      sun: interpolateColor(progress.value, [0, 1], ['#B3DBFF', '#89b4d8']),
+      humidity: interpolateColor(progress.value, [0, 1], ['#FFE179', '#e6c86d']),
+      pressure: interpolateColor(progress.value, [0, 1], ['#FBB9BA', '#e2a1a2']),
+      wind: interpolateColor(progress.value, [0, 1], ['#FF9A79', '#e6876a']),
+      aqi: interpolateColor(progress.value, [0, 1], ['#B9F4FB', '#a2d7e1']),
+      forecast: interpolateColor(progress.value, [0, 1], ['#CEBBFF', '#9d7bd8']),
+    };
+  });
+
+
 
   return (
     <View style={[
@@ -299,20 +306,21 @@ const WeatherPage: React.FC<{
             <ForecastPanel
               hourlyForecast={cityWithForecast.forecast.hourlyforecast}
               newTempUnits={userSettings.temperature}
-              tempUnits={cityWithForecast.forecast.tempUnits} />
+              tempUnits={cityWithForecast.forecast.tempUnits}
+              color={interpolatedColors.value.forecast}/>
           </View>
         </View>
         <View style={styles.row}>
           <WeatherDetailedPanel
             key="moon phase"
-            color="#A9E788"
+            color={interpolatedColors.value.moon}
             title={t('forecast.moonPhases.main')}
             text={t(getReadableMoonPhaseId(cityWithForecast.forecast.moonPhase))}
             contentElement={<MoonPhaseComponent phase={cityWithForecast.forecast.moonPhase} />}
           />
           <WeatherDetailedPanel
             key="sunsetsunrise"
-            color="#B3DBFF"
+            color={interpolatedColors.value.sun}
             title={t('forecast.sunsetSunrise.main')}
             text={new Date((cityWithForecast.forecast.sunrise + cityWithForecast.forecast.timezone) * 1000).toLocaleTimeString([], {
               hour: '2-digit',
@@ -337,7 +345,7 @@ const WeatherPage: React.FC<{
         <View style={styles.row}>
           <WeatherDetailedPanel
             key="humidity"
-            color="#FFE179"
+            color={interpolatedColors.value.humidity}
             title={t('forecast.humidity.main')}
             text={t(getReadableHumidityId(cityWithForecast.forecast.humidity))}
             contentElement={
@@ -346,7 +354,7 @@ const WeatherPage: React.FC<{
           />
           <WeatherDetailedPanel
             key="pressure"
-            color="#FBB9BA"
+            color={interpolatedColors.value.pressure}
             title={t('forecast.pressure.main')}
             text={t(
               getReadablePressureId(
@@ -369,7 +377,7 @@ const WeatherPage: React.FC<{
         <View style={styles.row}>
           <WeatherDetailedPanel
             key="wind"
-            color="#FF9A79"
+            color={interpolatedColors.value.wind}
             title={t('forecast.wind.main')}
             text={`${convertWindSpeed(
               cityWithForecast.forecast.windSpeed,
@@ -390,7 +398,7 @@ const WeatherPage: React.FC<{
           />
           <WeatherDetailedPanel
             key="air quality"
-            color="#B9F4FB"
+            color={interpolatedColors.value.aqi}
             title={t('forecast.airQuality.main')}
             text={t(getReadableAqiId(cityWithForecast.forecast.airQuality))}
             contentElement={<AqiComponent aqi={cityWithForecast.forecast.airQuality} />}
@@ -398,11 +406,12 @@ const WeatherPage: React.FC<{
         </View>
       </View>
 
-      {/* TODO: remove in production code */}
-      <Button
-        title="рябов ответит (за всё)"
+      <TouchableOpacity
+        style={styles.customButton}
         onPress={() => navigation.navigate(PagesNames.MeteoChannel)}
-      />
+      >
+        <CustomText style={styles.customButtonText}>Новости из мира погоды</CustomText>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -415,9 +424,9 @@ const CitiesTabBar: React.FC<CitiesTabBarProps> = ({
 
   return (
     <View style={styles.citiesTabBarContainer}>
-      <CustomText style={styles.citiesTabBarTitle}>
+      <CustomWeatherText style={styles.citiesTabBarTitle}>
         {cityName}
-      </CustomText>
+      </CustomWeatherText>
       <View style={styles.citiesTabBarDots}>
         {citiesPagesList.map((city, i) => city.savedCity.isGeolocation ? (
           <LocationLightImg
@@ -443,6 +452,7 @@ const HomePage = () => {
   const insets = useSafeAreaInsets();
   const {i18n} = useTranslation();
   const {setNewBackground} = useAnimatedBackground();
+  const {toggleTheme} = useWeatherTheme();
   const {savedCities, service} = useSavedCities();
   const [selectedCityIndex, setSelectedCityIndex] = React.useState(0);
 
@@ -489,6 +499,7 @@ const HomePage = () => {
     }
   }, [service, savedCities, selectedCityIndex, i18n]);
 
+  // noinspection t
   return (
     <View style={styles.outerContainer} key="home page">
       <SystemBars style="light" />
@@ -519,7 +530,16 @@ const HomePage = () => {
         >
           <FlatList
             data={savedCities}
-            renderItem={(item) => <WeatherPage cityWithForecast={item.item} pageIndex={selectedCityIndex} />}
+            nestedScrollEnabled={true}
+            keyExtractor={(item, index) =>
+              `${item.forecast.lastUpdated}_${index}`
+            }
+            renderItem={item => (
+              <WeatherPage
+                cityWithForecast={item.item}
+                pageIndex={selectedCityIndex}
+              />
+            )}
             horizontal
             showsHorizontalScrollIndicator={false}
             pagingEnabled
@@ -531,6 +551,7 @@ const HomePage = () => {
               if (pageIndex !== undefined && pageIndex !== null) {
                 setSelectedCityIndex(pageIndex);
                 setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
+                toggleTheme(createWeatherState(savedCities[pageIndex].forecast.state).lightDarkThemeFactor);
               }
             }}
           />

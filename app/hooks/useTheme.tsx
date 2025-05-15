@@ -1,17 +1,17 @@
-import React, { createContext, useState, useRef, useEffect, ReactNode, FC, useContext } from 'react';
-import { Animated } from 'react-native';
+import React, { createContext, useState, ReactNode, FC, useContext } from 'react';
+import {useDerivedValue, withTiming} from 'react-native-reanimated';
 
 export type ThemeMode = 'light' | 'dark';
 
 interface ThemeContextProps {
   currentTheme: ThemeMode;
-  lightToDarkAnimation: Animated.Value;
+  progress: { value: number };
   toggleTheme: () => Promise<void>;
 }
 
 export const ThemeContext = createContext<ThemeContextProps>({
   currentTheme: 'light',
-  lightToDarkAnimation: new Animated.Value(0),
+  progress: { value: 0 },
   toggleTheme: async () => {}, // Async toggle function placeholder
 });
 
@@ -29,23 +29,17 @@ export const useTheme = () => {
 
 export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('light');
-  const lightToDarkAnimation = useRef(new Animated.Value(currentTheme === 'light' ? 0 : 1)).current;
+  const progress = useDerivedValue(()=>{
+    return withTiming(currentTheme === 'light' ? 0 : 1);
+  });
   const toggleTheme = async () => {
     const newTheme: ThemeMode = currentTheme === 'light' ? 'dark' : 'light';
     setCurrentTheme(newTheme);
   };
-  useEffect(() => {
-    const compositeAnimation = Animated.timing(lightToDarkAnimation, {
-      toValue: currentTheme === 'light' ? 0 : 1,
-      duration: 500,
-      useNativeDriver: false,
-    });
-    compositeAnimation.start();
-    return () => compositeAnimation.stop();
-  }, [lightToDarkAnimation, currentTheme]);
   return (
-    <ThemeContext.Provider value={{ currentTheme, lightToDarkAnimation: lightToDarkAnimation, toggleTheme }}>
+    <ThemeContext.Provider value={{ currentTheme, progress, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
 };
+

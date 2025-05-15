@@ -1,68 +1,76 @@
 import React from 'react';
-import {Animated, Image, StyleSheet, View} from 'react-native';
-import { useAnimatedBackground } from '../../hooks/useAnimatedBackground'; // Adjust the path as needed
+import {Image, StyleSheet, View} from 'react-native';
+import { useAnimatedBackground } from '../../hooks/useAnimatedBackground';
+import Animated, {
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useDerivedValue,
+} from 'react-native-reanimated'; // Adjust the path as needed
 
 interface AnimatedBackgroundProps {
-  style?: any; // Optional styles for the container
+  style?: any;
 }
 
 const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ style}) => {
-  const { leftBackground, rightBackground, animationValue } = useAnimatedBackground();
+  const { leftBackground, rightBackground, progress } = useAnimatedBackground();
 
-  const opacityValueToNew = animationValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
+  const opacityValueToLeft = useAnimatedStyle(() => {
+    const opacity = interpolate(progress.value, [0, 1], [1, 0]);
+    return {
+      opacity: opacity,
+    };
+  });
+  const opacityValueToRight = useAnimatedStyle(() => {
+    const opacity = interpolate(progress.value, [0, 1], [0, 1]);
+    return {
+      opacity: opacity,
+    };
   });
 
-  const opacityValueToLeft = animationValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0],
-  });
-
-  const AnimatedImageBackground = Animated.createAnimatedComponent(Animated.View);
 
   return (
     <View style={[styles.container, style]}>
-      <AnimatedImageBackground
-        style={[styles.background, { opacity: opacityValueToLeft }]}
+      <Animated.View
+        style={[styles.background, opacityValueToLeft]}
       >
         <Image
           source={leftBackground}
           resizeMode={'cover'}
-          style={{ width: '100%', height: '100%'}}
+          style={styles.image}
+          blurRadius={1.2}
         />
-      </AnimatedImageBackground>
+      </Animated.View>
 
-      <AnimatedImageBackground
-        style={[styles.background, { opacity: opacityValueToNew }]}
+      <Animated.View
+        style={[styles.background, opacityValueToRight]}
       >
-        <Animated.Image
+        <Image
           source={rightBackground}
           resizeMode={'cover'}
-          //style={{ width: 1000, height: 1000 }}
+          style={styles.image}
+          blurRadius={1.2}
         />
-      </AnimatedImageBackground>
+      </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute', // Ensures the background stays in place
+    position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: 'transparent',
+  },
+  image:{
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
   background: {
-    position: 'absolute', // Spans the container
+    position: 'absolute',
     width: '100%',
     height: '100%',
-  },
-  childrenContainer: {
-    position: 'absolute', // Place children on top of the animated background
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'transparent',
   },
 });
 

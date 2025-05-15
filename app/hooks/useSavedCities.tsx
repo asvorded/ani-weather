@@ -37,9 +37,11 @@ export const SavedCitiesProvider = ({children}: {children: ReactNode}) => {
   const [savedCities, setSavedCities] = useState<SavedCityWithForecast[]>([]);
   const [ready, setReady] = useState(false);
 
-  async function updateAllCities() {
-    const savedCities = await SavedCitiesService.getAllSavedCities();
-    const geoCity = await SavedCitiesService.getGeolocationCity();
+  const updateAllCities = React.useCallback(async () => {
+    const [savedCities, geoCity] = await Promise.all([
+      SavedCitiesService.getAllSavedCities(),
+      SavedCitiesService.getGeolocationCity(),
+    ]);
     if (geoCity !== null) {
       WidgetService.setForecastOnWidget({
         name: geoCity.savedCity.name,
@@ -68,43 +70,57 @@ export const SavedCitiesProvider = ({children}: {children: ReactNode}) => {
 
       setSavedCities(savedCities);
     }
-  }
+  }, []);
 
-  async function addCity(foundCity: FoundCity) {
-    await SavedCitiesService.addCity(foundCity);
-    await updateAllCities();
-  }
+  const addCity = React.useCallback(
+    async (foundCity: FoundCity) => {
+      await SavedCitiesService.addCity(foundCity);
+      await updateAllCities();
+    },
+    [updateAllCities],
+  );
 
-  async function removeCity(city: SavedCity) {
-    await SavedCitiesService.removeCityByCoords(city.coords);
-    await updateAllCities();
-  }
+  const removeCity = React.useCallback(
+    async (city: SavedCity) => {
+      await SavedCitiesService.removeCityByCoords(city.coords);
+      await updateAllCities();
+    },
+    [updateAllCities],
+  );
 
-  async function updateCityForecast(city: SavedCityWithForecast) {
-    await SavedCitiesService.updateForecastByCoords(city.savedCity.coords);
-    await updateAllCities();
-  }
+  const updateCityForecast = React.useCallback(
+    async (city: SavedCityWithForecast) => {
+      await SavedCitiesService.updateForecastByCoords(city.savedCity.coords);
+      await updateAllCities();
+    },
+    [updateAllCities],
+  );
 
-  async function updateGeolocationCity(city: FoundCity) {
-    await SavedCitiesService.updateGeolocationCity(city);
-    await updateAllCities();
-  }
+  const updateGeolocationCity = React.useCallback(
+    async (city: FoundCity) => {
+      await SavedCitiesService.updateGeolocationCity(city);
+      await updateAllCities();
+    },
+    [updateAllCities],
+  );
 
-  async function updateGeolocationForecast() {
+  const updateGeolocationForecast = React.useCallback(async () => {
+    console.log('updateGeolocationForecast in useSavedCities called');
     await SavedCitiesService.updateGeolocationForecast();
     await updateAllCities();
-  }
+  }, [updateAllCities]);
 
   // Initialize cities
   useEffect(() => {
     updateAllCities().then(() => {
       setReady(true);
     });
-  }, []);
+  }, [updateAllCities]);
 
   return (
-    <SavedCitiesContext.Provider value={{
-      savedCities, ready,
+    <SavedCitiesContext.Provider value={React.useMemo(() => ({
+      savedCities,
+      ready,
       service: {
         addCity,
         removeCity,
@@ -112,8 +128,9 @@ export const SavedCitiesProvider = ({children}: {children: ReactNode}) => {
         updateGeolocationCity,
         updateExistingGeolocationForecast: updateGeolocationForecast,
       },
-    }}>
+    }), [savedCities, ready, addCity, removeCity, updateCityForecast, updateGeolocationCity, updateGeolocationForecast])}>
       {children}
     </SavedCitiesContext.Provider>
   );
+
 };

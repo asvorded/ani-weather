@@ -1,17 +1,17 @@
 import React, { createContext, useState, useRef, useEffect, ReactNode, FC, useContext } from 'react';
-import { Animated } from 'react-native';
+import {Easing, useDerivedValue, useSharedValue, withTiming} from 'react-native-reanimated';
 
 interface BackgroundContextProps {
   leftBackground: number;
   rightBackground: number;
-  animationValue: Animated.Value;
+  progress: { value: number };
   setNewBackground: (newBackground: number) => Promise<void>;
 }
 
 export const BackgroundContext = createContext<BackgroundContextProps>({
   leftBackground: 0,
   rightBackground: 0,
-  animationValue: new Animated.Value(0),
+  progress: { value: 0 },
   setNewBackground: async () => {}, // Placeholder async function
 });
 
@@ -29,35 +29,37 @@ export const useAnimatedBackground = () => {
 };
 
 export const BackgroundProvider: FC<BackgroundProviderProps> = ({ children, initialBackground }) => {
-  const [currentBackground, setCurrentBackground] = useState<number>(initialBackground);
-  const [previousBackground, setPreviousBackground] = useState<number>(initialBackground);
-  const animationValue = useRef(new Animated.Value(0)).current;
+  const [leftBackground, setLeftBackground] = useState<number>(initialBackground);
+  const [rightBackground, setRightBackground] = useState<number>(initialBackground);
+  const [targetSide, setTargetSide] = useState<boolean>(false);
+
+  const progress = useDerivedValue(() => {
+    return withTiming(
+      targetSide ? 1 : 0
+    );
+  });
 
   const setNewBackground = async (newBackground: number) => {
-    const toValue = currentBackground === newBackground ? 0 : 1;
-    if(toValue === 0) {
-      setPreviousBackground(newBackground);
+    if ((targetSide && rightBackground === newBackground) ||
+      (!targetSide && leftBackground === newBackground)) {
+      return;
     }
-    else
-    {
-      setCurrentBackground(newBackground);
+    if (targetSide) {
+      setLeftBackground(newBackground);
+    } else {
+      setRightBackground(newBackground);
     }
-    const compositeAnimation = Animated.timing(animationValue, {
-      toValue: toValue,
-      duration: 500,
-      useNativeDriver: false,
-    });
-
-    await new Promise((resolve) => {
-      compositeAnimation.start(() => {
-        resolve(true);
-      });
-    });
+    setTargetSide(prev =>!prev);
   };
 
   return (
     <BackgroundContext.Provider
-      value={{ leftBackground: previousBackground, rightBackground: currentBackground, animationValue, setNewBackground }}
+      value={{
+        leftBackground: leftBackground,
+        rightBackground: rightBackground,
+        progress,
+        setNewBackground,
+      }}
     >
       {children}
     </BackgroundContext.Provider>
