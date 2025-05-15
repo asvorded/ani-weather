@@ -76,13 +76,20 @@ const SettingsPage = () => {
       style={styles.background}
       source={require('../../../assets/images/sample.png')}>
       <ScrollView
-        contentContainerStyle={{
-          marginTop: insets.top,
-          marginBottom: insets.bottom,
-          marginLeft: insets.left,
-          marginRight: insets.right,
-          padding: 20,
-        }}
+        style={
+          {
+            marginTop: insets.top,
+            marginBottom: insets.bottom,
+            marginLeft: insets.left,
+            marginRight: insets.right,
+          }
+        }
+        contentContainerStyle={[
+          {
+            paddingHorizontal: 15,
+            paddingTop: 8,
+          },
+        ]}
         showsVerticalScrollIndicator={false}>
         <SystemBars style="light" />
         <View style={styles.headerContainer}>
@@ -117,7 +124,7 @@ const SettingsPage = () => {
         />
         <SettingsPanel
           color="#B3DBFF"
-          title={'theme'}
+          title={t('settings.theme')}
           contentElement={
             <Switch
               trackColor={{false: '#767577', true: '#81b0ff'}}

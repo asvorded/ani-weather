@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.AlarmClock
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.work.Constraints
 import androidx.work.OneTimeWorkRequestBuilder
@@ -69,7 +70,12 @@ class WidgetInitWorker(val appContext: Context, workerParams: WorkerParameters)
     : Worker(appContext, workerParams) {
     override fun doWork(): Result {
         val intent = Intent(appContext, WidgetInitService::class.java)
-        appContext.startService(intent)
+        try {
+            appContext.startService(intent)
+        } catch (e: Exception) {
+            Log.e("AniWeather", "Widget initialization failed: ${e.message}")
+            return Result.failure()
+        }
         return Result.success()
     }
 

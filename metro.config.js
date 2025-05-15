@@ -1,6 +1,8 @@
 const { getDefaultConfig } = require('expo/metro-config');
 
-module.exports = (() => {
+const {wrapWithReanimatedMetroConfig} = require('react-native-reanimated/metro-config');
+
+module.exports = wrapWithReanimatedMetroConfig( (() => {
   const config = getDefaultConfig(__dirname);
 
   const { transformer, resolver } = config;
@@ -16,4 +18,4 @@ module.exports = (() => {
   };
 
   return config;
-})();
+})() );

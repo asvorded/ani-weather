@@ -149,6 +149,7 @@ const FoundCities = ({
       ItemSeparatorComponent={() => (
         <View style={[styles.foundCitiesSeparator, colorStyles.foundCitiesSeparator]}/>
       )}
+      overScrollMode="never"
     />
   );
 };
@@ -294,7 +295,10 @@ const TownSelect = () => {
         </TouchableOpacity>
       ) : null}
 
-      <View style={styles.inputContainer} key="input">
+      <View style={[
+        styles.inputContainer,
+        !navigation.canGoBack() ? { marginTop: 20 } : undefined,
+      ]} key="input">
         <TextInput
           style={[styles.input, styles.defaultFont, colorStyles.cityInput]}
           placeholder={t('townSelect.textField.placeholder')}
@@ -346,7 +350,11 @@ const TownSelect = () => {
           onFoundCityClick={onFoundCityClick}
         />
       ) : (
-        <ScrollView style={styles.citiesContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.citiesContainer}
+          showsVerticalScrollIndicator={false}
+          overScrollMode="never"
+        >
           {/* Popular cities */}
           <View key="popular cities">
             <CustomText style={styles.popularCitiesText}>{t('townSelect.popularCities')}</CustomText>
