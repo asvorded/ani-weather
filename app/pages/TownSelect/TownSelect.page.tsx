@@ -28,6 +28,7 @@ import CloseLightImg from '../../../assets/icons/close-light.svg';
 import { PagesNames } from '../../types/common/root-stack-params-list';
 import { useSavedCities } from '../../hooks/useSavedCities';
 import { CustomText } from '../../components/CustomText/CustomText';
+import AdaptiveSystemBars from '../../components/AdaptiveSystemBars';
 
 function isQueryLongEnough(query: string): boolean {
   return query.length >= 3;
@@ -282,7 +283,7 @@ const TownSelect = () => {
       styles.screen,
       colorStyles.screen,
     ]}>
-      <SystemBars style="dark"/>
+      <AdaptiveSystemBars />
 
       {/* Back button */}
       {navigation.canGoBack() ? (

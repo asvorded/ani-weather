@@ -1,6 +1,6 @@
 {
-  "name": "BelWeather",
-  "displayName": "BelWeather",
+  "name": "AniWeather",
+  "displayName": "AniWeather",
   "plugins": [
     "expo-background-task"
   ]

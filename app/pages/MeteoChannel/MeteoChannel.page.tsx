@@ -11,6 +11,7 @@ import BackLightImg from '../../../assets/icons/back-light.svg';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../hooks/useTheme';
 import { CustomText } from '../../components/CustomText/CustomText';
+import AdaptiveSystemBars from '../../components/AdaptiveSystemBars';
 
 const MeteoChannel = () => {
   const insets = useSafeAreaInsets();
@@ -51,7 +52,7 @@ const MeteoChannel = () => {
         paddingRight: insets.right,
       },
     ]}>
-      <SystemBars style="auto" />
+      <AdaptiveSystemBars />
 
       <TouchableOpacity key="back" style={styles.backButton} onPress={() => { navigation.goBack(); }}>
         {colorScheme === 'light' ? (

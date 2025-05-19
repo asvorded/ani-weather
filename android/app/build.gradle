@@ -89,6 +89,16 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        
+        externalNativeBuild {
+            cmake {
+                // F**KING REACT NATIVE, THE WORST MOBILE PLATFORM EVER
+                // To build a release version:
+                // 1. Download the latest ninja from https://github.com/ninja-build/ninja/releases
+                // 2. Set DCMAKE_MAKE_PROGRAM=<path_to_downloaded_ninja>
+                arguments "-DCMAKE_MAKE_PROGRAM=D:\\Programs\\Android\\ninja.exe", "-DCMAKE_OBJECT_PATH_MAX=1024"                
+            }
+        }
     }
     signingConfigs {
         debug {

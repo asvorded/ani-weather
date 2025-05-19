@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">BelWeather</string>
+    <string name="app_name">AniWeather</string>
     <string name="add_widget">Add widget</string>
-    <string name="app_widget_description">Classic BelWeather weather widget</string>
+    <string name="app_widget_description">Classic AniWeather weather widget</string>
 
     <!-- Stub strings for widget -->
     <string name="widget_default_time" translatable="false">--:--</string>
