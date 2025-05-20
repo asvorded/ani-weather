@@ -1,4 +1,11 @@
-import {MoonPhase, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast';
+import {Forecast, MoonPhase, PressureUnits, TempUnits, WindSpeedUnits} from '../../types/api/Forecast';
+
+export const shouldForecastUpdate = (forecast: Forecast) : boolean =>{
+  const timeNow = Date.now() / 1000;
+  return timeNow - forecast.lastUpdated > 10 * 60;
+};
+
+
 const MOON_PHASE_TRANSLATIONS: Record<MoonPhase, string> = {
   [MoonPhase.NewMoon]: 'forecast.moonPhases.newMoon',
   [MoonPhase.WaxingCrescent]: 'forecast.moonPhases.waxingCrescent',

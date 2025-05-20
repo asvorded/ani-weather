@@ -117,6 +117,7 @@
     "theme": "Dark theme"
   },
   "meteoChannel": {
+    "link": "News from the world of weather",
     "noContent": "No news. Stay tuned!"
-  }
+  },
 }

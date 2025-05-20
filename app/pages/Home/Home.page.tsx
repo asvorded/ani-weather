@@ -38,7 +38,7 @@ import {
   getReadablePressureUnitsId,
   getReadableTemperatureUnitsId,
   getReadableWindDirectionId,
-  getReadableWindUnitsId,
+  getReadableWindUnitsId, shouldForecastUpdate,
 } from './Home.utils.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 
@@ -65,6 +65,7 @@ import Animated, {
   useAnimatedStyle, useDerivedValue,
 } from 'react-native-reanimated';
 import {CustomText} from '../../components/CustomText/CustomText.tsx';
+import {SavedCitiesService} from '../../services/SavedCitiesService.ts';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -112,9 +113,13 @@ const WeatherDetailedPanel = ({
   text,
   contentElement,
 }: WeatherDetailedPanelProps) => {
+  const animatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: color,
+    opacity: 0.75,
+  }));
   return (
     <View style={styles.cell}>
-      <Animated.View style={[styles.detailsPanel, { backgroundColor: color, opacity: 0.75}]}>
+      <Animated.View style={[styles.detailsPanel, animatedStyle]}>
         <View style={styles.detailsPanelContentWrapper}>
           {contentElement}
         </View>
@@ -269,14 +274,15 @@ const WeatherPage: React.FC<{
   const insets = useSafeAreaInsets();
   const dimensions = useWindowDimensions();
   const interpolatedColors = useDerivedValue(() => {
+    const currentProgress = progress.value;
     return {
-      moon: interpolateColor(progress.value, [0, 1], ['#A9E788', '#71c144']),
-      sun: interpolateColor(progress.value, [0, 1], ['#B3DBFF', '#89b4d8']),
-      humidity: interpolateColor(progress.value, [0, 1], ['#FFE179', '#e6c86d']),
-      pressure: interpolateColor(progress.value, [0, 1], ['#FBB9BA', '#e2a1a2']),
-      wind: interpolateColor(progress.value, [0, 1], ['#FF9A79', '#e6876a']),
-      aqi: interpolateColor(progress.value, [0, 1], ['#B9F4FB', '#a2d7e1']),
-      forecast: interpolateColor(progress.value, [0, 1], ['#CEBBFF', '#9d7bd8']),
+      moon: interpolateColor(currentProgress, [0, 1], ['#A9E788', '#71c144']),
+      sun: interpolateColor(currentProgress, [0, 1], ['#B3DBFF', '#89b4d8']),
+      humidity: interpolateColor(currentProgress, [0, 1], ['#FFE179', '#e6c86d']),
+      pressure: interpolateColor(currentProgress, [0, 1], ['#FBB9BA', '#e2a1a2']),
+      wind: interpolateColor(currentProgress, [0, 1], ['#FF9A79', '#e6876a']),
+      aqi: interpolateColor(currentProgress, [0, 1], ['#B9F4FB', '#a2d7e1']),
+      forecast: interpolateColor(currentProgress, [0, 1], ['#CEBBFF', '#9d7bd8']),
     };
   });
 
@@ -410,7 +416,7 @@ const WeatherPage: React.FC<{
         style={styles.customButton}
         onPress={() => navigation.navigate(PagesNames.MeteoChannel)}
       >
-        <CustomText style={styles.customButtonText}>Новости из мира погоды</CustomText>
+        <CustomText style={styles.customButtonText}>{t('meteoChannel.link')}</CustomText>
       </TouchableOpacity>
     </View>
   );
@@ -551,8 +557,17 @@ const HomePage = () => {
               const pageIndex = viewableItems[0]?.index;
               if (pageIndex !== undefined && pageIndex !== null) {
                 setSelectedCityIndex(pageIndex);
-                setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
-                toggleTheme(createWeatherState(savedCities[pageIndex].forecast.state).lightDarkThemeFactor);
+                if(shouldForecastUpdate(savedCities[pageIndex].forecast)) {
+                  SavedCitiesService.updateForecastByCoords(savedCities[pageIndex].savedCity.coords).then((newForecast) => {
+                    console.log('forecast updated');
+                    savedCities[pageIndex].forecast = newForecast.forecast;
+                    setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
+                    toggleTheme(createWeatherState(savedCities[pageIndex].forecast.state).lightDarkThemeFactor);
+                  });
+                }else {
+                  setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
+                  toggleTheme(createWeatherState(savedCities[pageIndex].forecast.state).lightDarkThemeFactor);
+                }
               }
             }}
           />

@@ -141,8 +141,6 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingVertical: 10,
-    width: '100%',
-    height: '100%',
   },
   forecastItem: {
     justifyContent: 'center',
