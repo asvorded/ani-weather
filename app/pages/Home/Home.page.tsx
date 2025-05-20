@@ -38,7 +38,7 @@ import {
   getReadablePressureUnitsId,
   getReadableTemperatureUnitsId,
   getReadableWindDirectionId,
-  getReadableWindUnitsId,
+  getReadableWindUnitsId, shouldForecastUpdate,
 } from './Home.utils.ts';
 import {useUserSettings} from '../../services/UserSettingsProvider.tsx';
 
@@ -65,6 +65,7 @@ import Animated, {
   useAnimatedStyle, useDerivedValue,
 } from 'react-native-reanimated';
 import {CustomText} from '../../components/CustomText/CustomText.tsx';
+import {SavedCitiesService} from '../../services/SavedCitiesService.ts';
 
 const ActionsPanel = ({
   navOnCitySelectClick,
@@ -556,8 +557,17 @@ const HomePage = () => {
               const pageIndex = viewableItems[0]?.index;
               if (pageIndex !== undefined && pageIndex !== null) {
                 setSelectedCityIndex(pageIndex);
-                setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
-                toggleTheme(createWeatherState(savedCities[pageIndex].forecast.state).lightDarkThemeFactor);
+                if(shouldForecastUpdate(savedCities[pageIndex].forecast)) {
+                  SavedCitiesService.updateForecastByCoords(savedCities[pageIndex].savedCity.coords).then((newForecast) => {
+                    console.log('forecast updated');
+                    savedCities[pageIndex].forecast = newForecast.forecast;
+                    setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
+                    toggleTheme(createWeatherState(savedCities[pageIndex].forecast.state).lightDarkThemeFactor);
+                  });
+                }else {
+                  setNewBackground(createWeatherState(savedCities[pageIndex].forecast.state).background);
+                  toggleTheme(createWeatherState(savedCities[pageIndex].forecast.state).lightDarkThemeFactor);
+                }
               }
             }}
           />
